@@ -3,7 +3,7 @@ import pylab as pl
 from scipy.integrate import odeint
 import scipy.stats as stats
 import matplotlib.pyplot as plt
-
+import math
 
 
 #%%
@@ -158,20 +158,55 @@ density = density/(no_of_particles/(x_divisions*y_divisions))
 for i in range(0,x.size-1):
     density[:,i] = density[:,i] + 0.5*np.sin((2*i*np.pi)/x_divisions)
 
+"""computation of error along the centerline"""
+
+error=np.zeros(density.size,dtype=np.float)
+for i in range(0,density.size):
+	error[i]=density[(y_divisions/2),i]-0.5*np.sin((2*i*np.pi)/x_divisions)-1
+
+
+
+"""computation of standard deviation"""
+total=0
+for i in range(0,density.size):
+	total=total+error[i]
+mean=total/(density.size)
+variance=0
+for i in range(0,error.size):
+	variance=variance+(error[i]-mean)**2
+variance=variance/(error.size-1)
+std_dev=math.sqrt(variance)
+total=0
+for i in range(0,density.size):
+	total=total+abs(error[i])
+mean_error=total/(density.size)
+
+print("The variance of error is:",variance)
+print("The standard deviation of error is:",std_dev)
+print("The mean value of error is:",mean_error)
 
 
 """ plotting the density contour plot"""
 X, Y = np.meshgrid(x,y)
 
 
-pl.contourf(density,100)
-pl.colorbar()
+#pl.contourf(density,100)
+#pl.colorbar()
 #pl.savefig('/media/tejas/games/quazarWork/nParticleDensity/contour/point_mass' + '%04d'%time_index + '.png')
 #pl.savefig('/media/tejas/games/quazarWork/nParticleDensity/InitialContour/IC'+'%04d'%x_divisions  + 'divisions.png')
-pl.show()
-pl.figure()
-#pl.clf()
+#pl.show()
 
+pl.figure()
+pl.title('Numerical Density Along Centerline')
+pl.xlabel('$x$')
+pl.ylabel('$\mathrm{Density}$')
 pl.plot(density[(y_divisions/2),:])
+pl.show()
+
+pl.figure()
+pl.plot(error,label='Error')
+pl.title('Error in Numerical Density Along Centerline')
+pl.xlabel('$x$')
+pl.ylabel('Error')
 pl.show()
 
