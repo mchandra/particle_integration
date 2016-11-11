@@ -16,7 +16,7 @@ pl.rcParams['font.sans-serif'] = 'serif'
 pl.rcParams['axes.linewidth']  = 1.5
 pl.rcParams['axes.titlesize']  = 'medium'
 pl.rcParams['axes.labelsize']  = 'medium'
-
+pl.rcParams['text.usetex']     = True
 pl.rcParams['xtick.major.size'] = 8
 pl.rcParams['xtick.minor.size'] = 4
 pl.rcParams['xtick.major.pad']  = 8
