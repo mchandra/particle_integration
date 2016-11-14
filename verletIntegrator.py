@@ -1,6 +1,7 @@
 import numpy as np
 import pylab as pl
 import scipy.stats as stats
+import math
 
 #%%
 """ Set plot parameters to make beautiful plots """
@@ -139,8 +140,34 @@ for time_index,t0 in enumerate(time):
             if(solution_all[i,time_index]<left_boundary):
                 solution_all[i,time_index] = solution_all[i,time_index] + length_of_box_x
 
+"""Computation of Energy and Momentum"""
+energy=np.zeros(time.size)
+for time_index in enumerate(time):
+    for i in range(no_of_particles):
+        energy[time_index]=energy[time_index]+(solution_all[(i+2*no_of_particles),time_index])**2+(solution_all[(i+3*no_of_particles),time_index])**2
+                      # +0*solution_all[i+no_of_particles,time_index]**2+0*solution_all[i,time_index]**2
 
-#%%
+mom=np.zeros(time.size)
+for time_index in enumerate(time):
+    for i in range(no_of_particles):
+        mom[time_index]=mom[time_index]+math.sqrt((solution_all[(i+2*no_of_particles),time_index])**2+(solution_all[(i+3*no_of_particles),time_index])**2)
+
+"""Plotting of the Energy and Momentum"""
+
+pl.figure()
+pl.plot(time,energy)
+pl.title('Energy of Particle')
+pl.xlabel('$\mathrm{Time}$')
+pl.ylabel('$E$')
+pl.show()
+
+pl.figure()
+pl.plot(time,mom)
+pl.title('Momentum of Particle')
+pl.xlabel('$\mathrm{Time}$')
+pl.ylabel('$p$')
+pl.show()
+
 """ Making images of the particles """
 
 
