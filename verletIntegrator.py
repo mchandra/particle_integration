@@ -69,6 +69,20 @@ length_of_box_y           = length_of_box_x
 initial_conditions_position_y = bottom_boundary + length_of_box_y*np.random.rand(no_of_particles)
 
 
+
+#%%
+""" Discretizing Space """
+
+x_divisions=int(input("Enter the number of divisions along x:"))
+dx = (length_of_box_x/x_divisions)
+x = np.arange(left_boundary,right_boundary,dx)
+x= np.concatenate((x,[right_boundary]),axis = 0)
+  
+y_divisions=int(input("Enter the number of divisions along y:"))
+dy = (length_of_box_y/y_divisions)
+y = np.arange(bottom_boundary,top_boundary,dy)
+y = np.concatenate((y,[top_boundary]), axis =0)
+
 #%%
 
 """ Setting velocities according to maxwellian distribution """
@@ -100,6 +114,10 @@ final_time            = 10 * box_crossing_time_scale
 dt   = 0.01 * box_crossing_time_scale
 time = np.arange(0, final_time, dt)
 
+""" Initializing density matrix """
+
+density = np.zeros((x.size-1,y.size-1,time.size),dtype=np.float)
+
 """ Initialization of solution matrix for all particles """
 
 
@@ -108,7 +126,7 @@ solution_all = np.zeros((4*no_of_particles,time.size),dtype=np.float)
 #%%
 
 """ Solving """
-BC=input("1 for Hard and 2 for Periodic")
+BC=input("1 for Hard and 2 for Periodic:")
 
 for time_index,t0 in enumerate(time):
     
@@ -140,56 +158,53 @@ for time_index,t0 in enumerate(time):
             if(solution_all[i,time_index]<left_boundary):
                 solution_all[i,time_index] = solution_all[i,time_index] + length_of_box_x
 
-"""Computation of Energy and Momentum"""
-energy=np.zeros(time.size)
-for time_index in enumerate(time):
-    for i in range(no_of_particles):
-        energy[time_index]=energy[time_index]+(solution_all[(i+2*no_of_particles),time_index])**2+(solution_all[(i+3*no_of_particles),time_index])**2
-                      # +0*solution_all[i+no_of_particles,time_index]**2+0*solution_all[i,time_index]**2
+""" Computing density plots """
 
-mom=np.zeros(time.size)
-for time_index in enumerate(time):
-    for i in range(no_of_particles):
-        mom[time_index]=mom[time_index]+math.sqrt((solution_all[(i+2*no_of_particles),time_index])**2+(solution_all[(i+3*no_of_particles),time_index])**2)
-
-"""Plotting of the Energy and Momentum"""
-
-pl.figure()
-pl.plot(time,energy)
-pl.title('Energy of Particle')
-pl.xlabel('$\mathrm{Time}$')
-pl.ylabel('$E$')
-pl.show()
-
-pl.figure()
-pl.plot(time,mom)
-pl.title('Momentum of Particle')
-pl.xlabel('$\mathrm{Time}$')
-pl.ylabel('$p$')
-pl.show()
-
-""" Making images of the particles """
+i=0
+j=0
+x_zone = 0
+y_zone = 0
 
 
-for time_index,t0 in enumerate(time[::10]):
-    for i in range(0,no_of_particles):
+for time_index,t0 in enumerate(time):
+    for p in range(0,no_of_particles):
+        for i in range(0,x.size-1):
+            if((solution_all[p,time_index]>x[i])and(solution_all[p,time_index]<x[i+1])):
+                x_zone = i
+        for j in range(0,y.size-1):
+            if((solution_all[p+no_of_particles,time_index]>y[j])and(solution_all[p+no_of_particles,time_index]<y[j+1])):
+                y_zone = j
         
-        pl.plot(solution_all[i][time_index],solution_all[no_of_particles + i][time_index], 'o',color='blue', markersize=10, alpha = 0.4)
-        pl.axhline(y=-1)
-        pl.axvline(x=-1)
-        pl.axhline(y=1)
-        pl.axvline(x=1)
-        pl.xlim([left_boundary, right_boundary])
-        pl.ylim([bottom_boundary, top_boundary])
-        pl.title('$\mathrm{Time}$ = ' + str(time[time_index]) )
-        pl.xlabel('$x$')
-        pl.ylabel('$y$')
+        density[x_zone,y_zone,time_index] = density[x_zone,y_zone,time_index] +1
+       
+        
+       
+"""for time_index,t0 in enumerate(time):
+    density[:,:,time_index]= density[:,:,time_index].transpose()
+        
+        
+for time_index,t0 in enumerate(time):
+    for i in range(0,y.size-1):
+        temp_array=density[:,i,time_index]
+        density[:,i,time_index] = temp_array[::-1]"""
+
+
+
+""" normalizing the density """
+for time_index,t0 in enumerate(time):
+    density[:,:,time_index] = density[:,:,time_index]/(no_of_particles/(x_divisions*y_divisions))
+
+"""sin perturbation"""
+
+for i in range(0,x.size-1):
+    density[:,i,0] = density[:,i,0] + 0.5*np.sin((2*i*np.pi)/x_divisions)
+
+"""Creating Density Plot Movie"""
+for time_index,t0 in enumerate(time[::10]):          
+    pl.title('Numerical Density Along Centerline')
+    pl.xlabel('$x$')
+    pl.ylabel('$\mathrm{Density}$')
+    pl.plot(density[(y_divisions/2),:,time_index])
     print ("Time index = ", time_index)
-    pl.savefig('point_mass' + '%04d'%time_index + '.png')
+    pl.savefig('%04d'%time_index + '.png')
     pl.clf()
-
-
-
-
-
-
