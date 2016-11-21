@@ -38,7 +38,7 @@ last=0
 next=0
 for i in range(x_divisions):
     next=last+(no_of_particles*0.5*np.sin(2*i*np.pi/x_divisions)/x_divisions)+(no_of_particles/x_divisions)
-    initial_conditions_position_x[int(last):int(next)+1] = length_of_box_x*(i+1)/(x_divisions+1)
+    initial_conditions_position_x[int(last):int(next)] = length_of_box_x*(i+1)/(x_divisions+1)
     last=next
 
 bottom_boundary = 0

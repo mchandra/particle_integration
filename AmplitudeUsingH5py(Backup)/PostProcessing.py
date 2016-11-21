@@ -56,7 +56,7 @@ for time_index,t0 in enumerate(time):
     h5f = h5py.File('solution_all/solution_'+str(time_index)+'.h5', 'r')
     solution_all_current = h5f['solution_all/solution_dataset_'+str(time_index)][:]
     h5f.close()
-	print("Density Computation for time_index : "+time_index)
+    print("Density Computation for time_index : ",time_index)
     for p in range(0,no_of_particles):
         for i in range(0,x.size-1):
             if((solution_all_current[p]>x[i])and(solution_all_current[p]<x[i+1])):
