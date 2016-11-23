@@ -105,4 +105,4 @@ for l in range(x.size-1):
     pl.clf()
 
 
-
+"""Plotting of the temperature distribution in each zome"""
