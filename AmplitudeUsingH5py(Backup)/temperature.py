@@ -1,8 +1,24 @@
-from initialization import *
 import numpy as np
 import pylab as pl
 import h5py
 import scipy.stats as stats
+
+no_of_particles = 100000
+length_of_box_x = 1
+h5f = h5py.File('initial_conditions.h5', 'r')
+initial_conditions = h5f['initial_conditions_dataset'][:]
+h5f.close()
+print(initial_conditions,"	",initial_conditions.size)    
+v_x=np.zeros(no_of_particles,dtype=np.float)
+v_x=initial_conditions[2*no_of_particles:3*no_of_particles]
+
+""" Discretizing time and making sure scaling is done right """
+
+box_crossing_time_scale = length_of_box_x / np.max(v_x)
+final_time            = 5 * box_crossing_time_scale
+dt   = 0.01 * box_crossing_time_scale
+time = np.arange(0, final_time, dt)   
+x=np.zeros(33,dtype=np.float)
 
 """Plotting of the temperature distribution in each zome"""
 
@@ -28,7 +44,5 @@ for time_index,t0 in enumerate(time):
     pl.xlabel('$x$')
     pl.ylabel('$\mathrm{Temperature}$')
     pl.plot(x[0:(x.size-1)],temperature)
-    pl.ylim(0,20)
-    print ("Time index = ", time_index)
     pl.savefig('temp/%04d'%time_index + '.png')
     pl.clf()

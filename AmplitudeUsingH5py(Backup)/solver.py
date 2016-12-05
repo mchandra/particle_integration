@@ -4,7 +4,7 @@ import scipy.stats as stats
 import h5py
 from scipy.integrate import odeint
 
-no_of_particles = 5000
+no_of_particles = 100000
 x_divisions=32
 y_divisions=1
 length_of_box_x=1
@@ -60,7 +60,9 @@ final_time            = 5 * box_crossing_time_scale
 dt   = 0.01 * box_crossing_time_scale
 time = np.arange(0, final_time, dt)   
     
-choice=input("Enter your choice: 1-Verlet, 2-Odeint")
+choice=input("Enter your choice: 1-Verlet, 2-Odeint:")
+
+ic=np.zeros(4*no_of_particles,dtype=np.float)
 
 for time_index,t0 in enumerate(time):
     
@@ -70,19 +72,17 @@ for time_index,t0 in enumerate(time):
         break
     t1 = time[time_index+1]
     t = [t0, t1] 
+    
     if(time_index==0):
         ic=initial_conditions
-       
     else:
-        ic = (solution_all_current[:])
-    
-    
-
+        ic=solution_all_current
+       
     if(choice=='1'):
     
-        sol = Verlet(initial_conditions,t)
+        sol = Verlet(ic,t)
         
-        solution_all_current[:] = sol
+        solution_all_current = sol
         if(BC=='1'):
         
             for i in range(2*no_of_particles):
@@ -94,12 +94,12 @@ for time_index,t0 in enumerate(time):
         if(BC=='2'):
             for i in range(2*no_of_particles):
                 if(solution_all_current[i]>=1):
-                    print ("particle number = ", i, "  position right = ", solution_all_current[i])
                     solution_all_current[i] = solution_all_current[i] - length_of_box_x
                 if(solution_all_current[i]<0):
-                    print ("particle number = ", i, "  position left = ", solution_all_current[i])
                     solution_all_current[i] = solution_all_current[i] + length_of_box_x
-                
+        
+        
+        
     if(choice=='2'):    
 
         sol = odeint(dY_dt,ic,t)
