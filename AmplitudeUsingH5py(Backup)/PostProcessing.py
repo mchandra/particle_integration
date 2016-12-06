@@ -1,9 +1,16 @@
-
-from initialization import *
 import numpy as np
 import pylab as pl
 import h5py
 no_of_particles=100000
+length_of_box_x=1
+dx = (length_of_box_x/32)
+x = np.arange(0,1,dx)
+x= np.concatenate((x,[1]),axis = 0)
+  
+
+dy = (length_of_box_x/32)
+y = np.arange(0,1,dy)
+y = np.concatenate((y,[1]), axis =0)
 
 """ Set plot parameters to make beautiful plots """
 pl.rcParams['figure.figsize']  = 12, 7.5
@@ -41,9 +48,9 @@ v_x=initial_conditions[2*no_of_particles:3*no_of_particles]
 
 """ Discretizing time and making sure scaling is done right """
 
-box_crossing_time_scale = length_of_box_x / np.max(v_x)
-final_time            = 5 * box_crossing_time_scale
-dt   = 0.01 * box_crossing_time_scale
+box_crossing_time_scale = length_of_box_x / np.amax(v_x)
+final_time            = 4 * box_crossing_time_scale
+dt   = 0.02 * box_crossing_time_scale
 time = np.arange(0, final_time, dt)   
 
 
@@ -66,14 +73,14 @@ for time_index,t0 in enumerate(time):
 
 
     n, bins, patches = pl.hist(solution[:no_of_particles], bins=x, histtype='step')
-    pl.clf()
+    """pl.clf()
     pl.plot(x[:-1], n/(no_of_particles/(x_divisions*y_divisions)), 'o-')
     pl.xlim([-0.1, 1.1])
     pl.ylim([0.4,1.6])
     pl.xlabel('$x$')
     pl.ylabel('$\mathrm{Number\;of\;Particles}$')
     pl.savefig('post/%04d'%time_index + '.png')
-    pl.clf()    
+    pl.clf()"""    
     amp[time_index]=np.amax(n)
 
 """ normalizing the density 
@@ -83,13 +90,16 @@ for time_index,t0 in enumerate(time):
 
 
    
-
-         
+amp=amp/no_of_particles
+amp=32*amp
+amp=amp-1    
 pl.title('Amplitude of Numerical Density')
 pl.xlabel('$x$')
 pl.ylabel('$\mathrm{Density}$')
-pl.plot(amp)
-#pl.ylim(1,1.6)
+t=np.linspace(0,0.93279822,200)
+pl.plot(t,amp)
+pl.plot(t,0.5*np.exp(-4*np.pi**2*t**2),'r')
+pl.ylim(0,0.6)
 pl.savefig('amplitude.png')
 
     

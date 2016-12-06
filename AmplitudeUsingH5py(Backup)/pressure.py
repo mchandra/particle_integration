@@ -3,7 +3,7 @@ import pylab as pl
 import h5py
 import scipy.stats as stats
 
-no_of_particles = 10000
+no_of_particles = 100000
 length_of_box_x = 1
 h5f = h5py.File('initial_conditions.h5', 'r')
 initial_conditions = h5f['initial_conditions_dataset'][:]

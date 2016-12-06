@@ -4,7 +4,7 @@ import scipy.stats as stats
 import h5py
 from scipy.integrate import odeint
 
-no_of_particles = 10000
+no_of_particles = 100000
 x_divisions=32
 y_divisions=1
 length_of_box_x=1
@@ -56,9 +56,10 @@ v_x=initial_conditions[2*no_of_particles:3*no_of_particles]
 """ Discretizing time and making sure scaling is done right """
 
 box_crossing_time_scale = length_of_box_x / np.max(v_x)
-final_time            = 5 * box_crossing_time_scale
-dt   = 0.01 * box_crossing_time_scale
+final_time            = 4 * box_crossing_time_scale
+dt   = 0.02 * box_crossing_time_scale
 time = np.arange(0, final_time, dt)   
+print(time)
     
 choice=input("Enter your choice: 1-Verlet, 2-Odeint:")
 
