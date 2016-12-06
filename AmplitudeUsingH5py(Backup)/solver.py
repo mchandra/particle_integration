@@ -4,7 +4,7 @@ import scipy.stats as stats
 import h5py
 from scipy.integrate import odeint
 
-no_of_particles = 100000
+no_of_particles = 10000
 x_divisions=32
 y_divisions=1
 length_of_box_x=1

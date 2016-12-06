@@ -5,7 +5,7 @@ import h5py
 
 """ Setting number of particles and other parameters"""
 
-no_of_particles = 100000
+no_of_particles = 10000
 x_divisions=32
 y_divisions=1
 
@@ -20,7 +20,7 @@ last=0
 next=0
 
 for i in range(x_divisions):
-    next=last+(no_of_particles*0.5*np.sin(2*i*np.pi/x_divisions)/x_divisions)+(no_of_particles/x_divisions)
+    next=last+(no_of_particles*0*np.sin(2*i*np.pi/x_divisions)/x_divisions)+(no_of_particles/x_divisions)
     initial_conditions_position_x[int(last):int(next)] = length_of_box_x*(2*i+1)/(2*x_divisions)
     last=next
 
@@ -43,15 +43,15 @@ y = np.concatenate((y,[top_boundary]), axis =0)
 
 """ Setting velocities according to maxwellian distribution """
 maxwell = stats.maxwell
-maxwell.mean(loc=0, scale=1)
+maxwell.mean(loc=0, scale=2)
 
 #%%
 """ Setting the  velocity distribution"""
 
 a=np.random.choice([1,-1], size = no_of_particles)
 b=np.random.choice([1,-1], size = no_of_particles)
-initial_conditions_velocity_x =  np.multiply(a,maxwell.rvs(loc=0, scale=1, size=no_of_particles))
-initial_conditions_velocity_y =  np.multiply(b,maxwell.rvs(loc=0, scale=1, size=no_of_particles))
+initial_conditions_velocity_x =  np.multiply(a,maxwell.rvs(loc=0, scale=2, size=no_of_particles))
+initial_conditions_velocity_y =  np.multiply(b,maxwell.rvs(loc=0, scale=2, size=no_of_particles))
 
 
 #%%

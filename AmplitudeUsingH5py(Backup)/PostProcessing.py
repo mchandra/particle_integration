@@ -52,11 +52,10 @@ time = np.arange(0, final_time, dt)
 density = np.zeros((x.size-1,y.size-1,time.size),dtype=np.float)
 
 
-
+n=np.zeros(x.size-1,dtype=np.float)
 
 """ Computing density plots """
-
-
+amp = np.zeros(time.size)
 
 for time_index,t0 in enumerate(time):
     if(time_index==time.size-1):
@@ -75,22 +74,22 @@ for time_index,t0 in enumerate(time):
     pl.ylabel('$\mathrm{Number\;of\;Particles}$')
     pl.savefig('post/%04d'%time_index + '.png')
     pl.clf()    
-
+    amp[time_index]=np.amax(n)
 
 """ normalizing the density 
 for time_index,t0 in enumerate(time):
     density[:,:,time_index] = (density[:,:,time_index])"""
    
-amp = np.zeros(time.size)
-for time_index,t0 in enumerate(time):
-    amp[time_index]=np.amax(density[:,:,time_index])
+
+
+   
 
          
 pl.title('Amplitude of Numerical Density')
 pl.xlabel('$x$')
 pl.ylabel('$\mathrm{Density}$')
 pl.plot(amp)
-pl.ylim(1,1.6)
+#pl.ylim(1,1.6)
 pl.savefig('amplitude.png')
 
     
