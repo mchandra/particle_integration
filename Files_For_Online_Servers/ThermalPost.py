@@ -29,8 +29,8 @@ pl.rcParams['ytick.color']      = 'k'
 pl.rcParams['ytick.labelsize']  = 'medium'
 pl.rcParams['ytick.direction']  = 'in'    
 
-h5f = h5py.File('plot.h5', 'r')
-amp = h5f['amp'][:]
+h5f = h5py.File('post.h5', 'r')
+amp = h5f['heatflux'][:]
 time = h5f['time'][:]
 h5f.close()
 
@@ -38,8 +38,8 @@ pl.title('Amplitude of Numerical Density')
 pl.xlabel('$t$')
 pl.ylabel('$\mathrm{Amplitude}$')
 pl.plot(time,amp,label='$\mathrm{Numerical}$')
-pl.plot(time,0.5*np.exp(-2*np.pi**2*time**2),'r-',label='$\mathrm{Analytical}$')
-pl.ylim(0,0.6)
+#pl.plot(time,0.5*np.exp(-2*np.pi**2*time**2),'r-',label='$\mathrm{Analytical}$')
+#pl.ylim(0,0.6)
 pl.legend()
 pl.savefig('amplitude.png')
 

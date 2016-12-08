@@ -3,7 +3,7 @@ import h5py
 
 """ Setting number of particles and other parameters"""
 
-no_of_particles = 10000000
+no_of_particles = 500000
 x_divisions=32
 y_divisions=1
 z_divisions=1
@@ -43,8 +43,8 @@ x= np.concatenate((x,[right_boundary]),axis = 0)
 
 k=1
 m=1
-T=2
-const=np.sqrt((k*T)/(2*m))
+T=1
+const=np.sqrt((k*T)/(m))
 initial_conditions_velocity_x=np.zeros(no_of_particles,dtype=np.float)
 initial_conditions_velocity_y=np.zeros(no_of_particles,dtype=np.float)
 initial_conditions_velocity_z=np.zeros(no_of_particles,dtype=np.float)

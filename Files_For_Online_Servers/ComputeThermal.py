@@ -4,8 +4,8 @@ import h5py
 
 """ Setting number of particles and other parameters"""
 
-no_of_particles = 100000
-x_divisions=32
+no_of_particles = 10000
+x_divisions=4
 y_divisions=1
 z_divisions=1
 
@@ -14,14 +14,14 @@ z_divisions=1
 left_boundary = 0
 right_boundary = 1
 length_of_box_x         = right_boundary - left_boundary
-initial_conditions_position_x=np.zeros(no_of_particles)
-last=0
-next=0
+initial_conditions_position_x = left_boundary + length_of_box_x*np.random.rand(no_of_particles)
+#last=0
+#next=0
 
-for i in range(x_divisions):
-    next=last+(no_of_particles*0.5*np.sin(2*i*np.pi/x_divisions)/x_divisions)+(no_of_particles/x_divisions)
-    initial_conditions_position_x[int(round(last)):int(round(next))] = length_of_box_x*(2*i+1)/(2*x_divisions)
-    last=next
+#for i in range(x_divisions):
+#    next=last+(no_of_particles*0*np.sin(2*i*np.pi/x_divisions)/x_divisions)+(no_of_particles/x_divisions)
+#    initial_conditions_position_x[int(round(last)):int(round(next))] = length_of_box_x*(2*i+1)/(2*x_divisions)
+#    last=next
 
 bottom_boundary = 0
 top_boundary = 1
@@ -92,7 +92,7 @@ v_x=initial_conditions[3*no_of_particles:4*no_of_particles]
 """ Discretizing time and making sure scaling is done right """
 
 box_crossing_time_scale = length_of_box_x / np.max(v_x)
-final_time            = 4 * box_crossing_time_scale
+final_time            = 20 * box_crossing_time_scale
 dt   = 0.004 * box_crossing_time_scale
 time = np.arange(0, final_time, dt)   
 
@@ -120,13 +120,13 @@ n = np.zeros(x.size-1,dtype=np.float)
 
 sol = np.zeros(6*no_of_particles,dtype=np.float)
 
-amp = np.zeros(time.size,dtype=np.float)
+pressuredata = np.zeros(time.size,dtype=np.float)
+heatfluxdata = np.zeros(time.size,dtype=np.float)
+
 
 """ Solving """
 
 old= np.zeros(6*no_of_particles,dtype=np.float)
-BC='2'
-
 for time_index,t0 in enumerate(time):
     print("Computing for TimeIndex = ",time_index)
     t0 = time[time_index]
@@ -142,23 +142,30 @@ for time_index,t0 in enumerate(time):
 
     sol = Verlet(initial_conditions,t)
    
-    if(BC=='1'):
-        for i in range(3*no_of_particles):
-            if(sol[i]>=right_boundary):
-                sol[3*no_of_particles+i] = sol[3*no_of_particles+i] * (-1)
-            if(sol[i]<=left_boundary):
-                sol[3*no_of_particles+i] = sol[3*no_of_particles+i] * (-1)
-
-    if(BC=='2'):
-        for i in range(3*no_of_particles):
-            if(sol[i]>=right_boundary):
-                sol[i] = sol[i] - length_of_box_x
-            if(sol[i]<=left_boundary):
-                sol[i] = sol[i] + length_of_box_x
+    
+    for i in range(no_of_particles):
+        alternator=0
+        alternatol=0
+        if(sol[i]>=right_boundary):#Cold Resevoir
+            if(alternator%2==0):
+                sol[3*no_of_particles+i] = abs(np.sqrt(1)*np.sqrt(-2*np.log(x_1))*np.cos(2*np.pi*x_2)) * (-1)
+            else:
+                sol[3*no_of_particles+i] = abs(np.sqrt(1)*np.sqrt(-2*np.log(x_1))*np.sin(2*np.pi*x_2)) * (-1)
+            alternator=alternator+1
+        if(sol[i]<=left_boundary):#Hot Resevoir
+            if(alternatol%2==0):
+                sol[3*no_of_particles+i] = abs(np.sqrt(3)*np.sqrt(-2*np.log(x_1))*np.cos(2*np.pi*x_2)) * (+1)
+            else:
+                sol[3*no_of_particles+i] = abs(np.sqrt(3)*np.sqrt(-2*np.log(x_1))*np.sin(2*np.pi*x_2)) * (+1)
+            alternatol=alternatol+1
+   
+    for i in range(2*no_of_particles,3*no_of_particles):
+        if(sol[i]>=right_boundary):
+            sol[i] = sol[i] - length_of_box_x
+        if(sol[i]<=left_boundary):
+            sol[i] = sol[i] + length_of_box_x
     
     old=sol
-    n, bins = np.histogram(sol[:no_of_particles], bins=x)
-    amp[time_index]=np.amax(n)
     pressure=0
     heatflux=0
     for i in range(no_of_particles):
@@ -169,12 +176,14 @@ for time_index,t0 in enumerate(time):
     heatflux=heatflux/no_of_particles
     pressure=pressure/no_of_particles
     print("Pressure = ",pressure)
+    pressuredata[time_index]=pressure
+    heatfluxdata[time_index]=heatflux
     print("Heat Flux = ",heatflux)
+    heatfluxdata[time_index]=heatflux
+    
 
-amp=amp/no_of_particles
-amp=32*amp
-amp=amp-1    
-h5f = h5py.File('plot.h5', 'w')
+h5f = h5py.File('post.h5', 'w')
 h5f.create_dataset('time', data=time)
-h5f.create_dataset('amp', data=amp)
+h5f.create_dataset('heatflux', data=heatfluxdata)
+h5f.create_dataset('pressure', data=pressuredata)
 h5f.close()
