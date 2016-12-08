@@ -30,16 +30,16 @@ pl.rcParams['ytick.labelsize']  = 'medium'
 pl.rcParams['ytick.direction']  = 'in'    
 
 h5f = h5py.File('post.h5', 'r')
-amp = h5f['heatflux'][:]
+heatflux = h5f['heatflux'][:]
+pressure = h5f['pressure'][:]
 time = h5f['time'][:]
 h5f.close()
 
-pl.title('Amplitude of Numerical Density')
+pl.title('$\mathrm{Pressure/HeatFlux}$')
 pl.xlabel('$t$')
-pl.ylabel('$\mathrm{Amplitude}$')
-pl.plot(time,amp,label='$\mathrm{Numerical}$')
-#pl.plot(time,0.5*np.exp(-2*np.pi**2*time**2),'r-',label='$\mathrm{Analytical}$')
-#pl.ylim(0,0.6)
+pl.ylabel('$<v^2>$ $\mathrm{or}$ $<v^2v_x>$')
+pl.plot(time[0:4998],heatflux[0:4998],'b',label='$\mathrm{HeatFlux}$')
+pl.plot(time[0:4998],pressure[0:4998],'r',label='$\mathrm{Pressure}$')
 pl.legend()
-pl.savefig('amplitude.png')
+pl.savefig('plot.png')
 

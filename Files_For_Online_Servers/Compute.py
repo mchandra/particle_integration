@@ -4,7 +4,7 @@ import h5py
 
 """ Setting number of particles and other parameters"""
 
-no_of_particles = 100000
+no_of_particles = 5000000
 x_divisions=32
 y_divisions=1
 z_divisions=1
@@ -160,16 +160,27 @@ for time_index,t0 in enumerate(time):
     n, bins = np.histogram(sol[:no_of_particles], bins=x)
     amp[time_index]=np.amax(n)
     pressure=0
-    heatflux=0
+    heatflux_x=0
+    heatflux_y=0
+    heatflux_z=0
+
     for i in range(no_of_particles):
         pressure=pressure+sol[i+3*no_of_particles]**2+sol[i+4*no_of_particles]**2\
                                                      +sol[i+5*no_of_particles]**2
-        heatflux=heatflux+sol[i+3*no_of_particles]*(sol[i+3*no_of_particles]**2+\
+        heatflux_x=heatflux_x+sol[i+3*no_of_particles]*(sol[i+3*no_of_particles]**2+\
                  sol[i+4*no_of_particles]**2+sol[i+5*no_of_particles]**2)    
-    heatflux=heatflux/no_of_particles
+        heatflux_y=heatflux_y+sol[i+4*no_of_particles]*(sol[i+3*no_of_particles]**2+\
+                 sol[i+4*no_of_particles]**2+sol[i+5*no_of_particles]**2)    
+        heatflux_z=heatflux_z+sol[i+5*no_of_particles]*(sol[i+3*no_of_particles]**2+\
+                 sol[i+4*no_of_particles]**2+sol[i+5*no_of_particles]**2)    
+    heatflux_x=heatflux_x/no_of_particles
+    heatflux_y=heatflux_y/no_of_particles
+    heatflux_z=heatflux_z/no_of_particles
     pressure=pressure/no_of_particles
     print("Pressure = ",pressure)
-    print("Heat Flux = ",heatflux)
+    print("Heat Flux in x-direction = ",heatflux_x)
+    print("Heat Flux in y-direction = ",heatflux_y)
+    print("Heat Flux in z-direction = ",heatflux_z)
 
 amp=amp/no_of_particles
 amp=32*amp

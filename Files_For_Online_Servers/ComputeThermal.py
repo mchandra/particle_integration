@@ -4,8 +4,8 @@ import h5py
 
 """ Setting number of particles and other parameters"""
 
-no_of_particles = 10000
-x_divisions=4
+no_of_particles = 1000000
+x_divisions=32
 y_divisions=1
 z_divisions=1
 
@@ -121,7 +121,9 @@ n = np.zeros(x.size-1,dtype=np.float)
 sol = np.zeros(6*no_of_particles,dtype=np.float)
 
 pressuredata = np.zeros(time.size,dtype=np.float)
-heatfluxdata = np.zeros(time.size,dtype=np.float)
+heatfluxdata_x = np.zeros(time.size,dtype=np.float)
+heatfluxdata_y = np.zeros(time.size,dtype=np.float)
+heatfluxdata_z = np.zeros(time.size,dtype=np.float)
 
 
 """ Solving """
@@ -175,23 +177,32 @@ for time_index,t0 in enumerate(time):
     
     old=sol
     pressure=0
-    heatflux=0
+    heatflux_x=0
+    heatflux_y=0
+    heatflux_z=0
     for i in range(no_of_particles):
         pressure=pressure+sol[i+3*no_of_particles]**2+sol[i+4*no_of_particles]**2\
                                                      +sol[i+5*no_of_particles]**2
-        heatflux=heatflux+sol[i+3*no_of_particles]*(sol[i+3*no_of_particles]**2+\
+        heatflux_x=heatflux_x+sol[i+3*no_of_particles]*(sol[i+3*no_of_particles]**2+\
+                 sol[i+4*no_of_particles]**2+sol[i+5*no_of_particles]**2)    
+        heatflux_y=heatflux_y+sol[i+4*no_of_particles]*(sol[i+3*no_of_particles]**2+\
+                 sol[i+4*no_of_particles]**2+sol[i+5*no_of_particles]**2)    
+        heatflux_z=heatflux_z+sol[i+5*no_of_particles]*(sol[i+3*no_of_particles]**2+\
                  sol[i+4*no_of_particles]**2+sol[i+5*no_of_particles]**2)    
     heatflux=heatflux/no_of_particles
     pressure=pressure/no_of_particles
     print("Pressure = ",pressure)
     pressuredata[time_index]=pressure
-    heatfluxdata[time_index]=heatflux
-    print("Heat Flux = ",heatflux)
-    heatfluxdata[time_index]=heatflux
-    
+    heatfluxdata_x[time_index]=heatflux_x
+    heatfluxdata_y[time_index]=heatflux_y
+    heatfluxdata_z[time_index]=heatflux_z
+    print("Heat Flux in x-direction= ",heatflux_x)
+        
 
 h5f = h5py.File('post.h5', 'w')
 h5f.create_dataset('time', data=time)
-h5f.create_dataset('heatflux', data=heatfluxdata)
+h5f.create_dataset('heatflux_x', data=heatfluxdata_x)
+h5f.create_dataset('heatflux_y', data=heatfluxdata_y)
+h5f.create_dataset('heatflux_z', data=heatfluxdata_z)
 h5f.create_dataset('pressure', data=pressuredata)
 h5f.close()
