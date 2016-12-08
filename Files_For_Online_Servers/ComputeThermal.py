@@ -148,14 +148,22 @@ for time_index,t0 in enumerate(time):
         alternatol=0
         if(sol[i]>=right_boundary):#Cold Resevoir
             if(alternator%2==0):
+                x_1=np.random.rand(1)
+                x_2=np.random.rand(1)
                 sol[3*no_of_particles+i] = abs(np.sqrt(1)*np.sqrt(-2*np.log(x_1))*np.cos(2*np.pi*x_2)) * (-1)
             else:
+                x_1=np.random.rand(1)
+                x_2=np.random.rand(1)
                 sol[3*no_of_particles+i] = abs(np.sqrt(1)*np.sqrt(-2*np.log(x_1))*np.sin(2*np.pi*x_2)) * (-1)
             alternator=alternator+1
         if(sol[i]<=left_boundary):#Hot Resevoir
             if(alternatol%2==0):
+                x_1=np.random.rand(1)
+                x_2=np.random.rand(1)
                 sol[3*no_of_particles+i] = abs(np.sqrt(3)*np.sqrt(-2*np.log(x_1))*np.cos(2*np.pi*x_2)) * (+1)
             else:
+                x_1=np.random.rand(1)
+                x_2=np.random.rand(1)
                 sol[3*no_of_particles+i] = abs(np.sqrt(3)*np.sqrt(-2*np.log(x_1))*np.sin(2*np.pi*x_2)) * (+1)
             alternatol=alternatol+1
    
