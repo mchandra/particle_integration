@@ -3,7 +3,7 @@ import h5py
 
 """ Setting number of particles and other parameters"""
 
-no_of_particles = 1000000
+no_of_particles = 100000
 x_divisions=32
 y_divisions=1
 z_divisions=1
@@ -36,7 +36,9 @@ x= np.concatenate((x,[right_boundary]),axis = 0)
 k=1
 m=1
 T=1
+T_walls=2
 const=np.sqrt((k*T)/(m))
+const2=np.sqrt((k*T_walls)/(m))
 initial_conditions_velocity_x=np.zeros(no_of_particles,dtype=np.float)
 initial_conditions_velocity_y=np.zeros(no_of_particles,dtype=np.float)
 initial_conditions_velocity_z=np.zeros(no_of_particles,dtype=np.float)
@@ -84,7 +86,7 @@ v_x=initial_conditions[3*no_of_particles:4*no_of_particles]
 
 box_crossing_time_scale = length_of_box_x / np.max(v_x)
 final_time            = 50 * box_crossing_time_scale
-dt   = 0.004 * box_crossing_time_scale
+dt   = 0.01 * box_crossing_time_scale
 time = np.arange(0, final_time, dt)   
 
 """Definition of Verlet Integrator"""
@@ -134,37 +136,47 @@ for time_index,t0 in enumerate(time):
         initial_conditions = old
 
     sol = Verlet(initial_conditions,t)
-   
+
     
-    for i in range(no_of_particles):
-        alternator=0
-        alternatol=0
-        x_1=np.random.rand(1)
-        x_2=np.random.rand(1)
-        x_3=np.random.rand(1)
-        x_4=np.random.rand(1)
-        x_5=np.random.rand(1)
-        x_6=np.random.rand(1)
+    for i in range(0,no_of_particles,2):
         if(sol[i]>=right_boundary):        #Cold Resevoir right
-            if(alternator%2==0):
-                sol[3*no_of_particles+i] = abs(np.sqrt(2)*np.sqrt(-2*np.log(x_1))*np.cos(2*np.pi*x_2)) * (-1)
-                sol[4*no_of_particles+i] = abs(np.sqrt(2)*np.sqrt(-2*np.log(x_3))*np.cos(2*np.pi*x_4)) * (-1)
-                sol[5*no_of_particles+i] = abs(np.sqrt(2)*np.sqrt(-2*np.log(x_5))*np.cos(2*np.pi*x_6)) * (-1)
-            else:
-                sol[3*no_of_particles+i] = abs(np.sqrt(2)*np.sqrt(-2*np.log(x_1))*np.sin(2*np.pi*x_2)) * (-1)
-                sol[4*no_of_particles+i] = abs(np.sqrt(2)*np.sqrt(-2*np.log(x_3))*np.sin(2*np.pi*x_4)) * (-1)
-                sol[5*no_of_particles+i] = abs(np.sqrt(2)*np.sqrt(-2*np.log(x_5))*np.sin(2*np.pi*x_6)) * (-1)
-            alternator=alternator+1
+            x_1=np.random.rand(1)
+            x_2=np.random.rand(1)
+            y_1=const2*np.sqrt(-2*np.log(x_1))*np.cos(2*np.pi*x_2)
+            y_2=const2*np.sqrt(-2*np.log(x_1))*np.sin(2*np.pi*x_2)
+            x_3=np.random.rand(1)
+            x_4=np.random.rand(1)
+            y_3=const2*np.sqrt(-2*np.log(x_3))*np.cos(2*np.pi*x_4)
+            y_4=const2*np.sqrt(-2*np.log(x_3))*np.sin(2*np.pi*x_4)
+            x_5=np.random.rand(1)
+            x_6=np.random.rand(1)
+            y_5=const2*np.sqrt(-2*np.log(x_5))*np.cos(2*np.pi*x_6)
+            y_6=const2*np.sqrt(-2*np.log(x_5))*np.sin(2*np.pi*x_6)
+            sol[i+3*no_of_particles]=abs(y_1)*(-1)
+            sol[i+4*no_of_particles]=abs(y_2)*(-1)
+            sol[i+5*no_of_particles]=abs(y_3)*(-1)
+            sol[i+3*no_of_particles+1]=abs(y_4)*(-1)
+            sol[i+4*no_of_particles+1]=abs(y_5)*(-1)
+            sol[i+5*no_of_particles+1]=abs(y_6)*(-1)
         if(sol[i]<=left_boundary):       #Hot Resevoir left side
-            if(alternatol%2==0):
-                sol[3*no_of_particles+i] = abs(np.sqrt(2)*np.sqrt(-2*np.log(x_1))*np.cos(2*np.pi*x_2)) 
-                sol[4*no_of_particles+i] = abs(np.sqrt(2)*np.sqrt(-2*np.log(x_3))*np.cos(2*np.pi*x_4))
-                sol[5*no_of_particles+i] = abs(np.sqrt(2)*np.sqrt(-2*np.log(x_5))*np.cos(2*np.pi*x_6))
-            else:
-                sol[3*no_of_particles+i] = abs(np.sqrt(2)*np.sqrt(-2*np.log(x_1))*np.sin(2*np.pi*x_2)) 
-                sol[4*no_of_particles+i] = abs(np.sqrt(2)*np.sqrt(-2*np.log(x_3))*np.sin(2*np.pi*x_4))
-                sol[5*no_of_particles+i] = abs(np.sqrt(2)*np.sqrt(-2*np.log(x_5))*np.sin(2*np.pi*x_6))
-            alternatol=alternatol+1
+            x_1=np.random.rand(1)
+            x_2=np.random.rand(1)
+            y_1=const2*np.sqrt(-2*np.log(x_1))*np.cos(2*np.pi*x_2)
+            y_2=const2*np.sqrt(-2*np.log(x_1))*np.sin(2*np.pi*x_2)
+            x_3=np.random.rand(1)
+            x_4=np.random.rand(1)
+            y_3=const2*np.sqrt(-2*np.log(x_3))*np.cos(2*np.pi*x_4)
+            y_4=const2*np.sqrt(-2*np.log(x_3))*np.sin(2*np.pi*x_4)
+            x_5=np.random.rand(1)
+            x_6=np.random.rand(1)
+            y_5=const2*np.sqrt(-2*np.log(x_5))*np.cos(2*np.pi*x_6)
+            y_6=const2*np.sqrt(-2*np.log(x_5))*np.sin(2*np.pi*x_6)
+            sol[i+3*no_of_particles]=abs(y_1)
+            sol[i+4*no_of_particles]=abs(y_2)
+            sol[i+5*no_of_particles]=abs(y_3)
+            sol[i+3*no_of_particles+1]=abs(y_4)
+            sol[i+4*no_of_particles+1]=abs(y_5)
+            sol[i+5*no_of_particles+1]=abs(y_6)
    
     for i in range(no_of_particles,3*no_of_particles):
         if(sol[i]>=right_boundary):
@@ -187,7 +199,7 @@ for time_index,t0 in enumerate(time):
         heatflux_z=heatflux_z+sol[i+5*no_of_particles]*(sol[i+3*no_of_particles]**2+\
                  sol[i+4*no_of_particles]**2+sol[i+5*no_of_particles]**2)
     
-    if(time_index==time.size-2)
+    if(time_index==time.size-2):
         h5f=h5py.File('endingtimestep.h5', 'w')
         h5f.create_dataset('sol', data=sol)  
         h5f.close()
@@ -201,9 +213,9 @@ for time_index,t0 in enumerate(time):
     heatfluxdata_x[time_index]=heatflux_x
     heatfluxdata_y[time_index]=heatflux_y
     heatfluxdata_z[time_index]=heatflux_z
-    print("Heat Flux in x-direction= ",heatflux_x)
-    print("Heat Flux in y-direction= ",heatflux_y)
-    print("Heat Flux in z-direction= ",heatflux_z)
+#    print("Heat Flux in x-direction= ",heatflux_x)
+    #print("Heat Flux in y-direction= ",heatflux_y)
+    #print("Heat Flux in z-direction= ",heatflux_z)
     print(" ")#To provide spacing between the results of each time step
 
 h5f = h5py.File('post.h5', 'w')
@@ -212,4 +224,5 @@ h5f.create_dataset('heatflux_x', data=heatfluxdata_x)
 h5f.create_dataset('heatflux_y', data=heatfluxdata_y)
 h5f.create_dataset('heatflux_z', data=heatfluxdata_z)
 h5f.create_dataset('pressure', data=pressuredata)
-h5f.close()
+h5f.close() 
+
