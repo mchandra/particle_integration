@@ -4,9 +4,9 @@ import h5py
 
 """ Setting number of particles and other parameters"""
 
-no_of_particles = 10000
+no_of_particles = 100000
 x_coll = 100
-y_coll = 1
+y_coll = 100
 
 x_divisions=100
 y_divisions=1
@@ -43,18 +43,18 @@ initial_conditions_velocity_y=np.zeros(no_of_particles,dtype=np.float)
 initial_conditions_velocity_z=np.zeros(no_of_particles,dtype=np.float)
 
 for i in range(0,no_of_particles):
-    r_1=np.random.uniform(0.0001,1)
-    r_2=np.random.uniform(0.0001,1)
-    r_3=np.random.uniform(0.0001,1)
-    r_4=np.random.uniform(0.0001,1)
+    r_1=np.random.rand(1)
+    r_2=np.random.rand(1)
+    r_3=np.random.rand(1)
+    r_4=np.random.rand(1)
     
     y_1 = r_1
     y_2 = r_2
     y_3 = r_3
     
-    initial_conditions_velocity_x[i]=y_1
-    initial_conditions_velocity_y[i]=y_2
-    initial_conditions_velocity_z[i]=y_3
+    initial_conditions_velocity_x[i]=4*y_1*np.random.choice([1,-1])
+    initial_conditions_velocity_y[i]=4*y_2*np.random.choice([1,-1])
+    initial_conditions_velocity_z[i]=4*y_3*np.random.choice([1,-1])
 
 print
 
@@ -74,8 +74,8 @@ h5f.close()
 """ Discretizing time and making sure scaling is done right """
 
 box_crossing_time_scale = length_of_box_x / np.max(initial_conditions_velocity_x)
-final_time            = 10 * box_crossing_time_scale
-dt   = 0.0001 * box_crossing_time_scale
+final_time            = 20 * box_crossing_time_scale
+dt   = 0.01 * box_crossing_time_scale
 time = np.arange(0, final_time, dt)  
 
 """ Verlet Integrator """
@@ -127,30 +127,32 @@ for time_index,t0 in enumerate(time):
 
     for i in range(0,3*no_of_particles):
         if(sol[i]>=right_boundary):
-            sol[i] = sol[i] - int(sol[i])
+            sol[i] = sol[i] - 1
         if(sol[i]<=left_boundary):
-            sol[i] =  int(sol[i])-sol[i] 
+            sol[i] =  sol[i] +1
     
     #print(np.max(sol[:no_of_particles]))
     
     for i in range(no_of_particles):
-        x_div = int(100*sol[i])
-        y_div = int(0.5)
+        x_div = int(x_coll*sol[i])
+        y_div = int(y_coll*sol[no_of_particles+i])
             
         list_indices[x_div][y_div].append(i)
-
+    count = 0
+    #print('list contains \n', list_indices)
     for i in range(x_coll):
         for j in range(y_coll):
+            
             if(len(list_indices[i][j])>1):
                 local_temp = 0
                 for k in (list_indices[i][j]):
                     local_temp = local_temp + sol[3*no_of_particles+k]**2+sol[4*no_of_particles+k]**2+sol[5*no_of_particles+k]**2
                 local_temp = local_temp/(3*len(list_indices[i][j]))
-                
-                for m in (list_indices[i][j]):
+                #print('non empty list element')
+                for q in (list_indices[i][j]):
                     k=1
                     m=1
-                    
+                    #print('inner loop')
                     const_local = np.sqrt(k*local_temp/m)
                     r_1=np.random.rand(1)
                     r_2=np.random.rand(1)
@@ -159,9 +161,13 @@ for time_index,t0 in enumerate(time):
                     y_1=const_local*np.sqrt(-2*np.log(r_1))*np.cos(2*np.pi*r_2)
                     y_2=const_local*np.sqrt(-2*np.log(r_1))*np.sin(2*np.pi*r_2)
                     y_3=const_local*np.sqrt(-2*np.log(r_3))*np.cos(2*np.pi*r_4)
-                    sol[3*no_of_particles+m]=y_1
-                    sol[4*no_of_particles+m]=y_2
-                    sol[5*no_of_particles+m]=y_3
+                    sol[3*no_of_particles+q]=y_1
+                    sol[4*no_of_particles+q]=y_2
+                    sol[5*no_of_particles+q]=y_3
+                    count += 1 
+                    #print(q)
+                    #print('blah')
+    #print('no of collisions ',count)
     old=sol
     list_indices.clear()
     h5f = h5py.File('solution_all/solution_'+str(time_index)+'.h5', 'w')
