@@ -86,7 +86,7 @@ for time_index in range(max_iterations):
     if(time_index==0):
         for i in range(Nx):
             for j in range(Ny):
-                Ez[i,j] = np.exp(-(x[i]**2+y[j]**2)/(2*spread**2))    
+                Ez[i,j] = np.exp(-((x[i]-0.5)**2+(y[j]-0.5)**2)/(2*spread**2))    
         
     for i in range(0,Nx-1):
         for j in range(0,Ny-1):
