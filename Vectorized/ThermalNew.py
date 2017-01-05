@@ -4,7 +4,7 @@ from scipy.special import erfinv
 import numexpr as ne
 
 """ Setting number of particles and other parameters"""
-no_of_particles = 100000
+no_of_particles = 1000000
 
 """ Initial conditions """
 
@@ -53,8 +53,8 @@ initial_conditions = np.concatenate([initial_conditions_position_x,initial_condi
 """ Discretizing time and making sure scaling is done right """
 
 box_crossing_time_scale = length_of_box_x / np.max(initial_conditions_velocity_x)
-final_time            = 50
-dt   = 0.05 * box_crossing_time_scale
+final_time            = 5.0
+dt   = 0.005 * box_crossing_time_scale
 time = np.arange(0, final_time, dt)
 print(time.size)
 
@@ -124,25 +124,29 @@ for time_index,t0 in enumerate(time):
     x2 = np.random.rand(collided_right[0].size)
     x3 = np.random.rand(collided_right[0].size)
 
-    v_x[collided_right[0]] = abs(np.sqrt(2*T_walls)*erfinv(2*x1-1))*(-1)    
+    x_coords[collided_right[0]] = 1
+    v_x[collided_right[0]] = abs(np.sqrt(-2*T_walls*np.log(x1)))*(-1)    
     v_y[collided_right[0]] = np.sqrt(2*T_walls)*erfinv(2*x2-1)    
     v_z[collided_right[0]] = np.sqrt(2*T_walls)*erfinv(2*x3-1)    
 
     sol[collided_right[0]+3*no_of_particles] = v_x[collided_right[0]]
     sol[collided_right[0]+4*no_of_particles] = v_y[collided_right[0]]
     sol[collided_right[0]+5*no_of_particles] = v_z[collided_right[0]]
+    sol[collided_right[0]] = x_coords[collided_right[0]]
     
     x1 = np.random.rand(collided_left[0].size)
     x2 = np.random.rand(collided_left[0].size)
     x3 = np.random.rand(collided_left[0].size)
    
-    v_x[collided_left[0]] = abs(np.sqrt(2*T_walls)*erfinv(2*x1-1)) 
+    x_coords[collided_left[0]] = 0
+    v_x[collided_left[0]] = abs(np.sqrt(-2*T_walls*np.log(x1))) 
     v_y[collided_left[0]] = np.sqrt(2*T_walls)*erfinv(2*x2-1)    
     v_z[collided_left[0]] = np.sqrt(2*T_walls)*erfinv(2*x3-1)    
     
     sol[3*no_of_particles+collided_left[0]] = v_x[collided_left[0]]
     sol[4*no_of_particles+collided_left[0]] = v_y[collided_left[0]]
     sol[5*no_of_particles+collided_left[0]] = v_z[collided_left[0]]
+    sol[collided_left[0]] = x_coords[collided_left[0]]
 
     """Implementation of Periodic B.C's"""
 
