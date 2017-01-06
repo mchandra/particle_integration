@@ -46,7 +46,6 @@ def error(Nz):
     z_plot = z[0:Nz]
     Ex = np.zeros((Nz),dtype = np.float)
     By = np.zeros((Nz), dtype = np.float)
-    #print(len(z))
 
     div_B = np.zeros(Nz, dtype = np.float)
     c = 1
@@ -101,32 +100,19 @@ def error(Nz):
 
 
 
-N = np.array( [32,64,128,256,512,1024, 2048 ] )
+N = np.array( [32,64,128,256,512, 1024 , 2048 , 4096 ] )
 ErrorN = np.zeros(len(N),dtype = np.float)
-
-ErrorN[0] = error(32)
-ErrorN[1] = error(64)
-ErrorN[2] = error(128)
-ErrorN[3] = error(256)
-ErrorN[4] = error(512)
-ErrorN[5] = error(1024)
-ErrorN[6] = error(2048)
-#ErrorN[7] = error(4096)
-#ErrorN[8] = error(8192)
-#ErrorN[9] = error(16384)
-#ErrorN[10] = error(32768)
-
+for i in range(len(N)):
+    ErrorN[i] = error(N[i])
 
 
 pl.loglog(N,ErrorN,'--g',lw =3,label = '$\mathrm{L_1 Norm}$ ' )
 pl.legend()
 pl.loglog(N,1000*(N**-1.999),'b',lw = 2,label = ' Analytical ')
-#print(N**-2)
 pl.legend()
 pl.title('Error vs Grid Points after 400 timesteps')
 pl.xlabel('Number of grid points')
 pl.ylabel('$\mathrm{L_1 Norm}$')
-#pl.ylim(-1,1)
 pl.show()
 pl.clf()
     
