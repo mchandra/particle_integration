@@ -41,7 +41,8 @@ def gauss(zvar,time):
     return np.exp(  -  (zvar-0.5 )**2/(2*spread**2))  #(0.5+time*dt) - int(0.5+time*dt)
 
 def error(Nz):
-    absSumError = 0
+    absSumErrorEx = 0
+    absSumErrorBy = 0
     z = np.linspace(0,1,Nz+1)
     z_plot = z[0:Nz]
     Ex = np.zeros((Nz),dtype = np.float)
@@ -64,7 +65,7 @@ def error(Nz):
         if(time_index==0):
             for i in range(Nz):
                 Ex[i] = np.exp(-(z[i]-0.5)**2/(2*spread**2))
-                By[i] = np.exp(-(z[i]-0.5)**2/(2*spread**2))
+                By[i] = 2*np.exp(-(z[i]-0.5)**2/(2*spread**2))
 
         for i in range(Nz):
             if(i==0):
@@ -83,36 +84,40 @@ def error(Nz):
     
 
         if(time_index==max_iterations-1):
-            #pl.plot(z_plot,Ex,'--g',lw =3,label = 'Numerical ' )
-            #pl.legend()
-            #pl.plot(z_plot,gauss(z_plot,time_index),'b',lw = 2,label = ' Analytical ')
-            #pl.legend()
-            #pl.title('Numerical vs Analytical after 400 timesteps')
-            #pl.xlabel('Z axis')
-            #pl.ylabel('Ex : Electric Field in x direction varying along Z axis')
-            #pl.ylim(-1,1)
-            #pl.show()
-            #pl.clf()            
-            absSumError = sum( abs(  Ex - gauss(z_plot,time_index)  )   ) / (Nz)
-    
-    #print(absSumError)            
-    return absSumError
+            pl.plot(z_plot,Ex,'--',color = 'black',lw =3,label = 'Numerical ' )
+            pl.legend()
+            pl.plot(z_plot,gauss(z_plot,time_index),'b',lw = 2,label = ' Analytical ')
+            pl.legend()
+            pl.title(' $N  = ' + str(Nz)+'$')
+            pl.xlabel('$z$ ')
+            pl.ylabel('$E_x$')
+            pl.ylim(-1,1.2)
+            #print('Blah Blah')
+            pl.savefig('L1/1-1-'+str(Nz)+'.png')
+            pl.clf()            
+            absSumErrorEx = sum( abs(  Ex - gauss(z_plot,time_index)  )   ) / (Nz)
+            absSumErrorBy = sum( abs(  By - 2*gauss(z_plot,time_index)  )   ) / (Nz)
+    print('Grid Points Taken =', Nz, ' Error in Electric Field= ', absSumErrorEx,' Error in Magnetic Field', absSumErrorBy)            
+    return absSumErrorEx,absSumErrorBy
 
 
 
-N = np.array( [32,64,128,256,512, 1024 , 2048 , 4096 ] )
-ErrorN = np.zeros(len(N),dtype = np.float)
+N = np.array( [ 32, 64, 128, 256, 512, 1024, 2048, 4096 ] )
+ErrorNEx = np.zeros(len(N),dtype = np.float)
+ErrorNBy = np.zeros(len(N),dtype = np.float)
 for i in range(len(N)):
-    ErrorN[i] = error(N[i])
+    ErrorNEx[i],ErrorNBy[i] = error(N[i])
 
 
-pl.loglog(N,ErrorN,'--g',lw =3,label = '$\mathrm{L_1 Norm}$ ' )
+pl.loglog(N,ErrorNEx,'-o',lw =3,label = '$E_x$ ' )
 pl.legend()
-pl.loglog(N,1000*(N**-1.999),'b',lw = 2,label = ' Analytical ')
+pl.loglog(N,ErrorNBy,'-o',lw =3,label = '$B_y$ ' )
 pl.legend()
-pl.title('Error vs Grid Points after 400 timesteps')
-pl.xlabel('Number of grid points')
-pl.ylabel('$\mathrm{L_1 Norm}$')
+pl.loglog(N,15*(N**-1.999),'--',color = 'black',lw = 2,label = ' $O(N^{-2})$. ')
+pl.legend()
+pl.title('$\mathrm{Convergence\; plot}$ ')
+pl.xlabel('$\mathrm{N}$.')
+pl.ylabel('$\mathrm{L_1\;norm\;of\;error}$')
 pl.show()
 pl.clf()
     
