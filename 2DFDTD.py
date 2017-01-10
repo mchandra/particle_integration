@@ -92,7 +92,7 @@ for time_index in range(max_iterations):
     for i in range(ghostcells, Nx + ghostcells):
         for j in range(ghostcells, Ny + ghostcells):
             
-            Ez[i, j] = Ez[i, j] + (dt_by_dx*(By[i, j]-By[i-1, j])) -  (dt_by_dy*(By[i, j]-By[i,  j - 1 ]))
+            Ez[i, j] = Ez[i, j] + (dt_by_dx*(By[i, j]-By[i-1, j])) -  (dt_by_dy*(Bx[i, j]-Bx[i,  j - 1 ]))
 
 
     
