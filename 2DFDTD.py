@@ -96,11 +96,11 @@ for time_index in range(max_iterations):
 
 
     
-    Ez[0, :] = Ez[Nx, :]
-    Ez[: , 0] = Ez[:, Ny]
+    Ez[0, :] = Ez[Nx, :].copy()
+    Ez[: , 0] = Ez[:, Ny].copy()
     
-    Ez[Nx+ghostcells, :] = Ez[ghostcells, :]
-    Ez[ :, Ny+ghostcells] = Ez[:, ghostcells]
+    Ez[Nx+ghostcells, :] = Ez[ghostcells, :].copy()
+    Ez[ :, Ny+ghostcells] = Ez[:, ghostcells].copy()
     
     
     
@@ -114,25 +114,25 @@ for time_index in range(max_iterations):
     
     
     
-    Bx[0, :] = Bx[Nx, :]
-    Bx[:, 0] = Bx[:, Ny]
-    Bx[Nx+ghostcells, :] = Bx[ghostcells,:]
-    Bx[:, Ny+ghostcells] = Bx[:, ghostcells]
+    Bx[0, :] = Bx[Nx, :].copy()
+    Bx[:, 0] = Bx[:, Ny].copy()
+    Bx[Nx+ghostcells, :] = Bx[ghostcells,:].copy()
+    Bx[:, Ny+ghostcells] = Bx[:, ghostcells].copy()
     
-    By[0, :] = By[Nx, :]
-    By[:, 0] = By[:, Ny]
-    By[Nx+ghostcells, :] = By[ghostcells,:]
-    By[:, Ny+ghostcells] = By[:, ghostcells]
+    By[0, :] = By[Nx, :].copy()
+    By[:, 0] = By[:, Ny].copy()
+    By[Nx+ghostcells, :] = By[ghostcells,:].copy()
+    By[:, Ny+ghostcells] = By[:, ghostcells].copy()
     
     for i in range(ghostcells,Nx+ghostcells):
         for j in range(ghostcells, Ny + ghostcells):
             
             div_B[i, j] = (Bx[i, j]-Bx[i-1,j])/(dx) +  (By[i, j]-By[i, j- 1])/(dy)
 
-    div_B[0, :] = div_B[Nx, :]
-    div_B[:, 0] = div_B[:, Ny]
-    div_B[Nx+ghostcells, :] = div_B[ghostcells,:]
-    div_B[:, Ny+ghostcells] = div_B[:, ghostcells]
+    div_B[0, :] = div_B[Nx, :].copy()
+    div_B[:, 0] = div_B[:, Ny].copy()
+    div_B[Nx+ghostcells, :] = div_B[ghostcells,:].copy()
+    div_B[:, Ny+ghostcells] = div_B[:, ghostcells].copy()
     
     
     
