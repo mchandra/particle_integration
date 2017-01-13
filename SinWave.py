@@ -87,40 +87,40 @@ def error(Nz):
         By[0] = By[Nz]
         By[Nz+ghostcells] = By[ghostcells]
 
-        pl.plot(z_plot,Ex[1:Nz+1],'--',color = 'black',lw =3,label = 'Numerical ' )
-        pl.legend()
-        pl.plot(z_plot,np.sin(2*np.pi*(time_index*dt-z_plot)),color = 'green',lw =1,label = 'Analytical ' )
-        pl.legend()
-        pl.title(' $N  = ' + str(Nz)+'$')
-        pl.xlabel('$z$ ')
-        pl.ylabel('$E_x$')
-        pl.ylim(-1.2,1.2)
-        pl.legend()            
-        pl.savefig('images/point_mass' + '%04d'%time_index + '.png')
-        pl.clf()
+        #pl.plot(z_plot,Ex[1:Nz+1],'--',color = 'black',lw =3,label = 'Numerical ' )
+        #pl.legend()
+        #pl.plot(z_plot,np.sin(2*np.pi*(time_index*dt-z_plot)),color = 'green',lw =1,label = 'Analytical ' )
+        #pl.legend()
+        #pl.title(' $N  = ' + str(Nz)+'$')
+        #pl.xlabel('$z$ ')
+        #pl.ylabel('$E_x$')
+        #pl.ylim(-1.2,1.2)
+        #pl.legend()            
+        #pl.savefig('images/point_mass' + '%04d'%time_index + '.png')
+        #pl.clf()
 
 
-        pl.plot(z_plot,Ex[1:Nz+1],'--',color = 'black',lw =3,label = 'Numerical ' )
-        pl.legend()
-        pl.plot(z_plot,np.sin(2*np.pi*(time_index*dt-z_plot)),color = 'green',lw =1,label = 'Analytical ' )
-        pl.legend()
-        pl.title(' $N  = ' + str(Nz)+'$')
-        pl.xlabel('$z$ ')
-        pl.ylabel('$B_y$')
-        pl.ylim(-1.2,1.2)
-        pl.legend()            
-        pl.savefig('mag/point_mass' + '%04d'%time_index + '.png')
-        pl.clf()
+        #pl.plot(z_plot,By[1:Nz+1],'--',color = 'black',lw =3,label = 'Numerical ' )
+        #pl.legend()
+        #pl.plot(z_plot,np.sin(2*np.pi*(time_index*dt-z_plot)),color = 'green',lw =1,label = 'Analytical ' )
+        #pl.legend()
+        #pl.title(' $N  = ' + str(Nz)+'$')
+        #pl.xlabel('$z$ ')
+        #pl.ylabel('$B_y$')
+        #pl.ylim(-1.2,1.2)
+        #pl.legend()            
+        #pl.savefig('mag/point_mass' + '%04d'%time_index + '.png')
+        #pl.clf()
 
         if(  time_index==max_iterations-3  ):
 
-            pl.plot(z_plot,Ex[1:Nz+1],'--',color = 'black',lw =3,label = 'Numerical ' )
-            pl.legend()
-            pl.plot(z_plot,np.sin(2*np.pi*(time_index*dt-z_plot)),color = 'green',lw =1,label = 'Analytical ' )
-            pl.ylim(-1.2,1.2)
-            pl.legend()            
-            pl.show()
-            pl.clf()
+            #pl.plot(z_plot,Ex[1:Nz+1],'--',color = 'black',lw =3,label = 'Numerical ' )
+            #pl.legend()
+            #pl.plot(z_plot,np.sin(2*np.pi*(time_index*dt-z_plot)),color = 'green',lw =1,label = 'Analytical ' )
+            #pl.ylim(-1.2,1.2)
+            #pl.legend()            
+            #pl.show()
+            #pl.clf()
 
             absSumErrorEx = sum( abs(  Ex[ghostcells:Nz+ghostcells] - np.sin(2*np.pi*( (time_index+1)*dt-z_plot)  )  )   ) / (Nz)
             absSumErrorBy = sum( abs(  By[ghostcells:Nz+ghostcells] - np.sin(2*np.pi*( (time_index+1)*dt-z_plot) )  )   ) / (Nz)
@@ -129,7 +129,7 @@ def error(Nz):
             return absSumErrorEx,absSumErrorBy
 
 
-N = np.array( [ 128 ] )
+N = np.array( [ 32,48,64,96,128,192,256,384,512,768,1024 ] )
 ErrorNEx = np.zeros(len(N),dtype = np.float)
 ErrorNBy = np.zeros(len(N),dtype = np.float)
 for i in range(len(N)):
