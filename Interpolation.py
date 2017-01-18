@@ -39,6 +39,7 @@ def getXi(nodal_point, local_domain_nodes):
 
 
 def shape(localXi,local_array): 
+    #print('The Xi for the term is ')
     
     local_domain_nodes = len(local_array)
     localXi_matrix = [[ 0 ] for i in range(local_domain_nodes)]
@@ -59,16 +60,23 @@ def shape(localXi,local_array):
     return np.matrix(localXi_matrix)*np.matrix(c)
 
 
+number_of_ghost_points = 0
 Nx = 1000
 
 x1 = np.linspace(0, 1, Nx+1)
 x2 = np.linspace(0, 1, Nx+1)
 
 Electric_field = np.sin(4*np.pi*x1)
-Magnetic_field = np.sin(4*np.pi*x2)
 
 
-number_of_random_points = 20
+if(np.int( (zones_random_points[i]-1)*(order_of_interpolation) )  + order_of_interpolation+1 > Nx)
+    number_of_ghost_points = np.int( (zones_random_points[i])*(order_of_interpolation) )  +1 - Nx
+
+Electric_field = np.concatenate([Electric_field,Electric_field[0:number_of_ghost_points]],axis = 0)
+
+
+
+number_of_random_points = 10
 
 random_points = np.random.rand(number_of_random_points)
 Xi_random_points = np.zeros(number_of_random_points, dtype = np.float)
@@ -82,15 +90,23 @@ interpolated_electric_fields = np.zeros(len(random_points), dtype = np.float)
 order_of_interpolation = 2
 
 
-
 Xi_random_points =   ( (  (random_points*Nx)%(order_of_interpolation)  )/order_of_interpolation  )
 for i in range(number_of_random_points):
-    zones_random_points[i] =     np.int(   (   (random_points[i]*Nx)/order_of_interpolation   )  )
+    zones_random_points[i] =     np.int(   (   (random_points[i]*Nx)/order_of_interpolation   )  )+1
+
+print('random points are : ', random_points)
+print('Zones for those random points are : ', zones_random_points)
+print(' Xi for those random points are : ', Xi_random_points)
+#print('random points are : ', random_points)
+
+
+print(' The point selected is ',random_points[2])
+print('Starting index of point is ', np.int( (zones_random_points[2]-1)*(order_of_interpolation+1) )  )
 
 
 
 for i in range(number_of_random_points):
-    interpolated_electric_fields[i] = shape(Xi_random_points[i],Electric_field[  np.int( (zones_random_points[i]-1)*(order_of_interpolation+1) -1)   :     np.int( (zones_random_points[i]-1)*(order_of_interpolation+1) -1)  + order_of_interpolation+1      ] )
+    interpolated_electric_fields[i] = shape(Xi_random_points[i],Electric_field[  np.int( (zones_random_points[i]-1)*(order_of_interpolation) )   :     np.int( (zones_random_points[i]-1)*(order_of_interpolation) )  + order_of_interpolation+1      ] )
 
 
 x_refined = np.linspace(0,1,101)
