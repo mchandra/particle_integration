@@ -31,12 +31,8 @@ pl.rcParams['ytick.labelsize']  = 'medium'
 pl.rcParams['ytick.direction']  = 'in'    
 
 
-
-
 def getXi(nodal_point, local_domain_nodes):
-    return np.float(nodal_point/local_domain_nodes)
-
-
+    return np.float(nodal_point/(local_domain_nodes-1))
 
 def shape(localXi,local_array): 
     #print('The Xi for the term is ')
@@ -47,18 +43,18 @@ def shape(localXi,local_array):
     
     for i in range(local_domain_nodes):
         localXi_matrix[i] = localXi**i
-        
+    #print('local Xi vector matrix is ',localXi_matrix)
     c = np.matrix( [[ 0 ] for i in range(local_domain_nodes)] )
     A = np.zeros( (local_domain_nodes , local_domain_nodes ) ,dtype = np.float)
     
     for i in range(local_domain_nodes):
         for j in range(local_domain_nodes):
             A[i,j] = getXi(i, local_domain_nodes)**j
-    
+    #print('A is  ',A)
     c = np.matrix(la.inv(A))*u.transpose()
-
+    #print('c is  is ',c)
+    #print('The answer returned is  ', np.matrix(localXi_matrix)*np.matrix(c))
     return np.matrix(localXi_matrix)*np.matrix(c)
-
 
 
 def error(Nx,order):
@@ -67,8 +63,6 @@ def error(Nx,order):
     x2 = np.linspace(0, 1, Nx+1)
 
     Electric_field = np.sin(4*np.pi*x1)
-
-
 
     number_of_random_points = 10
 
@@ -110,6 +104,10 @@ def error(Nx,order):
 
 
 
+#print(shape(0.35,np.array([1,2])))
+
+
+
 N = np.array( [ 32,64,128,256,512,1024, 2048, 4096, 8192  ] )
 ErrorNEOne = np.zeros((  len(N) )  ,dtype = np.float)
 ErrorNEThree = np.zeros((  len(N) )  ,dtype = np.float)
@@ -138,15 +136,15 @@ for i in range(len(N)):
     
 
 pl.loglog(N,ErrorNEOne,'-o',label = '$Order= '+str(1)+'$' )
-pl.legend()
+pl.legend().draggable()
 pl.loglog(N,ErrorNEThree,'-o',label = '$Order= '+str(3)+'$' )
-pl.legend()
+pl.legend().draggable()
 pl.loglog(N,ErrorNEFive,'-o',label = '$Order= '+str(5)+'$' )
-pl.legend()
+pl.legend().draggable()
 pl.loglog(N,ErrorNESeven,'-o',label = '$Order= '+str(7)+'$' )
-pl.legend()
+pl.legend().draggable()
 pl.loglog(N,ErrorNENine,'-o',label = '$Order= '+str(9)+'$' )
-pl.legend()
+pl.legend().draggable()
 #pl.loglog(N,ErrorNE[:,1],'-o',lw =1,label = '$Order= '+str(3)+'$' )
 #pl.legend()
 #pl.loglog(N,ErrorNE[:,2],lw =1,label = '$Order= '+str(5)+'$' )
@@ -155,14 +153,10 @@ pl.legend()
 #pl.legend()
 #pl.loglog(N,ErrorNE[:,4],lw =1,label = '$Order= '+str(9)+'$' )
 #pl.legend()
-pl.loglog(N,15*(N**-.999),'--',color = 'black',label = ' $O(N^{-1})$ ')
-pl.legend()
+pl.loglog(N,0.15*(N**-.999),'--',color = 'black',label = ' $O(N^{-1})$ ')
+pl.legend().draggable()
 pl.title('$\mathrm{Convergence\; plot}$ ')
 pl.xlabel('$\mathrm{N}$')
 pl.ylabel('$\mathrm{L_1\;norm\;of\;error}$')
 pl.show()
 pl.clf()
-    
-
-
-
