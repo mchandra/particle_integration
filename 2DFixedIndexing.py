@@ -38,20 +38,29 @@ def sumsum(a):
 spread = 0.1
 ghostcells = 1
 
-
 def Interpolate(y, x, x_grid, y_grid, E):
-    n = len(E[0,:])-2
+    n      = len(E[0,:])-1           # number of zones
+
     x_zone = int(n * x)             # indexing from zero itself
     y_zone = int(n * y)
-    dx = x_grid[x_zone + 1] - x_grid[x_zone]
-    dy = y_grid[y_zone + 1] - y_grid[y_zone]
+    dx     = x_grid[x_zone + 1] - x_grid[x_zone]
+    dy     = y_grid[y_zone + 1] - y_grid[y_zone]
+
+    print('n is = ', n)
+    print('printing x = ', x)
+    print('printing y = ', y)
+    print('printing x_grid', x_grid)
+    print('printing y_grid', y_grid)
+    print('Electric field  = ', E)
+    print('printing x zone', x_zone)
+    print('printing y zone', y_zone)
+# Interpolating
 
     E_interpolated = -(  (( (x_grid[x_zone+1] - x )*(y_grid[y_zone] - y ) )/( (dx) * (dy) ))*E[x_zone, y_zone + 1] +\
                      (( ( x - x_grid[x_zone] )*(y_grid[y_zone] - y ) )/( (dx) * (dy) )) * E[x_zone + 1, y_zone + 1] +\
                      (( (x_grid[x_zone+1] - x )*( y - y_grid[y_zone+1]) )/( (dx) * (dy) )) * E[x_zone, y_zone] +\
                      (( (x - x_grid[x_zone])*( y - y_grid[y_zone + 1]) )/( (dx) * (dy) )) * E[x_zone + 1, y_zone]  )
-
-
+    print('Interpolated answer = ', E_interpolated)
     return E_interpolated
 
 
