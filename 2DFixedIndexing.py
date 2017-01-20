@@ -83,8 +83,8 @@ def error(a):
 
     x = np.linspace(0,1,nx+1,endpoint=True)
     x_plot = x[0:nx]
-    print('x is ', x)
-    print('Length of x ', len(x))
+    # print('x is ', x)
+    # print('Length of x ', len(x))
 
     y = np.linspace(0,1,ny+1, endpoint=True)
     y_plot = y[0:ny]
@@ -101,7 +101,7 @@ def error(a):
 
     for i in range(nx+1):
         for j in range(ny+1):
-            Ez[i + ghostcells][j + ghostcells] = i#np.exp(-(y[j] - 0.5) ** 2 / (2 * spread ** 2))
+            Ez[i + ghostcells][j + ghostcells] = np.exp(-x[i]**2-y[j]**2)#np.exp(-(y[j] - 0.5) ** 2 / (2 * spread ** 2))
             Bx[i + ghostcells][j + ghostcells] = np.exp(-((y[j] - 0.5) ** 2) / (2 * spread ** 2))
             By[i + ghostcells][j + ghostcells] = 0
     print(' Electric Field with ghost cells in the domain is set as ',Ez)
@@ -124,28 +124,30 @@ def error(a):
 
 # Random points for error Testing
 
-    number_random_points = 1
+    number_random_points = 30
 
-    # x_random = np.random.rand(number_random_points)
-    # y_random = np.random.rand(number_random_points)
+    x_random = np.random.rand(number_random_points)
+    y_random = np.random.rand(number_random_points)
 
-    x_random = np.array([0.5])
-    y_random = np.array([0.75])
+    # x_random = np.array([0.5])
+    # y_random = np.array([0.75])
 
 
     Ez_at_random = np.random.rand(number_random_points)
 
     for i in range(number_random_points):
-        Ez_at_random[i] = Interpolate(x_random[i], y_random[i],x, y,Ez[ghostcells:-1,ghostcells:-1])
+        Ez_at_random[i] = Interpolate( y_random[i], x_random[i], x, y,Ez[ghostcells:-ghostcells,ghostcells:-ghostcells].transpose())
 
     error = 0
-    for i in range(number_random_points):
-        error += abs(np.array(Ez_at_random[i]-np.exp(-(y_random[i] + dy - 0.5) ** 2 / (2 * spread ** 2))))/number_random_points
+    print('Interpolated answer', Ez_at_random)
+    print('Expected answer', np.exp(-x_random**2-y_random**2) )
 
+    error = sum( abs(Ez_at_random - np.exp(-x_random**2-y_random**2)  ) ) /number_random_points
+    print('error calculated = ',error)
     return error
 
 
-N = np.array([2])
+N = np.array([32, 64, 128, 256, 512,1024,2048,4096])
 ErrorNEz = np.zeros(len(N), dtype=np.float)
 # ErrorNBx = np.zeros(len(N), dtype=np.float)
 # ErrorNBy = np.zeros(len(N), dtype=np.float)
@@ -153,23 +155,23 @@ ErrorNEz = np.zeros(len(N), dtype=np.float)
 for i in range(len(N)):
     ErrorNEz[i] = error(N[i])
 
-#
-# pl.loglog(N,ErrorNEz,'-o',lw =3,label = '$E_z$ ' )
+
+pl.loglog(N,ErrorNEz,'-o',lw =3,label = '$E_z$ ' )
+pl.legend()
+# pl.loglog(N,ErrorNBx,'-',lw =4, label = '$B_x$ ' )
 # pl.legend()
-# # pl.loglog(N,ErrorNBx,'-',lw =4, label = '$B_x$ ' )
-# # pl.legend()
-# # pl.loglog(N,ErrorNBy,'-o',lw =3,label = '$B_y$ ' )
-# # pl.legend()
-# pl.loglog(N,1.5*(N**-1.999),'--',color = 'black',lw = 2,label = ' $O(N^{-2})$ ')
+# pl.loglog(N,ErrorNBy,'-o',lw =3,label = '$B_y$ ' )
 # pl.legend()
-# # pl.ylim(10**-7,10**1)
-# pl.title('$\mathrm{Convergence\; plot}$ ')
-# pl.xlabel('$\mathrm{N}$')
-# pl.ylabel('$\mathrm{L_1\;norm\;of\;error}$')
-# # pl.savefig('Init2.png')
-# pl.show()
-# pl.clf()
-#
-#
+pl.loglog(N,1.5*(N**-1.999),'--',color = 'black',lw = 2,label = ' $O(N^{-2})$ ')
+pl.legend()
+# pl.ylim(10**-7,10**1)
+pl.title('$\mathrm{Convergence\; plot}$ ')
+pl.xlabel('$\mathrm{N}$')
+pl.ylabel('$\mathrm{L_1\;norm\;of\;error}$')
+# pl.savefig('Init2.png')
+pl.show()
+pl.clf()
+
+
 # print('Ez errors :')
 # print(ErrorNEz)
