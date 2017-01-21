@@ -2,8 +2,6 @@ import numpy as np
 import pylab as pl
 import numpy.linalg as la
 
-import numpy.linalg as la
-
 pl.rcParams['figure.figsize']   = 12, 7.5
 pl.rcParams['lines.linewidth']  = 1.5
 pl.rcParams['font.family']      = 'serif'
@@ -35,54 +33,16 @@ ghostcells = 1
 
 
 
-def EInterpolate(x, y, x_grid, y_grid, E):
-    E_function = E.transpose()
-    n      = len(E_function[0,:])-1           # number of zones
+def Interpolate(x, y, x_grid, y_grid, F):
+    F_function = F.transpose()
+    n      = len(F_function[0,:])-3           # number of zones
 
-    x_zone = int(n * x)             # indexing from zero itself
-    y_zone = int(n * y)
-    dx     = x_grid[x_zone + 1] - x_grid[x_zone]
-    dy     = y_grid[y_zone + 1] - y_grid[y_zone]
-
-    b = np.matrix([ [0], [0], [0], [0] ])
-
-    A = np.matrix( [ [1, x_grid[x_zone], y_grid[y_zone], x_grid[x_zone]*y_grid[y_zone] ], \
-            [1, x_grid[x_zone], y_grid[y_zone + 1], x_grid[x_zone]*y_grid[y_zone + 1] ], \
-            [1, x_grid[x_zone + 1], y_grid[y_zone], x_grid[x_zone + 1]*y_grid[y_zone] ], \
-            [1, x_grid[x_zone + 1], y_grid[y_zone + 1], x_grid[x_zone + 1]*y_grid[y_zone + 1] ] ])
-
-
-
-    point_to_calculated_for = np.matrix([ [1],[x], [y], [x*y] ])
-
-    b = (la.inv(A)).transpose()*point_to_calculated_for
-
-
-    Q11 = E_function[x_zone, y_zone]
-    Q21 = E_function[x_zone + 1, y_zone]
-    Q12 = E_function[x_zone, y_zone + 1]
-    Q22 = E_function[x_zone + 1, y_zone + 1]
-
-    Q = np.matrix([[Q11], [Q12], [Q21], [Q22] ])
-
-
-    E_interpolated = b.transpose()*Q
-
-    return E_interpolated
-
-
-# Correct
-
-def BInterpolate(x, y, x_grid, y_grid, B):
-    B_function = B.transpose()
-    n      = len(B_function[0,:])-2         # number of zones
-
-    x_zone = int(n * (x-x_grid[0]) )             # indexing from zero itself
+    x_zone = int(n * (x-x_grid[0]))             # indexing from zero itself
     y_zone = int(n * (y-y_grid[0]))
-    dx     = x_grid[x_zone + 1] - x_grid[x_zone]
-    dy     = y_grid[y_zone + 1] - y_grid[y_zone]
+    #print('',x_zone)
 
-    #print('Magnetic Field = ', B)
+
+
     b = np.matrix([ [0], [0], [0], [0] ])
 
     A = np.matrix( [ [1, x_grid[x_zone], y_grid[y_zone], x_grid[x_zone]*y_grid[y_zone] ], \
@@ -97,28 +57,28 @@ def BInterpolate(x, y, x_grid, y_grid, B):
     b = (la.inv(A)).transpose()*point_to_calculated_for
 
 
-    Q11 = B_function[x_zone, y_zone]
-    Q21 = B_function[x_zone + 1, y_zone]
-    Q12 = B_function[x_zone, y_zone + 1]
-    Q22 = B_function[x_zone + 1, y_zone + 1]
+    Q11 = F_function[x_zone, y_zone]
+    Q21 = F_function[x_zone + 1, y_zone]
+    Q12 = F_function[x_zone, y_zone + 1]
+    Q22 = F_function[x_zone + 1, y_zone + 1]
 
     Q = np.matrix([[Q11], [Q12], [Q21], [Q22] ])
 
 
-    B_interpolated = b.transpose()*Q
+    F_interpolated = b.transpose()*Q
 
-    # print('Inside Function n is  = ', n)
-    # print('x is =', x)
-    # print('y is =', y)
-    # print('Input x grid  = ', x_grid)
-    # print('Input y grid  = ', y_grid)
-    # print('x_zone  = ', x_zone)
-    # print('y_zone  = ', y_zone)
-    # print('Input Magnetic Field  = ', B)
-    #
-    # print('Inside Function Interpolated Magenetic Field = ', B_interpolated)
-    return B_interpolated
 
+
+    # print('n is = ', n)
+    # print('printing x = ', x)
+    # print('printing y = ', y)
+    # print('printing x_grid', x_grid)
+    # print('printing y_grid', y_grid)
+    # print('Field  = ', F)
+    # print('printing x zone', x_zone)
+    # print('printing y zone', y_zone)
+    # print('Interpolated magnetic field = ', F_interpolated)
+    return F_interpolated
 
 
 
@@ -137,14 +97,18 @@ def BInterpolate(x, y, x_grid, y_grid, B):
 
 
 
-
-# E_test = np.ones((3,3), dtype = np.float)
+#
+# E_test = np.ones((5,5), dtype = np.float)
 # E_test[:,1]*=2
 # E_test[:,2]*=3
+# E_test[:,3]*=5
 # print(E_test)
-# print(E_test[1,0],E_test[1,1],E_test[1,2])
+# print(E_test[1,1],E_test[1,2],E_test[1,3])
 # print(E_test[0,1],E_test[1,1],E_test[2,1])
-# print(    EInterpolate( 0.25, 0.75, np.array([0,0.5,1]), np.array([0,0.5,1]) , E_test )    )
+# print(    Interpolate( 0.5, 0.5, np.array([-0.5,0,0.5,1,1.5]), np.array([-0.5,0,0.5,1,1.5]) , E_test )    )
+#
+
+
 
 
 
@@ -152,27 +116,28 @@ def error(a):
     nx = a  # number of zones not points
     ny = a  # number of zones not points
 
-    x = np.linspace(0, 1, nx + 1, endpoint=True)
-    y = np.linspace(0, 1, ny + 1, endpoint=True)
-
-    Ez = np.zeros(((len(x) + 2 * ghostcells), (len(y) + 2 * ghostcells)), dtype=np.float)
-    Bx = np.zeros(((len(x) + 2 * ghostcells), (len(y) + 2 * ghostcells)), dtype=np.float)
-    By = np.zeros(((len(x) + 2 * ghostcells), (len(y) + 2 * ghostcells)), dtype=np.float)
-
     dx = np.float(1 / (nx))
     dy = np.float(1 / (ny))
 
-    x_b = np.linspace(-dx / 2, 1 + dx / 2, nx + 2, endpoint=True)
-    y_b = np.linspace(-dx / 2, 1 + dx / 2, ny + 2, endpoint=True)
+    x_center = np.linspace(-dx, 1 + dx, nx + 3, endpoint=True)
+    y_center = np.linspace(-dy, 1 + dy, ny + 3, endpoint=True)
+
+    Ez = np.zeros(((len(x_center)), (len(y_center))), dtype=np.float)
+    Bx = np.zeros(((len(x_center)), (len(y_center) )), dtype=np.float)
+    By = np.zeros(((len(x_center)), (len(y_center))), dtype=np.float)
+
+
+
+    x_right = np.linspace(-dx / 2, 1 + 3*dx / 2, nx + 3, endpoint=True)
+    y_top   = np.linspace(-dy / 2, 1 + 3*dy / 2, ny + 3, endpoint=True)
 
     # Conditions
 
     for i in range(nx + 1):
         for j in range(ny + 1):
-            Ez[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * x[i] * y[j]) * np.cos(2 * np.pi * x[i] * y[j])
-            Bx[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * x[i] * y[j]) * np.cos(2 * np.pi * x[i] * y[j])
-            By[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * (x_b[i + 1]) * y_b[j + 1]) * np.cos(
-                2 * np.pi * x_b[i + 1] * y_b[j + 1])
+            Ez[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * x_center[i+1] * y_center[j+1]) * np.cos(2 * np.pi * x_center[i+1] * y_center[j+1])
+            Bx[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * x_center[i+1] * y_center[j+1]) * np.cos(2 * np.pi * x_center[i+1] * y_center[j+1])
+            By[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * x_center[i+1] * y_center[j+1]) * np.cos(2 * np.pi * x_center[i+1] * y_center[j+1])
 
             # Ghost cells values copying
 
@@ -193,6 +158,7 @@ def error(a):
 
     # Random points for error Testing
 
+
     number_random_points = 50
 
     # Declaring random points
@@ -200,10 +166,17 @@ def error(a):
     x_random = np.random.rand(number_random_points)
     y_random = np.random.rand(number_random_points)
 
+
+    # x_random[0] = 0.5
+    # x_random[1] = 0.25
+    # x_random[2] = 0.75
+    # y_random[0] = 0.25
+    # y_random[1] = 0.5
+    # y_random[2] = 0.75
     # x_random = np.array(0.1)
     # y_random = np.array(0.1)
-    x_random_b = x_random
-    y_random_b = y_random
+    #x_random_b = x_random
+    #y_random_b = y_random
 
     # x_random = np.array([0.50,0.50,0.50])
     # y_random = np.array([0.25,0.5,0.75])
@@ -215,33 +188,47 @@ def error(a):
     # Calculating Interpolated values at the
 
     for i in range(number_random_points):
-        # Ez_at_random[i] = EInterpolate( y_random[i], x_random[i], x, y, Ez[ghostcells:-ghostcells,ghostcells:-ghostcells].transpose() )
-        Bx_at_random[i] = BInterpolate(x_random[i] , y_random[i] , x_b, y_b, Bx[:-1, :-1])
-        # By_at_random[i] = BInterpolate( y_random[i] - dy/2, x_random[i] - dx/2, x_b, y_b, By[:-ghostcells, ghostcells:-ghostcells].transpose() )
+        Ez_at_random[i] = Interpolate( x_random[i] , y_random[i], x_center, y_center, Ez )
+        Bx_at_random[i] = Interpolate(x_random[i] , y_random[i] , x_center, y_top, Bx)
+        By_at_random[i] = Interpolate( x_random[i] , y_random[i], x_right, y_center, By )
 
     #Bx_at_random = BInterpolate(x_random , y_random , x_b, y_b, Bx[:-2, :-2])
-    error = 0
+
+    Ez_error = 0
+    Bx_error = 0
+    By_error = 0
+
+
     # error = sum( abs(Ez_at_random - np.sin(2*np.pi*x_random*y_random)*np.cos(2*np.pi*x_random*y_random)  ) ) /number_random_points
-    error = sum(abs(Bx_at_random - np.sin(2 * np.pi * (x_random-dx/2) * (y_random-dy/2)) * np.cos(2 * np.pi * (x_random-dx/2) * (y_random-dy/2)) )) / number_random_points
-    #print('expected Magnetic field = ',(x_random-dx/2)**2+(y_random-dy/2)**2 )
+    Ez_error = sum(abs(Ez_at_random - np.sin(2 * np.pi * (x_random) * (y_random)) * np.cos( 2 * np.pi * (x_random) * (y_random)))) / number_random_points
+    Bx_error = sum(abs(Bx_at_random - np.sin(2 * np.pi * (x_random) * (y_random - dy/2 )) * np.cos(2 * np.pi * (x_random) * (y_random - dy/2 ) )) ) / number_random_points
+    By_error = sum(abs(By_at_random - np.sin(2 * np.pi * (x_random -dx/2) * (y_random)) * np.cos(2 * np.pi * (x_random-dx/2 ) * (y_random)))) / number_random_points
+    #print('expected Magnetic field = ',np.sin(2 * np.pi * (x_random) * (y_random )) * np.cos(2 * np.pi * (x_random) * (y_random )) )
     #print('dx = ', dx)
-    #print('error = ',error)
-    return error
+    #print('Ez error = ',Ez_error)
+    #print('Bx error = ', Bx_error)
+    #print('By error = ', By_error)
+    return Ez_error,Bx_error, By_error
 
 
 # Test Grid Sizes
 
-#N = np.array([32,64,128,256,512])
-N = np.arange(30,600,30)
+#N = np.array([32, 64, 128, 256, 512, 1024])
+N = np.arange(50,1500,50)
 ErrorNEz = np.zeros(len(N), dtype=np.float)
-
+ErrorNBx = np.zeros(len(N), dtype=np.float)
+ErrorNBy = np.zeros(len(N), dtype=np.float)
 for i in range(len(N)):
-    ErrorNEz[i] = error(N[i])
+    ErrorNEz[i], ErrorNBx[i], ErrorNBy[i]  = error(N[i])
     print('Term = ', i)
 
 # Plotting
 
 pl.loglog(N, ErrorNEz, '-o', lw=3, label='$E_z$ ')
+pl.legend()
+pl.loglog(N, ErrorNBx, '-o', lw=3, label='$B_x$ ')
+pl.legend()
+pl.loglog(N, ErrorNBy, '-o', lw=5, label='$B_y$ ')
 pl.legend()
 pl.loglog(N, 150 * (N ** -1.999), '--', color='black', lw=2, label=' $O(N^{-2})$ ')
 pl.legend()
