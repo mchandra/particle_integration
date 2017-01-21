@@ -39,9 +39,6 @@ def Interpolate(x, y, x_grid, y_grid, F):
 
     x_zone = int(n * (x-x_grid[0]))             # indexing from zero itself
     y_zone = int(n * (y-y_grid[0]))
-    #print('',x_zone)
-
-
 
     b = np.matrix([ [0], [0], [0], [0] ])
 
@@ -67,47 +64,7 @@ def Interpolate(x, y, x_grid, y_grid, F):
 
     F_interpolated = b.transpose()*Q
 
-
-
-    # print('n is = ', n)
-    # print('printing x = ', x)
-    # print('printing y = ', y)
-    # print('printing x_grid', x_grid)
-    # print('printing y_grid', y_grid)
-    # print('Field  = ', F)
-    # print('printing x zone', x_zone)
-    # print('printing y zone', y_zone)
-    # print('Interpolated magnetic field = ', F_interpolated)
     return F_interpolated
-
-
-
-
-#
-# B_test = np.ones((4,4), dtype = np.float)
-# B_test[:,1]*=2
-# B_test[:,2]*=3
-# print(B_test)
-# print(B_test[1,0],B_test[1,1],B_test[1,2],B_test[1])
-# print(B_test[0,1],B_test[1,1],B_test[2,1])
-# print(    BInterpolate( 0.5, 0.25, np.array([-0.25, 0.25, 0.75, 1.25]), np.array([-0.25, 0.25, 0.75, 1.25]) , B_test )    )
-#
-#
-
-
-
-
-#
-# E_test = np.ones((5,5), dtype = np.float)
-# E_test[:,1]*=2
-# E_test[:,2]*=3
-# E_test[:,3]*=5
-# print(E_test)
-# print(E_test[1,1],E_test[1,2],E_test[1,3])
-# print(E_test[0,1],E_test[1,1],E_test[2,1])
-# print(    Interpolate( 0.5, 0.5, np.array([-0.5,0,0.5,1,1.5]), np.array([-0.5,0,0.5,1,1.5]) , E_test )    )
-#
-
 
 
 
@@ -166,25 +123,10 @@ def error(a):
     x_random = np.random.rand(number_random_points)
     y_random = np.random.rand(number_random_points)
 
-
-    # x_random[0] = 0.5
-    # x_random[1] = 0.25
-    # x_random[2] = 0.75
-    # y_random[0] = 0.25
-    # y_random[1] = 0.5
-    # y_random[2] = 0.75
-    # x_random = np.array(0.1)
-    # y_random = np.array(0.1)
-    #x_random_b = x_random
-    #y_random_b = y_random
-
-    # x_random = np.array([0.50,0.50,0.50])
-    # y_random = np.array([0.25,0.5,0.75])
     Ez_at_random = np.zeros(number_random_points)
     Bx_at_random = np.zeros(number_random_points)
     By_at_random = np.zeros(number_random_points)
 
-    #print('Physical grid = ', x)
     # Calculating Interpolated values at the
 
     for i in range(number_random_points):
@@ -192,22 +134,14 @@ def error(a):
         Bx_at_random[i] = Interpolate(x_random[i] , y_random[i] , x_center, y_top, Bx)
         By_at_random[i] = Interpolate( x_random[i] , y_random[i], x_right, y_center, By )
 
-    #Bx_at_random = BInterpolate(x_random , y_random , x_b, y_b, Bx[:-2, :-2])
-
     Ez_error = 0
     Bx_error = 0
     By_error = 0
 
 
-    # error = sum( abs(Ez_at_random - np.sin(2*np.pi*x_random*y_random)*np.cos(2*np.pi*x_random*y_random)  ) ) /number_random_points
     Ez_error = sum(abs(Ez_at_random - np.sin(2 * np.pi * (x_random) * (y_random)) * np.cos( 2 * np.pi * (x_random) * (y_random)))) / number_random_points
     Bx_error = sum(abs(Bx_at_random - np.sin(2 * np.pi * (x_random) * (y_random - dy/2 )) * np.cos(2 * np.pi * (x_random) * (y_random - dy/2 ) )) ) / number_random_points
     By_error = sum(abs(By_at_random - np.sin(2 * np.pi * (x_random -dx/2) * (y_random)) * np.cos(2 * np.pi * (x_random-dx/2 ) * (y_random)))) / number_random_points
-    #print('expected Magnetic field = ',np.sin(2 * np.pi * (x_random) * (y_random )) * np.cos(2 * np.pi * (x_random) * (y_random )) )
-    #print('dx = ', dx)
-    #print('Ez error = ',Ez_error)
-    #print('Bx error = ', Bx_error)
-    #print('By error = ', By_error)
     return Ez_error,Bx_error, By_error
 
 
