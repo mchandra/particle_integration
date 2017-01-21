@@ -69,6 +69,11 @@ def Interpolate(x, y, x_grid, y_grid, F):
 
 
 
+
+
+
+
+
 def error(a):
     nx = a  # number of zones not points
     ny = a  # number of zones not points
@@ -93,8 +98,8 @@ def error(a):
     for i in range(nx + 1):
         for j in range(ny + 1):
             Ez[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * x_center[i+1] * y_center[j+1]) * np.cos(2 * np.pi * x_center[i+1] * y_center[j+1])
-            Bx[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * x_center[i+1] * y_center[j+1]) * np.cos(2 * np.pi * x_center[i+1] * y_center[j+1])
-            By[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * x_center[i+1] * y_center[j+1]) * np.cos(2 * np.pi * x_center[i+1] * y_center[j+1])
+            Bx[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * x_center[i+1] * (y_top[j+1]-dy/2) ) * np.cos(2 * np.pi * x_center[i+1] * (y_top[j+1]-dy/2))
+            By[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * (x_right[i+1]-dx/2) * y_center[j+1]) * np.cos(2 * np.pi * (x_right[i+1]-dx/2) * y_center[j+1])
 
             # Ghost cells values copying
 
@@ -116,16 +121,19 @@ def error(a):
     # Random points for error Testing
 
 
-    number_random_points = 50
+    number_random_points = 30
 
     # Declaring random points
 
     x_random = np.random.rand(number_random_points)
     y_random = np.random.rand(number_random_points)
 
+
+
     Ez_at_random = np.zeros(number_random_points)
     Bx_at_random = np.zeros(number_random_points)
     By_at_random = np.zeros(number_random_points)
+
 
     # Calculating Interpolated values at the
 
@@ -134,21 +142,25 @@ def error(a):
         Bx_at_random[i] = Interpolate(x_random[i] , y_random[i] , x_center, y_top, Bx)
         By_at_random[i] = Interpolate( x_random[i] , y_random[i], x_right, y_center, By )
 
+    #Bx_at_random = BInterpolate(x_random , y_random , x_b, y_b, Bx[:-2, :-2])
+
     Ez_error = 0
     Bx_error = 0
     By_error = 0
 
 
+    # error = sum( abs(Ez_at_random - np.sin(2*np.pi*x_random*y_random)*np.cos(2*np.pi*x_random*y_random)  ) ) /number_random_points
     Ez_error = sum(abs(Ez_at_random - np.sin(2 * np.pi * (x_random) * (y_random)) * np.cos( 2 * np.pi * (x_random) * (y_random)))) / number_random_points
     Bx_error = sum(abs(Bx_at_random - np.sin(2 * np.pi * (x_random) * (y_random - dy/2 )) * np.cos(2 * np.pi * (x_random) * (y_random - dy/2 ) )) ) / number_random_points
     By_error = sum(abs(By_at_random - np.sin(2 * np.pi * (x_random -dx/2) * (y_random)) * np.cos(2 * np.pi * (x_random-dx/2 ) * (y_random)))) / number_random_points
+
     return Ez_error,Bx_error, By_error
 
 
 # Test Grid Sizes
 
-#N = np.array([32, 64, 128, 256, 512, 1024])
-N = np.arange(50,1500,50)
+
+N = np.arange(100,2000,100)
 ErrorNEz = np.zeros(len(N), dtype=np.float)
 ErrorNBx = np.zeros(len(N), dtype=np.float)
 ErrorNBy = np.zeros(len(N), dtype=np.float)
