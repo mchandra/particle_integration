@@ -66,7 +66,7 @@ def bilinear_interpolate(x, y, x_grid, y_grid, F):
 
     return F_interpolated
 
-
+bilinear_interpolate = np.vectorize(bilinear_interpolate, excluded=(['x_grid','y_grid','F']) )
 
 """ Function for initialization of the fields """
 
@@ -79,7 +79,7 @@ def initial_fields(x,y):
 """ Error function """
 
 def error(a):
-
+    print('Computing error for N = ',a)
     """ Getting the two dimension matrix for initializing the fields """
 
     nx = a  # number of zones not points
@@ -143,42 +143,33 @@ def error(a):
     Bx_at_random = np.zeros(number_random_points)
     By_at_random = np.zeros(number_random_points)
 
-    # Calculating Interpolated values at the
+    """ Calculating Interpolated values at the randomly selected points """
 
-    for i in range(number_random_points):
+    Ez_at_random = np.array(bilinear_interpolate( x = [x_random], y = [y_random], x_grid =x_center, y_grid = y_center, F = Ez ) )
+    Bx_at_random = np.array(bilinear_interpolate( x = [x_random], y = [y_random], x_grid =x_center, y_grid = y_top, F = Bx    ) )
+    By_at_random = np.array(bilinear_interpolate( x = [x_random], y = [y_random], x_grid =x_right, y_grid = y_center, F = By  ) )
 
-        Ez_at_random[i] = bilinear_interpolate( x_random[i] , y_random[i], x_center, y_center, Ez )
-        Bx_at_random[i] = bilinear_interpolate( x_random[i] , y_random[i], x_center, y_top, Bx    )
-        By_at_random[i] = bilinear_interpolate( x_random[i] , y_random[i], x_right, y_center, By  )
+    Ez_error = sum(sum(  abs(  Ez_at_random - [initial_fields(x_random,y_random)]  )   ) )/ number_random_points
+    Bx_error = sum(sum(  abs(  Bx_at_random - [initial_fields(x_random,y_random)]  )   ) )/ number_random_points
+    By_error = sum(sum(  abs(  By_at_random - [initial_fields(x_random,y_random)]  )   ) )/ number_random_points
+
+    return np.array(Ez_error),np.array(Bx_error), np.array(By_error)
 
 
-    Ez_error = 0
-    Bx_error = 0
-    By_error = 0
+""" Vectorizing the output of the error function"""
 
-    Ez_error = sum(  abs(  Ez_at_random - initial_fields(x_random,y_random)  )   ) / number_random_points
-    Bx_error = sum(  abs(  Bx_at_random - initial_fields(x_random,y_random)  )   ) / number_random_points
-    By_error = sum(  abs(  By_at_random - initial_fields(x_random,y_random)  )   ) / number_random_points
-
-    return Ez_error,Bx_error, By_error
-
+error = np.vectorize(error)
 
 """ Choosing test grid densities """
 
-# N = np.array([32, 64, 128, 256, 512, 1024])
+#N = np.array([32, 64, 128, 256, 512, 1024])
 
 N = np.arange(100, 4000, 100)
-error_N_Ez = np.zeros(len(N), dtype=np.float)
-error_N_Bx = np.zeros(len(N), dtype=np.float)
-error_N_By = np.zeros(len(N), dtype=np.float)
+
 
 """ Computing error at the corresponding grid densities """
 
-
-for i in range(len(N)):
-    error_N_Ez[i], error_N_Bx[i], error_N_By[i]  = error(N[i])
-    print('Term = ', i)
-
+error_N_Ez, error_N_Bx, error_N_By  = error(N)
 
 """ Plotting error vs grid density """
 
