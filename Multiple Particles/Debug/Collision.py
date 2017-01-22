@@ -48,7 +48,7 @@ kineticEnergy   = np.zeros(time.size)
 # Here 'a' is the parameter which controls the steepness of the potential function
 
 def potential(a, x):
-  potential= 200 * ( -1 * np.tanh(a*x) + 1)
+  potential= 2 * ( -1 * np.tanh(a*x) + 1)
   return(potential)
 
 # This function returns the value of potential gradient
@@ -118,7 +118,7 @@ def calcPotentialEnergy(soln):
   # potential[i,j] is the pair potential between particles i and j
   # Summing over all potentials in the system will give us the total potential energy
   # Of the system at a particular time-step
-  potentialEnergy = np.sum(potential(300,dist))
+  potentialEnergy = 0.5*(np.sum(potential(300,dist)-200*np.identity(noOfParticles)))
   return(potentialEnergy)
 
 
@@ -312,7 +312,7 @@ for timeIndex,t0 in enumerate(time):
                                                  sol[3*noOfParticles:4*noOfParticles]**2
                                                 )
   totalPotentialEnergy = calcPotentialEnergy(sol)
-
+  
   # Assigning the values to an array, which will be used in post-processing
   momentumX[timeIndex]       = totalMomentumX
   momentumY[timeIndex]       = totalMomentumY
