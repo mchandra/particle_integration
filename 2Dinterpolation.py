@@ -27,40 +27,40 @@ pl.rcParams['ytick.color']      = 'k'
 pl.rcParams['ytick.labelsize']  = 'medium'
 pl.rcParams['ytick.direction']  = 'in'
 
-# number of ghost cells
+""" Number of Ghost cells """
 
-ghostcells = 1
+ghost_cells = 1
 
+""" Interpolation Function """
 
+def bilinear_interpolate(x, y, x_grid, y_grid, F):
+    F_function = F
 
-def Interpolate(x, y, x_grid, y_grid, F):
-    F_function = F.transpose()
-    n      = len(F_function[0,:])-3           # number of zones
+    n      = len(F_function[0,:]) - 3           # number of zones
 
     x_zone = int(n * (x-x_grid[0]))             # indexing from zero itself
     y_zone = int(n * (y-y_grid[0]))
 
     b = np.matrix([ [0], [0], [0], [0] ])
 
-    A = np.matrix( [ [1, x_grid[x_zone], y_grid[y_zone], x_grid[x_zone]*y_grid[y_zone] ], \
-            [1, x_grid[x_zone], y_grid[y_zone + 1], x_grid[x_zone]*y_grid[y_zone + 1] ], \
-            [1, x_grid[x_zone + 1], y_grid[y_zone], x_grid[x_zone + 1]*y_grid[y_zone] ], \
-            [1, x_grid[x_zone + 1], y_grid[y_zone + 1], x_grid[x_zone + 1]*y_grid[y_zone + 1] ] ])
-
-
+    A = np.matrix(\
+                    [ [1, x_grid[x_zone], y_grid[y_zone], x_grid[x_zone]*y_grid[y_zone] ], \
+                      [1, x_grid[x_zone], y_grid[y_zone + 1], x_grid[x_zone]*y_grid[y_zone + 1] ], \
+                      [1, x_grid[x_zone + 1], y_grid[y_zone], x_grid[x_zone + 1]*y_grid[y_zone] ], \
+                      [1, x_grid[x_zone + 1], y_grid[y_zone + 1], x_grid[x_zone + 1]*y_grid[y_zone + 1] ]\
+                    ]
+                 )
 
     point_to_calculated_for = np.matrix([ [1],[x], [y], [x*y] ])
 
     b = (la.inv(A)).transpose()*point_to_calculated_for
 
-
-    Q11 = F_function[x_zone, y_zone]
-    Q21 = F_function[x_zone + 1, y_zone]
-    Q12 = F_function[x_zone, y_zone + 1]
-    Q22 = F_function[x_zone + 1, y_zone + 1]
+    Q11 = F_function[y_zone, x_zone]
+    Q21 = F_function[y_zone, x_zone + 1]
+    Q12 = F_function[y_zone + 1, x_zone]
+    Q22 = F_function[y_zone + 1, x_zone + 1]
 
     Q = np.matrix([[Q11], [Q12], [Q21], [Q22] ])
-
 
     F_interpolated = b.transpose()*Q
 
@@ -68,113 +68,125 @@ def Interpolate(x, y, x_grid, y_grid, F):
 
 
 
+""" Function for initialization of the fields """
 
+def initial_fields(x,y):
 
+    function_value = np.sin(2 * np.pi * x * y) * np.cos(2 * np.pi * x * y)
 
+    return function_value
 
-
+""" Error function """
 
 def error(a):
+
+    """ Getting the two dimension matrix for initializing the fields """
+
     nx = a  # number of zones not points
     ny = a  # number of zones not points
+
+    """ Length of each zone along x and y """
 
     dx = np.float(1 / (nx))
     dy = np.float(1 / (ny))
 
+
     x_center = np.linspace(-dx, 1 + dx, nx + 3, endpoint=True)
     y_center = np.linspace(-dy, 1 + dy, ny + 3, endpoint=True)
+
+    """ Initializing the field variables """
 
     Ez = np.zeros(((len(x_center)), (len(y_center))), dtype=np.float)
     Bx = np.zeros(((len(x_center)), (len(y_center) )), dtype=np.float)
     By = np.zeros(((len(x_center)), (len(y_center))), dtype=np.float)
 
-
-
     x_right = np.linspace(-dx / 2, 1 + 3*dx / 2, nx + 3, endpoint=True)
     y_top   = np.linspace(-dy / 2, 1 + 3*dy / 2, ny + 3, endpoint=True)
 
-    # Conditions
+    """ Getting the two dimension matrix for initializing the fields """
 
-    for i in range(nx + 1):
-        for j in range(ny + 1):
-            Ez[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * x_center[i+1] * y_center[j+1]) * np.cos(2 * np.pi * x_center[i+1] * y_center[j+1])
-            Bx[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * x_center[i+1] * (y_top[j+1]-dy/2) ) * np.cos(2 * np.pi * x_center[i+1] * (y_top[j+1]-dy/2))
-            By[i + ghostcells][j + ghostcells] = np.sin(2 * np.pi * (x_right[i+1]-dx/2) * y_center[j+1]) * np.cos(2 * np.pi * (x_right[i+1]-dx/2) * y_center[j+1])
+    X_center_physical, Y_center_physical = np.meshgrid(x_center[ghost_cells:-ghost_cells], y_center[ghost_cells:-ghost_cells])
+    X_right_physical, Y_top_physical = np.meshgrid(x_right[ghost_cells:-ghost_cells], y_top[ghost_cells:-ghost_cells])
 
-            # Ghost cells values copying
+    """ Assigning Field values to the physical physical domain """
+    Ez[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] = initial_fields(X_center_physical,Y_center_physical)
+    Bx[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] = initial_fields(X_center_physical,Y_top_physical)
+    By[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] = initial_fields(X_right_physical,Y_center_physical)
 
-    Ez[0, :] = Ez[nx + 1, :].copy()
-    Ez[:, 0] = Ez[:, ny + 1].copy()
-    Ez[nx + 1 + ghostcells, :] = Ez[ghostcells, :].copy()
-    Ez[:, ny + 1 + ghostcells] = Ez[:, ghostcells].copy()
+    """ Implementing Periodic Boundary conditions using ghost cells """
 
-    Bx[0, :] = Bx[nx + 1, :].copy()
-    Bx[:, 0] = Bx[:, ny + 1].copy()
-    Bx[nx + 1 + ghostcells, :] = Bx[ghostcells, :].copy()
-    Bx[:, ny + 1 + ghostcells] = Bx[:, ghostcells].copy()
+    Ez[0, :]               = Ez[len(y_center)-1 - ghost_cells, :].copy()
+    Ez[:, 0]               = Ez[:, len(x_center)-1 - ghost_cells].copy()
+    Ez[len(y_center)-1, :] = Ez[ghost_cells, :].copy()
+    Ez[:, len(x_center)-1] = Ez[:, ghost_cells].copy()
 
-    By[0, :] = By[nx + 1, :].copy()
-    By[:, 0] = By[:, ny + 1].copy()
-    By[nx + 1 + ghostcells, :] = By[ghostcells, :].copy()
-    By[:, ny + 1 + ghostcells] = By[:, ghostcells].copy()
+    Bx[0, :]               = Bx[len(y_top)-1 - ghost_cells, :].copy()
+    Bx[:, 0]               = Bx[:, len(x_center)-1 - ghost_cells].copy()
+    Bx[len(y_top)-1, :]    = Bx[ghost_cells, :].copy()
+    Bx[:, len(x_center)-1] = Bx[:, ghost_cells].copy()
 
-    # Random points for error Testing
+    By[0, :]               = By[len(y_center)-1 - ghost_cells, :].copy()
+    By[:, 0]               = By[:, len(x_right)-1 - ghost_cells].copy()
+    By[len(y_center)-1, :] = By[ghost_cells, :].copy()
+    By[:, len(x_right)-1]  = By[:, ghost_cells].copy()
 
+    """ Selecting a number of test points for testing error """
 
-    number_random_points = 30
-
-    # Declaring random points
+    number_random_points = 100
 
     x_random = np.random.rand(number_random_points)
     y_random = np.random.rand(number_random_points)
 
-
+    """ Selecting a number of test points for testing error """
 
     Ez_at_random = np.zeros(number_random_points)
     Bx_at_random = np.zeros(number_random_points)
     By_at_random = np.zeros(number_random_points)
 
-
     # Calculating Interpolated values at the
 
     for i in range(number_random_points):
-        Ez_at_random[i] = Interpolate( x_random[i] , y_random[i], x_center, y_center, Ez )
-        Bx_at_random[i] = Interpolate(x_random[i] , y_random[i] , x_center, y_top, Bx)
-        By_at_random[i] = Interpolate( x_random[i] , y_random[i], x_right, y_center, By )
 
-    #Bx_at_random = BInterpolate(x_random , y_random , x_b, y_b, Bx[:-2, :-2])
+        Ez_at_random[i] = bilinear_interpolate( x_random[i] , y_random[i], x_center, y_center, Ez )
+        Bx_at_random[i] = bilinear_interpolate( x_random[i] , y_random[i], x_center, y_top, Bx    )
+        By_at_random[i] = bilinear_interpolate( x_random[i] , y_random[i], x_right, y_center, By  )
+
 
     Ez_error = 0
     Bx_error = 0
     By_error = 0
 
-
-    # error = sum( abs(Ez_at_random - np.sin(2*np.pi*x_random*y_random)*np.cos(2*np.pi*x_random*y_random)  ) ) /number_random_points
-    Ez_error = sum(abs(Ez_at_random - np.sin(2 * np.pi * (x_random) * (y_random)) * np.cos( 2 * np.pi * (x_random) * (y_random)))) / number_random_points
-    Bx_error = sum(abs(Bx_at_random - np.sin(2 * np.pi * (x_random) * (y_random - dy/2 )) * np.cos(2 * np.pi * (x_random) * (y_random - dy/2 ) )) ) / number_random_points
-    By_error = sum(abs(By_at_random - np.sin(2 * np.pi * (x_random -dx/2) * (y_random)) * np.cos(2 * np.pi * (x_random-dx/2 ) * (y_random)))) / number_random_points
+    Ez_error = sum(  abs(  Ez_at_random - initial_fields(x_random,y_random)  )   ) / number_random_points
+    Bx_error = sum(  abs(  Bx_at_random - initial_fields(x_random,y_random)  )   ) / number_random_points
+    By_error = sum(  abs(  By_at_random - initial_fields(x_random,y_random)  )   ) / number_random_points
 
     return Ez_error,Bx_error, By_error
 
 
-# Test Grid Sizes
+""" Choosing test grid densities """
+
+# N = np.array([32, 64, 128, 256, 512, 1024])
+
+N = np.arange(100, 4000, 100)
+error_N_Ez = np.zeros(len(N), dtype=np.float)
+error_N_Bx = np.zeros(len(N), dtype=np.float)
+error_N_By = np.zeros(len(N), dtype=np.float)
+
+""" Computing error at the corresponding grid densities """
 
 
-N = np.arange(100,2000,100)
-ErrorNEz = np.zeros(len(N), dtype=np.float)
-ErrorNBx = np.zeros(len(N), dtype=np.float)
-ErrorNBy = np.zeros(len(N), dtype=np.float)
 for i in range(len(N)):
-    ErrorNEz[i], ErrorNBx[i], ErrorNBy[i]  = error(N[i])
+    error_N_Ez[i], error_N_Bx[i], error_N_By[i]  = error(N[i])
     print('Term = ', i)
 
-# Plotting
 
-pl.loglog(N, ErrorNEz, '-o', lw=3, label='$E_z$ ')
+""" Plotting error vs grid density """
+
+pl.loglog(N, error_N_Ez, '-o', lw=3, label='$E_z$ ')
 pl.legend()
-pl.loglog(N, ErrorNBx, '-o', lw=3, label='$B_x$ ')
+pl.loglog(N, error_N_Bx, '-o', lw=3, label='$B_x$ ')
 pl.legend()
-pl.loglog(N, ErrorNBy, '-o', lw=5, label='$B_y$ ')
+pl.loglog(N, error_N_By, '-o', lw=5, label='$B_y$ ')
 pl.legend()
 pl.loglog(N, 150 * (N ** -1.999), '--', color='black', lw=2, label=' $O(N^{-2})$ ')
 pl.legend()
