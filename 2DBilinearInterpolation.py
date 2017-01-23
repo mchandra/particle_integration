@@ -108,6 +108,8 @@ def error(a):
     X_center_physical, Y_center_physical = np.meshgrid(x_center[ghost_cells:-ghost_cells], y_center[ghost_cells:-ghost_cells])
     X_right_physical, Y_top_physical = np.meshgrid(x_right[ghost_cells:-ghost_cells], y_top[ghost_cells:-ghost_cells])
 
+    """ [-ghostcells:ghostcells] selects the points located in the physical domain excluding the ghost cells """
+    
     """ Assigning Field values to the physical physical domain """
     Ez[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] = initial_fields(X_center_physical,Y_center_physical)
     Bx[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] = initial_fields(X_center_physical,Y_top_physical)
