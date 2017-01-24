@@ -23,12 +23,12 @@ spread = 0.1
 ghost_cells = 1
 
 
-def two_d_fdtd(mode,Nx,Ny):
+def two_d_fdtd(mode, Nx, Ny, t):
 
     if mode==1:
-        return mode1_fdtd(Nx, Ny)
+        return mode1_fdtd(Nx, Ny, t)
     else:
-        return mode2_fdtd(Nx, Ny)
+        return mode2_fdtd(Nx, Ny, t)
 
 
 
@@ -44,7 +44,7 @@ def two_d_fdtd(mode,Nx,Ny):
 
 """Particle grid coinciding with  the spatial grid for the Electric field """
 
-def mode1_fdtd(a, b):
+def mode1_fdtd(a, b, time_in_seconds):
 
     """ Number of divisions in the physical domain"""
     Nx = a
@@ -62,7 +62,7 @@ def mode1_fdtd(a, b):
 
     """ Setting max number of iterations"""
 
-    max_iterations = np.int(2 / (dt))
+    max_iterations = np.int(time_in_seconds / (dt))
 
     """ defining variable for convinience """
 
@@ -199,7 +199,7 @@ def mode1_fdtd(a, b):
 # div_B = dBz/dz
 
 
-def mode2_fdtd(a, b):
+def mode2_fdtd(a, b, time_in_seconds):
 
     """ Number of divisions in the physical domain"""
 
@@ -218,7 +218,7 @@ def mode2_fdtd(a, b):
 
     """ Setting max number of iterations"""
 
-    max_iterations = np.int(2 / (dt))
+    max_iterations = np.int(time_in_seconds / (dt))
 
     """ defining variable for convinience """
 
@@ -327,11 +327,10 @@ def mode2_fdtd(a, b):
         Ey[len(y_center) - 1, :] =     Ey[ghost_cells, :].copy()
         Ey[:, len(x_right) - 1]  =     Ey[:, ghost_cells].copy()
 
-
 """-------------------------------------------------End--of--Mode--2-------------------------------------------------"""
 
 
 # Example for running the fdtd code
 
 #f = two_d_fdtd(1,100,100) # for mode 1
-#f = two_d_fdtd(2,100,100) # for mode 2
+#f = two_d_fdtd(2,100,100, 4) # for mode 2
