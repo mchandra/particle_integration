@@ -2,7 +2,7 @@ import numpy as np
 import numpy.linalg as la
 
 
-"""------------------------Basis-Bilinear-Interpolation-Function(Scipy libraries can also be used)------------------ """
+"""------------------------Basic-Bilinear-Interpolation-Function(Scipy libraries can also be used)------------------ """
 
 
 def bilinear_interpolate(x, y, x_grid, y_grid, F):
