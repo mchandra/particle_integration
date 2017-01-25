@@ -15,56 +15,61 @@ import numpy as np
 # dEy/dt = - dBz/dx
 # div_B = dBz/dz
 
+"""
+Notes for periodic boundary conditions:
+
+for [0, Lx] domain use periodic BC's such that last point in the physical domain coincides with the first point
+
+for [0, Lx) domain use periodic BC's such that the ghost point after the last physical point coincides with the first physical point
+
+
+
+"""
+
+
 """ Alignment of the spatial grids (Convention chosen)"""
+
 
 # Alignment of the x direction
 """
 mode 1:
-
 Ez (x_center)
 ----o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o---
     |       |                                                                                       |       |
   ghost     |                                                                                       |     ghost
   point     |                                                                                       |     point
 ---------starts here----------------------------------------------------------------------------ends here---------------
-
 Bx (x_center)
 ----o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o---
     |       |                                                                                       |       |
   ghost     |                                                                                       |     ghost
   point     |                                                                                       |     point
 ---------starts here----------------------------------------------------------------------------ends here---------------
-
 By (x_right)
 --------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------
         |       |                                                                                       |       |
       ghost     |                                                                                       |     ghost
       point     |                                                                                       |     point
 ------------starts here----------------------------------------------------------------------------ends here------------
-
 mode :
-
 Bz (x_right)
 --------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------
         |       |                                                                                       |       |
       ghost     |                                                                                       |     ghost
       point     |                                                                                       |     point
 ------------starts here----------------------------------------------------------------------------ends here------------
-
 Ex (x_right)
 --------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------
         |       |                                                                                       |       |
       ghost     |                                                                                       |     ghost
       point     |                                                                                       |     point
 ------------starts here-----------------------------------------------------------------------------ends here-----------
-
 Ey (x_center)
 ----o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o---
     |       |                                                                                       |       |
   ghost     |                                                                                       |     ghost
   point     |                                                                                       |     point
 ---------starts here-----------------------------------------------------------------------------ends here--------------
-
 """
 
 # Alignment of the y direction
@@ -72,37 +77,31 @@ Ey (x_center)
 
 """
 mode 1:
-
 Ez (y_center)
 ----o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o---
     |       |                                                                                       |       |
   ghost     |                                                                                       |     ghost
   point     |                                                                                       |     point
 ---------starts here-----------------------------------------------------------------------------ends here--------------
-
 Bx (y_top)
 --------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------
         |       |                                                                                       |       |
       ghost     |                                                                                       |     ghost
       point     |                                                                                       |     point
 ------------starts here-----------------------------------------------------------------------------ends here-----------
-
 By (y_center)
 ----o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o---
     |       |                                                                                       |       |
   ghost     |                                                                                       |     ghost
   point     |                                                                                       |     point
 ---------starts here---------------------------------------------------------------------------ends here----------------
-
 mode :
-
 Bz (y_top)
 --------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------
         |       |                                                                                       |       |
       ghost     |                                                                                       |     ghost
       point     |                                                                                       |     point
 ------------starts here------------------------------------------------------------------------------ends here----------
-
 Ex (y_center)
 ----o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o-------o---
     |       |                                                                                       |       |
@@ -154,20 +153,20 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """Enforcing BC's"""
 
-  Ez_in_function[0, :]                      = Ez_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Ez_in_function[:, 0]                      = Ez_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  Ez_in_function[y_number_of_points - 1, :] = Ez_in_function[ghost_cells, :].copy()
-  Ez_in_function[:, x_number_of_points - 1] = Ez_in_function[:, ghost_cells].copy()
+  Ez_in_function[0, :]                      = Ez_in_function[y_number_of_points - 2 - ghost_cells, :].copy()
+  Ez_in_function[:, 0]                      = Ez_in_function[:, x_number_of_points - 2 - ghost_cells].copy()
+  Ez_in_function[y_number_of_points - 1, :] = Ez_in_function[ghost_cells + 1, :].copy()
+  Ez_in_function[:, x_number_of_points - 1] = Ez_in_function[:, ghost_cells + 1].copy()
 
-  Bx_in_function[0, :]                      = Bx_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Bx_in_function[:, 0]                      = Bx_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  Bx_in_function[y_number_of_points - 1, :] = Bx_in_function[ghost_cells, :].copy()
-  Bx_in_function[:, x_number_of_points - 1] = Bx_in_function[:, ghost_cells].copy()
+  Bx_in_function[0, :]                      = Bx_in_function[y_number_of_points - 2 - ghost_cells, :].copy()
+  Bx_in_function[:, 0]                      = Bx_in_function[:, x_number_of_points - 2 - ghost_cells].copy()
+  Bx_in_function[y_number_of_points - 1, :] = Bx_in_function[ghost_cells + 1, :].copy()
+  Bx_in_function[:, x_number_of_points - 1] = Bx_in_function[:, ghost_cells + 1].copy()
 
-  By_in_function[0, :]                      = By_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  By_in_function[:, 0]                      = By_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  By_in_function[y_number_of_points - 1, :] = By_in_function[ghost_cells, :].copy()
-  By_in_function[:, x_number_of_points - 1] = By_in_function[:, ghost_cells].copy()
+  By_in_function[0, :]                      = By_in_function[y_number_of_points - 2 - ghost_cells, :].copy()
+  By_in_function[:, 0]                      = By_in_function[:, x_number_of_points - 2 - ghost_cells].copy()
+  By_in_function[y_number_of_points - 1, :] = By_in_function[ghost_cells + 1, :].copy()
+  By_in_function[:, x_number_of_points - 1] = By_in_function[:, ghost_cells + 1].copy()
 
   """ Setting division size and time steps"""
 
@@ -197,10 +196,10 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """  Implementing periodic boundary conditions using ghost cells  """
 
-  Ez_in_function[0, :]                      = Ez_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Ez_in_function[:, 0]                      = Ez_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  Ez_in_function[y_number_of_points - 1, :] = Ez_in_function[ghost_cells, :].copy()
-  Ez_in_function[:, x_number_of_points - 1] = Ez_in_function[:, ghost_cells].copy()
+  Ez_in_function[0, :]                      = Ez_in_function[y_number_of_points - 2 - ghost_cells, :].copy()
+  Ez_in_function[:, 0]                      = Ez_in_function[:, x_number_of_points - 2 - ghost_cells].copy()
+  Ez_in_function[y_number_of_points - 1, :] = Ez_in_function[ghost_cells + 1, :].copy()
+  Ez_in_function[:, x_number_of_points - 1] = Ez_in_function[:, ghost_cells + 1].copy()
 
   """  Updating the Magnetic fields   """
 
@@ -214,17 +213,15 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """  Implementing periodic boundary conditions using ghost cells  """
 
-  Bx_in_function[0, :]                      = Bx_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Bx_in_function[:, 0]                      = Bx_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  Bx_in_function[y_number_of_points - 1, :] = Bx_in_function[ghost_cells, :].copy()
-  Bx_in_function[:, x_number_of_points - 1] = Bx_in_function[:, ghost_cells].copy()
+  Bx_in_function[0, :]                      = Bx_in_function[y_number_of_points - 2 - ghost_cells, :].copy()
+  Bx_in_function[:, 0]                      = Bx_in_function[:, x_number_of_points - 2 - ghost_cells].copy()
+  Bx_in_function[y_number_of_points - 1, :] = Bx_in_function[ghost_cells + 1, :].copy()
+  Bx_in_function[:, x_number_of_points - 1] = Bx_in_function[:, ghost_cells + 1].copy()
 
-
-
-  By_in_function[0, :]                      = By_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  By_in_function[:, 0]                      = By_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  By_in_function[y_number_of_points - 1, :] = By_in_function[ghost_cells, :].copy()
-  By_in_function[:, x_number_of_points - 1] = By_in_function[:, ghost_cells].copy()
+  By_in_function[0, :]                      = By_in_function[y_number_of_points - 2 - ghost_cells, :].copy()
+  By_in_function[:, 0]                      = By_in_function[:, x_number_of_points - 2 - ghost_cells].copy()
+  By_in_function[y_number_of_points - 1, :] = By_in_function[ghost_cells + 1, :].copy()
+  By_in_function[:, x_number_of_points - 1] = By_in_function[:, ghost_cells + 1].copy()
 
   return Ez_in_function, Bx_in_function, By_in_function
 
@@ -235,9 +232,7 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
 """-------------------------------------------------Start--of--Mode-2------------------------------------------------"""
 
-
 """ Equations for mode 2 fdtd (variation along x and y)"""
-
 
 # dBz/dt = - ( dEy/dx - dEx/dy )
 # dEx/dt = + dBz/dy
@@ -258,7 +253,7 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
   Ex_in_function = Ex
   Ey_in_function = Ey
 
-  """Enforcing BC's"""
+  """Enforcing periodic BC's"""
 
   Bz_in_function[0, :]                      = Bz_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
   Bz_in_function[:, 0]                      = Bz_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
