@@ -114,7 +114,7 @@ def fdtd(Ex, Ey, Ez, Bx, By, Bz, c, Lx, Ly, ghost_cells, Jx, Jy, Jz):
 
   Ez_updated, Bx_updated, By_updated = mode1_fdtd(Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz)
 
-  Bz_updated, Ex_updated, Ey_updated =mode2_fdtd(Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz )
+  Bz_updated, Ex_updated, Ey_updated = mode2_fdtd(Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz )
 
   return Ex_updated, Ey_updated, Ez_updated, Bx_updated, By_updated, Bz_updated
 
@@ -132,8 +132,9 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
   """ Number of divisions in the physical domain"""
 
   x_number_of_points,  y_number_of_points = Ez.shape
-  Nx = x_number_of_points - 2*ghost_cells-1
-  Ny = y_number_of_points - 2*ghost_cells-1
+
+  Nx = x_number_of_points - 2*ghost_cells - 1
+  Ny = y_number_of_points - 2*ghost_cells - 1
 
   Ez_in_function = Ez
   Bx_in_function = Bx
@@ -141,20 +142,20 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """Enforcing BC's"""
 
-  Ez_in_function[0, :]                 = Ez_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Ez_in_function[:, 0]                 = Ez_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
+  Ez_in_function[0, :]                      = Ez_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
+  Ez_in_function[:, 0]                      = Ez_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
   Ez_in_function[y_number_of_points - 1, :] = Ez_in_function[ghost_cells, :].copy()
   Ez_in_function[:, x_number_of_points - 1] = Ez_in_function[:, ghost_cells].copy()
 
-  Bx_in_function[0, :]                 = Bx_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Bx_in_function[:, 0]                 = Bx_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  Bx_in_function[y_number_of_points - 1, :]    = Bx_in_function[ghost_cells, :].copy()
+  Bx_in_function[0, :]                      = Bx_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
+  Bx_in_function[:, 0]                      = Bx_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
+  Bx_in_function[y_number_of_points - 1, :] = Bx_in_function[ghost_cells, :].copy()
   Bx_in_function[:, x_number_of_points - 1] = Bx_in_function[:, ghost_cells].copy()
 
-  By_in_function[0, :]                 = By_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  By_in_function[:, 0]                 = By_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
+  By_in_function[0, :]                      = By_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
+  By_in_function[:, 0]                      = By_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
   By_in_function[y_number_of_points - 1, :] = By_in_function[ghost_cells, :].copy()
-  By_in_function[:, x_number_of_points - 1]  = By_in_function[:, ghost_cells].copy()
+  By_in_function[:, x_number_of_points - 1] = By_in_function[:, ghost_cells].copy()
 
   """ Setting division size and time steps"""
 
@@ -176,14 +177,16 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """  Updating the Electric field  """
 
-  Ez_in_function[I, J] = Ez_in_function[I, J] + (dt_by_dx * (By_in_function[I, J] - By_in_function[I, J - 1]))\
-              - (dt_by_dy * (Bx_in_function[I, J] - Bx_in_function[I - 1, J])
-                )
+  Ez_in_function[I, J] = Ez_in_function[I, J] + ( (dt_by_dx * (By_in_function[I, J] - By_in_function[I, J - 1]))\
+                                                 - (dt_by_dy * (Bx_in_function[I, J] - Bx_in_function[I - 1, J]))\
+                                                 )
+
+  # dEz/dt = dBy/dx - dBx/dy
 
   """  Implementing periodic boundary conditions using ghost cells  """
 
-  Ez_in_function[0, :]                 = Ez_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Ez_in_function[:, 0]                 = Ez_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
+  Ez_in_function[0, :]                      = Ez_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
+  Ez_in_function[:, 0]                      = Ez_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
   Ez_in_function[y_number_of_points - 1, :] = Ez_in_function[ghost_cells, :].copy()
   Ez_in_function[:, x_number_of_points - 1] = Ez_in_function[:, ghost_cells].copy()
 
@@ -191,21 +194,25 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   Bx_in_function[I, J] = Bx_in_function[I, J] - (dt_by_dy * (Ez_in_function[I + 1, J] - Ez_in_function[I, J]))
 
+  # dBx/dt = -dEz/dy
+
   By_in_function[I, J] = By_in_function[I, J] + (dt_by_dx * (Ez_in_function[I, J + 1] - Ez_in_function[I, J]))
+
+  # dBy/dt = +dEz/dx
 
   """  Implementing periodic boundary conditions using ghost cells  """
 
-  Bx_in_function[0, :]                 = Bx_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Bx_in_function[:, 0]                 = Bx_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  Bx_in_function[y_number_of_points - 1, :]    = Bx_in_function[ghost_cells, :].copy()
+  Bx_in_function[0, :]                      = Bx_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
+  Bx_in_function[:, 0]                      = Bx_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
+  Bx_in_function[y_number_of_points - 1, :] = Bx_in_function[ghost_cells, :].copy()
   Bx_in_function[:, x_number_of_points - 1] = Bx_in_function[:, ghost_cells].copy()
 
 
 
-  By_in_function[0, :]                 = By_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  By_in_function[:, 0]                 = By_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
+  By_in_function[0, :]                      = By_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
+  By_in_function[:, 0]                      = By_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
   By_in_function[y_number_of_points - 1, :] = By_in_function[ghost_cells, :].copy()
-  By_in_function[:, x_number_of_points - 1]  = By_in_function[:, ghost_cells].copy()
+  By_in_function[:, x_number_of_points - 1] = By_in_function[:, ghost_cells].copy()
 
   return Ez_in_function, Bx_in_function, By_in_function
 
@@ -231,6 +238,7 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
   """ Number of divisions in the physical domain"""
 
   x_number_of_points,  y_number_of_points = Bz.shape
+
   Nx = x_number_of_points - 2*ghost_cells-1
   Ny = y_number_of_points - 2*ghost_cells-1
 
@@ -275,7 +283,7 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """  Updating the Electric field  """
 
-  Bz_in_function[I, J] = Bz_in_function[I, J] - (dt_by_dx * (Ey_in_function[I, J] - Ey_in_function[I, J - 1])\
+  Bz_in_function[I, J] = Bz_in_function[I, J] - ((dt_by_dx * (Ey_in_function[I, J] - Ey_in_function[I, J - 1]))\
                                                   - (dt_by_dy * (Ex_in_function[I, J] - Ex_in_function[I - 1, J]))\
                                                  )
 
