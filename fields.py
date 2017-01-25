@@ -255,20 +255,20 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """Enforcing periodic BC's"""
 
-  Bz_in_function[0, :]                      = Bz_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Bz_in_function[:, 0]                      = Bz_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  Bz_in_function[y_number_of_points - 1, :] = Bz_in_function[ghost_cells, :].copy()
-  Bz_in_function[:, x_number_of_points - 1] = Bz_in_function[:, ghost_cells].copy()
+  Bz_in_function[0, :]                      = Bz_in_function[y_number_of_points - 2 - ghost_cells, :].copy()
+  Bz_in_function[:, 0]                      = Bz_in_function[:, x_number_of_points - 2 - ghost_cells].copy()
+  Bz_in_function[y_number_of_points - 1, :] = Bz_in_function[ghost_cells + 1, :].copy()
+  Bz_in_function[:, x_number_of_points - 1] = Bz_in_function[:, ghost_cells + 1].copy()
 
-  Ex_in_function[0, :]                      = Ex_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Ex_in_function[:, 0]                      = Ex_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  Ex_in_function[y_number_of_points - 1, :] = Ex_in_function[ghost_cells, :].copy()
-  Ex_in_function[:, x_number_of_points - 1] = Ex_in_function[:, ghost_cells].copy()
+  Ex_in_function[0, :]                      = Ex_in_function[y_number_of_points - 2 - ghost_cells, :].copy()
+  Ex_in_function[:, 0]                      = Ex_in_function[:, x_number_of_points - 2 - ghost_cells].copy()
+  Ex_in_function[y_number_of_points - 1, :] = Ex_in_function[ghost_cells + 1, :].copy()
+  Ex_in_function[:, x_number_of_points - 1] = Ex_in_function[:, ghost_cells + 1].copy()
 
-  Ey_in_function[0, :]                      = Ey_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Ey_in_function[:, 0]                      = Ey_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  Ey_in_function[y_number_of_points - 1, :] = Ey_in_function[ghost_cells, :].copy()
-  Ey_in_function[:, x_number_of_points - 1] = Ey_in_function[:, ghost_cells].copy()
+  Ey_in_function[0, :]                      = Ey_in_function[y_number_of_points - 2 - ghost_cells, :].copy()
+  Ey_in_function[:, 0]                      = Ey_in_function[:, x_number_of_points - 2 - ghost_cells].copy()
+  Ey_in_function[y_number_of_points - 1, :] = Ey_in_function[ghost_cells + 1, :].copy()
+  Ey_in_function[:, x_number_of_points - 1] = Ey_in_function[:, ghost_cells + 1].copy()
 
 
   """ Setting division size and time steps"""
@@ -298,10 +298,10 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """  Implementing periodic boundary conditions using ghost cells  """
 
-  Bz_in_function[0, :]                      = Bz_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Bz_in_function[:, 0]                      = Bz_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  Bz_in_function[y_number_of_points - 1, :] = Bz_in_function[ghost_cells, :].copy()
-  Bz_in_function[:, x_number_of_points - 1] = Bz_in_function[:, ghost_cells].copy()
+  Bz_in_function[0, :]                      = Bz_in_function[y_number_of_points - 2 - ghost_cells, :].copy()
+  Bz_in_function[:, 0]                      = Bz_in_function[:, x_number_of_points - 2 - ghost_cells].copy()
+  Bz_in_function[y_number_of_points - 1, :] = Bz_in_function[ghost_cells + 1, :].copy()
+  Bz_in_function[:, x_number_of_points - 1] = Bz_in_function[:, ghost_cells + 1].copy()
 
   """  Updating the Magnetic fields   """
 
@@ -315,15 +315,15 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """  Implementing periodic boundary conditions using ghost cells  """
 
-  Ex_in_function[0, :]                      = Ex_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Ex_in_function[:, 0]                      = Ex_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  Ex_in_function[y_number_of_points - 1, :] = Ex_in_function[ghost_cells, :].copy()
-  Ex_in_function[:, x_number_of_points - 1] = Ex_in_function[:, ghost_cells].copy()
+  Ex_in_function[0, :]                      = Ex_in_function[y_number_of_points - 2 - ghost_cells, :].copy()
+  Ex_in_function[:, 0]                      = Ex_in_function[:, x_number_of_points - 2 - ghost_cells].copy()
+  Ex_in_function[y_number_of_points - 1, :] = Ex_in_function[ghost_cells + 1, :].copy()
+  Ex_in_function[:, x_number_of_points - 1] = Ex_in_function[:, ghost_cells + 1].copy()
 
-  Ey_in_function[0, :]                      = Ey_in_function[y_number_of_points - 1 - ghost_cells, :].copy()
-  Ey_in_function[:, 0]                      = Ey_in_function[:, x_number_of_points - 1 - ghost_cells].copy()
-  Ey_in_function[y_number_of_points - 1, :] = Ey_in_function[ghost_cells, :].copy()
-  Ey_in_function[:, x_number_of_points - 1] = Ey_in_function[:, ghost_cells].copy()
+  Ey_in_function[0, :]                      = Ey_in_function[y_number_of_points - 2 - ghost_cells, :].copy()
+  Ey_in_function[:, 0]                      = Ey_in_function[:, x_number_of_points - 2 - ghost_cells].copy()
+  Ey_in_function[y_number_of_points - 1, :] = Ey_in_function[ghost_cells + 1, :].copy()
+  Ey_in_function[:, x_number_of_points - 1] = Ey_in_function[:, ghost_cells + 1].copy()
 
   return Bz_in_function, Ex_in_function, Ey_in_function
 
