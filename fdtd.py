@@ -159,8 +159,8 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """ Setting division size and time steps"""
 
-  dx = np.float(1 / (Nx))
-  dy = np.float(1 / (Ny))
+  dx = np.float(Lx / (Nx))
+  dy = np.float(Ly / (Ny))
   dt = np.float(dx / (2 * c))
 
 
@@ -266,8 +266,8 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """ Setting division size and time steps"""
 
-  dx = np.float(1 / (Nx))
-  dy = np.float(1 / (Ny))
+  dx = np.float(Lx / (Nx))
+  dy = np.float(Ly / (Ny))
   dt = np.float(dx / (2 * c))
 
   """ defining variable for convenience """
