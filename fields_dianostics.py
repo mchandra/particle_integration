@@ -124,11 +124,11 @@ def error(a, b):
 
 
 
-  Bz[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] = 2 * np.exp(-((X_right_physical-0.5)**2)/(spread**2))
+  Bz[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] = 2*np.exp(-((X_right_physical-0.5)**2)/(spread**2))
 
   Ex[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] = 0
 
-  Ey[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] = 2 * np.exp(-((X_center_physical-0.5)**2)/(spread**2))
+  Ey[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] = 2*np.exp(-((X_center_physical-0.5)**2)/(spread**2))
         
 
 
@@ -190,20 +190,21 @@ def error(a, b):
                        )/(a*b)
 
       Bz_error = sumsum(Bz[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] - \
-                        2 * np.exp(-((X_right_physical-0.5)**2)/(spread**2))\
+                        2*np.exp(-((X_right_physical-0.5)**2)/(spread**2))\
                        )/(a*b)
       Ex_error = sumsum(Ex[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] - 0)/(a*b)
+      
       Ey_error = sumsum(Ey[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] - \
-                        2 * np.exp(-((X_center_physical-0.5)**2)/(spread**2))\
+                        2*np.exp(-((X_center_physical-0.5)**2)/(spread**2))\
                        )/(a*b)
       
-      return Ez_error, Bx_error, By_error, Ez_error, Bx_error, By_error
+      return Ez_error, Bx_error, By_error, Bz_error, Ex_error, Ey_error
 
     
 error = np.vectorize(error)
 
 
-N = np.array( [32, 64, 128, 256, 512] )
+N = np.array( [32, 64, 128, 256] )
 ErrorNEz = np.zeros(len(N),dtype = np.float)
 ErrorNBx = np.zeros(len(N),dtype = np.float)
 ErrorNBy = np.zeros(len(N),dtype = np.float)
@@ -214,17 +215,17 @@ ErrorNEy = np.zeros(len(N),dtype = np.float)
 
 ErrorNEz, ErrorNBx, ErrorNBy, ErrorNBz,  ErrorNEx, ErrorNEy,= error(N, N)
 
-pl.loglog(N,ErrorNEz,'-o',lw =3,label = '$E_z$ ' )
+pl.loglog(N,ErrorNEz,'-o',label = '$E_z$ ' )
 pl.legend()
-pl.loglog(N,ErrorNBx,'-o',lw =3, label = '$B_x$ ' )
+pl.loglog(N,ErrorNBx,'-o', label = '$B_x$ ' )
 pl.legend()
-pl.loglog(N,ErrorNBy,'-o',lw =3,label = '$B_y$ ' )
+pl.loglog(N,ErrorNBy,'-o', label = '$B_y$ ' )
 pl.legend()
-pl.loglog(N,ErrorNBz,'--',lw =5,label = '$B_z$ ' )
+pl.loglog(N,ErrorNBz, label = '$B_z$ ' )
 pl.legend()
-pl.loglog(N,ErrorNEx,'--',lw =5, label = '$E_x$ ' )
+pl.loglog(N,ErrorNEx, label = '$E_x$ ' )
 pl.legend()
-pl.loglog(N,ErrorNEy,'--',lw =5,label = '$E_y$ ' )
+pl.loglog(N,ErrorNEy, label = '$E_y$ ' )
 pl.legend()
 pl.loglog(N,1.5*(N**-1.999),'--',color = 'black',lw = 2,label = ' $O(N^{-2})$ ')
 pl.legend()
