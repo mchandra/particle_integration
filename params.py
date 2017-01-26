@@ -2,8 +2,9 @@ import numpy as np
 import pylab as pl
 import numpy.linalg as la
 from interpolator import bilinear_interpolate
-from fields import fdtd
+from fields import *
 
+# Plotting parameters
 pl.rcParams['figure.figsize']     = 12, 7.5
 pl.rcParams['lines.linewidth']    = 1.5
 pl.rcParams['font.family']        = 'serif'
@@ -43,16 +44,20 @@ ghost_cells = 1
 
 c = 1
 
-""" Size of domain """
-Lx = 1
-Ly = 1
+""" Time for the simulation"""
+
+time_in_seconds = 1.5
+
+""" Size of domain in x and y directions"""
+Lx = 2
+Ly = 2
 
 """Currents for the current fdtd code all irrelevant"""
 Jx = 0
 Jy = 0
 Jz = 0
 
-""" User defined function for convinience to find sum of absolute values of all the elements in a 2D matrix"""
+""" User defined functions for convenience """
 
 
 def sumsum(a):
