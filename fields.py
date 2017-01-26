@@ -18,7 +18,8 @@ import numpy as np
 """
 Notes for periodic boundary conditions:
 for [0, Lx] domain use periodic BC's such that last point in the physical domain coincides with the first point
-for [0, Lx) domain use periodic BC's such that the ghost point after the last physical point coincides with the first physical point
+for [0, Lx) domain use periodic BC's such that the ghost point after the last physical point coincides with the first
+physical point
 """
 
 
@@ -51,59 +52,58 @@ y_top[0] and y_top[3] are the ghost points and y_top[1] and y_top[2] are the phy
 
 This can be seen visually with the below presented schematic
 
+where pij are the points located on the fused spatial grids for whole numbers i an j
 
-
-+++++++++p11--------p12--------p13--------p14--------p15--------p16--------p17--------p18+++++++++++++++++++++++++++++++++++++++++++++
-
-p11 = (x_center[0], y_center[0]) (ghost point), p13 = (x_center[1], y_center[0]) (physical point)
-p15 = (x_center[2], y_center[0]) (physical point),p17 = (x_center[3], y_center[0]) (ghost point)
-p12 = (x_right[0], y_center[0]) (ghost point), p14 = (x_right[1], y_center[0]) (physical point)
-p16 = (x_right[2], y_center[0]) (physical point), p18 = (x_right[3], y_center[0]) (ghost point)
-
-+++++++++p21--------p22--------p23--------p24--------p25--------p26--------p27--------p28+++++++++++++++++++++++++++++++++++++++++++++
-
-p21 = (x_center[0], y_top[0]) (ghost point), p23 = (x_center[1], y_top[0]) (physical point)
-p25 = (x_center[2], y_top[0]) (physical point), p27 = (x_center[3], y_top[0]) (ghost point)
-p22 = (x_right[0], y_top[0]) (ghost point), p24 = (x_right[1], y_top[0]) (physical point)
-p26 = (x_right[2], y_top[0]) (physical point), p28 = (x_right[3], y_top[0]) (ghost point)
-
++++++++++p11--------p12--------p13--------p14--------p15--------p16--------p17--------p18+++++++++++++++++++++++++++++++
+          |                                                                            |
+          |   p11 = (x_center[0], y_center[0]), p13 = (x_center[1], y_center[0])       |
+          |   p15 = (x_center[2], y_center[0]),p17 = (x_center[3], y_center[0])        |
+          |   p12 = (x_right[0], y_center[0]), p14 = (x_right[1], y_center[0])         |
+          |   p16 = (x_right[2], y_center[0]), p18 = (x_right[3], y_center[0])         |
+          |                                                                            |
++++++++++p21--------p22--------p23--------p24--------p25--------p26--------p27--------p28+++++++++++++++++++++++++++++++
+          |                                                                            |
+          |   p21 = (x_center[0], y_top[0]), p23 = (x_center[1], y_top[0])             |
+          |   p25 = (x_center[2], y_top[0]), p27 = (x_center[3], y_top[0])             |
+          |   p22 = (x_right[0], y_top[0]), p24 = (x_right[1], y_top[0])               |
+          |   p26 = (x_right[2], y_top[0]), p28 = (x_right[3], y_top[0])               |
+          |                                                                            |
 +++++++++p31--------p32--------p33--------p34--------p35--------p36--------p37--------p38+++++++++++++++++++++++++++++++
-
-p31 = (x_center[0], y_center[1]) (ghost point), p33 = (x_center[1], y_center[1]) (physical point)
-p35 = (x_center[2], y_center[1]) (physical point), p37 = (x_center[3], y_center[1]) (ghost point)
-p32 = (x_right[0], y_center[1]) (ghost point), p34 = (x_right[1], y_center[1]) (physical point)
-p36 = (x_right[2], y_center[1]) (physical point), p38 = (x_right[3], y_center[1]) (ghost point)
-
+          |                                                                            |
+          |   p31 = (x_center[0], y_center[1]), p33 = (x_center[1], y_center[1])       |
+          |   p35 = (x_center[2], y_center[1]), p37 = (x_center[3], y_center[1])       |
+          |   p32 = (x_right[0], y_center[1]), p34 = (x_right[1], y_center[1])         |
+          |   p36 = (x_right[2], y_center[1]), p38 = (x_right[3], y_center[1])         |
+          |                                                                            |
 +++++++++p41--------p42--------p43--------p44--------p45--------p46--------p47--------p48+++++++++++++++++++++++++++++++
-
-p41 = (x_center[0], y_top[1]) (ghost point), p43 = (x_center[1], y_top[1]) (physical point)
-p45 = (x_center[2], y_top[1]) (physical point), p47 = (x_center[3], y_top[1]) (ghost point)
-p42 = (x_right[0], y_top[1]) (ghost point), p44 = (x_right[1], y_top[1]) (physical point)
-p46 = (x_right[2], y_top[1]) (physical point), p48 = (x_right[3], y_top[1]) (ghost point)
-
+          |                                                                            |
+          |   p41 = (x_center[0], y_top[1]), p43 = (x_center[1], y_top[1])             |
+          |   p45 = (x_center[2], y_top[1]), p47 = (x_center[3], y_top[1])             |
+          |   p42 = (x_right[0], y_top[1]), p44 = (x_right[1], y_top[1])               |
+          |   p46 = (x_right[2], y_top[1]), p48 = (x_right[3], y_top[1])               |
+          |                                                                            |
 +++++++++p51--------p52--------p53--------p54--------p55--------p56--------p57--------p58+++++++++++++++++++++++++++++++
-
-And So on ................
-
-
-
-
+          |                                                                            |
+          |                                                                            |
+          |                                                                            |
+          | And So on ................                                                 |
+          |                                                                            |
+          |                                                                            |
 +++++++++p61--------p62--------p63--------p64--------p65--------p66--------p67--------p68+++++++++++++++++++++++++++++++
-
-And So on ................
-
-
-
-
+          |                                                                            |
+          |                                                                            |
+          | And So on ................                                                 |
+          |                                                                            |
+          |                                                                            |
+          |                                                                            |
 +++++++++p71--------p72--------p73--------p74--------p75--------p76--------p77--------p78+++++++++++++++++++++++++++++++
-
-And So on ................
-
-
-
-
+          |                                                                            |
+          |                                                                            |
+          |                                                                            |
+          | And So on ................                                                 |
+          |                                                                            |
+          |                                                                            |
 +++++++++p71--------p72--------p73--------p74--------p75--------p76--------p77--------p88+++++++++++++++++++++++++++++++
-
 
 Now the fields aligned in x and y direction along with the following grids:
 
@@ -114,11 +114,19 @@ Bx = (x_center, y_top   )
 By = (x_right, y_center )
 Bz = (x_right, y_top    )
 
-
-
-
 """
-"""  Setting number of ghost cells  """
+
+""" Function for enforcing periodic boundary conditions on a field"""
+
+def periodic(field, x_points, y_points, ghost_cells):
+
+    field[0, :]            = field[y_points - 2 - ghost_cells, :].copy()
+    field[:, 0]            = field[:, x_points - 2 - ghost_cells].copy()
+    field[y_points - 1, :] = field[ghost_cells + 1, :].copy()
+    field[:, x_points - 1] = field[:, ghost_cells + 1].copy()
+
+    return field
+
 
 
 def fdtd(Ex, Ey, Ez, Bx, By, Bz, c, Lx, Ly, ghost_cells, Jx, Jy, Jz):
@@ -137,19 +145,6 @@ def fdtd(Ex, Ey, Ez, Bx, By, Bz, c, Lx, Ly, ghost_cells, Jx, Jy, Jz):
 # dBx/dt = -dEz/dy
 # dBy/dt = +dEz/dx
 # div_B = dBx/dx + dBy/dy
-
-""" Function for enforcing periodic boundary conditions on a field"""
-
-def periodic(field, x_points, y_points, ghost_cells):
-
-    field[0, :]            = field[y_points - 2 - ghost_cells, :].copy()
-    field[:, 0]            = field[:, x_points - 2 - ghost_cells].copy()
-    field[y_points - 1, :] = field[ghost_cells + 1, :].copy()
-    field[:, x_points - 1] = field[:, ghost_cells + 1].copy()
-
-    return field
-
-
 
 def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
@@ -186,7 +181,7 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """  Defining index grid for updating the fields  """
 
-  I, J = np.meshgrid(range(ghost_cells, x_number_of_points-ghost_cells), \
+  I, J = np.meshgrid( range(ghost_cells, x_number_of_points-ghost_cells), \
                       range(ghost_cells, y_number_of_points-ghost_cells)\
                     )
 
