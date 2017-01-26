@@ -187,7 +187,7 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
   """  Defining index grid for updating the fields  """
 
   I, J = np.meshgrid(range(ghost_cells, x_number_of_points-ghost_cells), \
-                      range(ghost_cells, y_number_of_points-ghost_cells)
+                      range(ghost_cells, y_number_of_points-ghost_cells)\
                     )
 
   """  Updating the Electric field  """
@@ -271,7 +271,7 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
   """  Defining index grid for updating the fields  """
 
   I, J = np.meshgrid(range(ghost_cells, x_number_of_points-ghost_cells), \
-                      range(ghost_cells, y_number_of_points-ghost_cells)
+                      range(ghost_cells, y_number_of_points-ghost_cells)\
                     )
 
   """  Updating the Electric field  """
