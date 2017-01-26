@@ -1,6 +1,7 @@
-
 import numpy as np
 import pylab as pl
+import numpy.linalg as la
+from interpolator import bilinear_interpolate
 from fields import fdtd
 
 pl.rcParams['figure.figsize']     = 12, 7.5
@@ -30,12 +31,7 @@ pl.rcParams['ytick.color']        = 'k'
 pl.rcParams['ytick.labelsize']    = 'medium'
 pl.rcParams['ytick.direction']    = 'in'
 
-""" User defined function for convinience to find sum of absolute values of all the elements in a 2D matrix"""
-
-
-def sumsum(a):
-    return sum(sum(abs(a)))
-
+"""user defined parameters"""
 
 spread = 0.1
 
@@ -55,3 +51,22 @@ Ly = 1
 Jx = 0
 Jy = 0
 Jz = 0
+
+""" User defined function for convinience to find sum of absolute values of all the elements in a 2D matrix"""
+
+
+def sumsum(a):
+  return sum(sum(abs(a)))
+
+def gauss2D(x,y):
+
+  return np.exp(-( (x - 0.5)**2 +(y - 0.5)**2  )/(2*spread**2))
+
+def gauss1D(x):
+
+  return np.exp(-( (x - 0.5)**2 )/(2*spread**2))
+
+def initial_fields(x, y):
+  function_value = np.sin(2 * np.pi * x * y) * np.cos(2 * np.pi * x * y)
+
+  return function_value
