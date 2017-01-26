@@ -5,7 +5,7 @@ import numpy as np
 # dEz/dt = dBy/dx - dBx/dy
 # dBx/dt = -dEz/dy
 # dBy/dt = +dEz/dx
-# div_B = dBx/dx + dBy/dy
+# div_B  = dBx/dx + dBy/dy
 
 
 """ Equations for mode 2 fdtd"""
@@ -13,7 +13,7 @@ import numpy as np
 # dBz/dt = - ( dEy/dx - dEx/dy )
 # dEx/dt = + dBz/dy
 # dEy/dt = - dBz/dx
-# div_B = dBz/dz
+# div_B  = dBz/dz
 
 """
 Notes for periodic boundary conditions:
@@ -142,8 +142,8 @@ def fdtd(Ex, Ey, Ez, Bx, By, Bz, c, Lx, Ly, ghost_cells, Jx, Jy, Jz):
 
 def periodic(field, x_points, y_points, ghost_cells):
 
-    field[0, :] = field[y_points - 2 - ghost_cells, :].copy()
-    field[:, 0] = field[:, x_points - 2 - ghost_cells].copy()
+    field[0, :]            = field[y_points - 2 - ghost_cells, :].copy()
+    field[:, 0]            = field[:, x_points - 2 - ghost_cells].copy()
     field[y_points - 1, :] = field[ghost_cells + 1, :].copy()
     field[:, x_points - 1] = field[:, ghost_cells + 1].copy()
 
@@ -188,13 +188,13 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   I, J = np.meshgrid(range(ghost_cells, x_number_of_points-ghost_cells), \
                       range(ghost_cells, y_number_of_points-ghost_cells)
-                      )
+                    )
 
   """  Updating the Electric field  """
 
   Ez_in_function[I, J] = Ez_in_function[I, J] + ( (dt_by_dx * (By_in_function[I, J] - By_in_function[I, J - 1]))\
                                                  - (dt_by_dy * (Bx_in_function[I, J] - Bx_in_function[I - 1, J]))\
-                                                 )
+                                                )
 
   # dEz/dt = dBy/dx - dBx/dy
 
@@ -272,13 +272,13 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   I, J = np.meshgrid(range(ghost_cells, x_number_of_points-ghost_cells), \
                       range(ghost_cells, y_number_of_points-ghost_cells)
-                      )
+                    )
 
   """  Updating the Electric field  """
 
   Bz_in_function[I, J] = Bz_in_function[I, J] - ((dt_by_dx * (Ey_in_function[I, J] - Ey_in_function[I, J - 1]))\
                                                   - (dt_by_dy * (Ex_in_function[I, J] - Ex_in_function[I - 1, J]))\
-                                                 )
+                                                )
 
   # dBz/dt = - ( dEy/dx - dEx/dy )
 
