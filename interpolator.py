@@ -15,6 +15,8 @@ def bilinear_interpolate(x, y, x_grid, y_grid, F, ghost_cells):
   # x_grid and y_grid are the spatial grids for the field F used
   # F is the electric or magnetic field
 
+  # Storing the field F in temperory variable
+
   F_function = F
 
   n = (len(F_function[0, :]) - 1 - 2 * ghost_cells)  # number of zones
@@ -23,18 +25,21 @@ def bilinear_interpolate(x, y, x_grid, y_grid, F, ghost_cells):
   y_zone = int(n * np.float(y - y_grid[0]))
 
   # the 4*4 matrix for solving as mention in the wiki page
+
   A = np.matrix( \
-                  [ [1, x_grid[x_zone], y_grid[y_zone], x_grid[x_zone] * y_grid[y_zone]], \
-                    [1, x_grid[x_zone], y_grid[y_zone + 1], x_grid[x_zone] * y_grid[y_zone + 1]], \
-                    [1, x_grid[x_zone + 1], y_grid[y_zone], x_grid[x_zone + 1] * y_grid[y_zone]], \
+                  [ [1, x_grid[x_zone], y_grid[y_zone], x_grid[x_zone] * y_grid[y_zone]                ], \
+                    [1, x_grid[x_zone], y_grid[y_zone + 1], x_grid[x_zone] * y_grid[y_zone + 1]        ], \
+                    [1, x_grid[x_zone + 1], y_grid[y_zone], x_grid[x_zone + 1] * y_grid[y_zone]        ], \
                     [1, x_grid[x_zone + 1], y_grid[y_zone + 1], x_grid[x_zone + 1] * y_grid[y_zone + 1]] \
                   ]\
                )
 
   # The 1D matrix for the points for interpolation
+
   point_to_calculated_for = np.matrix([[1], [x], [y], [x * y]])
 
   # Calculating the coefficient matrix
+
   b = (la.inv(A)).transpose() * point_to_calculated_for
 
   # assigning the values at the corner points at the grid cell
@@ -53,7 +58,7 @@ def bilinear_interpolate(x, y, x_grid, y_grid, F, ghost_cells):
   return F_interpolated
 
 
-# Vectorizing the interpolator
+# Vectorizing the interpolation function
 
 bilinear_interpolate = np.vectorize(bilinear_interpolate, excluded=(['x_grid', 'y_grid', 'F','ghost_cells']))
 
