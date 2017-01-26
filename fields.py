@@ -110,7 +110,7 @@ Now the fields aligned in x and y direction along with the following grids:
 Ex = (x_right, y_center )
 Ey = (x_center, y_top   )
 Ez = (x_center, y_center)
-Bx = (x_center, y_center)
+Bx = (x_center, y_top   )
 By = (x_right, y_center )
 Bz = (x_right, y_top    )
 
