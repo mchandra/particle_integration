@@ -12,16 +12,17 @@ lengthBoxX     = rightBoundary - leftBoundary
 lengthBoxY     = topBoundary   - bottomBoundary   
 
 # Randomizing the initial conditions of the particles to spread them evenly through the box
-initialPositionX = lengthBoxX * np.random.rand(noOfParticles)
-initialPositionY = lengthBoxY * np.random.rand(noOfParticles)
+initialPositionX = np.linspace(0.01,0.99,100) #lengthBoxX * np.random.rand(noOfParticles)
+initialPositionY = np.linspace(0.01,0.99,100) #lengthBoxY * np.random.rand(noOfParticles)
 
 # Assigning velocities so that a flat velocity distribution is obtained
-initialVelocityX = np.random.rand(noOfParticles)
-initialVelocityY = np.random.rand(noOfParticles)
+initialVelocityX = np.linspace(0.01,0.99,100) #np.random.rand(noOfParticles)
+initialVelocityY = np.linspace(0.01,0.99,100) #np.random.rand(noOfParticles)
 
 # We shall randomize direction of velocity
-initialVelocityX = initialVelocityX * np.random.choice([-1,1],size=noOfParticles)
-initialVelocityY = initialVelocityY * np.random.choice([-1,1],size=noOfParticles)
+b = np.concatenate([-1*np.ones(50),np.ones(50)])
+initialVelocityX = initialVelocityX * b #np.random.choice([-1,1],size=noOfParticles)
+initialVelocityY = initialVelocityY * b #np.random.choice([-1,1],size=noOfParticles)
 
 # Combinining the initial conditions into a single vector
 initialConditions = np.concatenate([initialPositionX,initialPositionY, \
@@ -31,7 +32,7 @@ initialConditions = np.concatenate([initialPositionX,initialPositionY, \
 
 # All quantities of time are mentioned in seconds
 boxCrossingTimeScale = (lengthBoxX/np.max(initialVelocityX))
-finalTime            = 1.0 * boxCrossingTimeScale
+finalTime            = 1.05 * boxCrossingTimeScale
 dt                   = 0.000005 * boxCrossingTimeScale
 time                 = np.arange(0, finalTime, dt)
 
@@ -48,7 +49,7 @@ kineticEnergy   = np.zeros(time.size)
 # Here 'a' is the parameter which controls the steepness of the potential function
 
 def potential(a, x):
-  potential= 2 * ( -1 * np.tanh(a*x) + 1)
+  potential= 200 * ( -1 * np.tanh(a*x) + 1)
   return(potential)
 
 # This function returns the value of potential gradient
