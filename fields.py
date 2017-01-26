@@ -54,6 +54,12 @@ This can be seen visually with the below presented schematic
 
 where pij are the points located on the fused spatial grids for whole numbers i an j
 
+p11, p12, p13, p14, p15, p16, p17, p18, p28, p38, p48, p58, p68, p78, p88, p87, p86, p85, p84, p83, p82,
+p81, p71, p61, p51, p41, p31 and p21 are all ghost points while all other points are the physical points for this
+example taken.
+
+
+
 +++++++++p11--------p12--------p13--------p14--------p15--------p16--------p17--------p18+++++++++++++++++++++++++++++++
           |                                                                            |
           |   p11 = (x_center[0], y_center[0]), p13 = (x_center[1], y_center[0])       |
@@ -103,7 +109,7 @@ where pij are the points located on the fused spatial grids for whole numbers i 
           | And So on ................                                                 |
           |                                                                            |
           |                                                                            |
-+++++++++p71--------p72--------p73--------p74--------p75--------p76--------p77--------p88+++++++++++++++++++++++++++++++
++++++++++p81--------p82--------p83--------p84--------p85--------p86--------p87--------p88+++++++++++++++++++++++++++++++
 
 Now the fields aligned in x and y direction along with the following grids:
 
@@ -127,15 +133,16 @@ def periodic(field, x_points, y_points, ghost_cells):
 
     return field
 
-
+""" Fdtd function which returns the Electric and Magnetic fields for the next time step"""
 
 def fdtd(Ex, Ey, Ez, Bx, By, Bz, c, Lx, Ly, ghost_cells, Jx, Jy, Jz):
 
-
+  # Decoupling the fields to solve for them individually
   Ez_updated, Bx_updated, By_updated = mode1_fdtd(Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz)
 
   Bz_updated, Ex_updated, Ey_updated = mode2_fdtd(Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz )
 
+  # combining the the results from both modes
   return Ex_updated, Ey_updated, Ez_updated, Bx_updated, By_updated, Bz_updated
 
 
@@ -148,12 +155,16 @@ def fdtd(Ex, Ey, Ez, Bx, By, Bz, c, Lx, Ly, ghost_cells, Jx, Jy, Jz):
 
 def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
-  """ Number of divisions in the physical domain"""
+  """ Number of grid points in the field's domain"""
 
   x_number_of_points,  y_number_of_points = Ez.shape
 
+  """ number of grid zones from the input fields """
+
   Nx = x_number_of_points - 2*ghost_cells - 1
   Ny = y_number_of_points - 2*ghost_cells - 1
+
+  """ local variables for storing the input fields """
 
   Ez_in_function = Ez
   Bx_in_function = Bx
@@ -174,7 +185,7 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
   dt = np.float(dx / (2 * c))
 
 
-  """ defining variable for convenience """
+  """ defining variables for convenience """
 
   dt_by_dx = dt / (dx)
   dt_by_dy = dt / (dy)
@@ -232,12 +243,16 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
 def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
-  """ Number of divisions in the physical domain"""
+  """ Number of grid points in the field's domain """
 
   x_number_of_points,  y_number_of_points = Bz.shape
 
+  """ number of grid zones calculated from the input fields """
+
   Nx = x_number_of_points - 2*ghost_cells-1
   Ny = y_number_of_points - 2*ghost_cells-1
+
+  """ local variables for storing the input fields """
 
   Bz_in_function = Bz
   Ex_in_function = Ex
