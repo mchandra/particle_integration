@@ -2,21 +2,36 @@ from params import *
 
 """ Error function """
 
+def interpolation_error_convergence(a, b):
 
-def error(a):
-  print('Computing error for N = ', a)
+  print('Computing error for Nx = ', a, 'Ny = ', b)
+
   """ Getting the two dimension matrix for initializing the fields """
 
   Nx = a  # number of zones not points
-  Ny = a  # number of zones not points
+  Ny = b  # number of zones not points
 
   """ Length of each zone along x and y """
 
   dx = np.float(Lx / (Nx))
   dy = np.float(Ly / (Ny))
 
+  """ Initializing the spatial grids"""
+
+  #np.linspace(start point, endpoint, number of points, endpoint = Tue/False)
+
   x_center = np.linspace(-ghost_cells*dx, 1 + ghost_cells*dx, Nx + 1 + 2 * ghost_cells, endpoint=True)
   y_center = np.linspace(-ghost_cells*dy, 1 + ghost_cells*dy, Ny + 1 + 2 * ghost_cells, endpoint=True)
+
+
+
+  x_right = np.linspace(-ghost_cells * dx / 2, 1 + (2 * ghost_cells + 1) * dx / 2, Nx + 1 + 2 * ghost_cells,\
+                          endpoint=True\
+                       )
+
+  y_top   = np.linspace(-ghost_cells * dy / 2, 1 + (2 * ghost_cells + 1) * dy / 2, Ny + 1 + 2 * ghost_cells,\
+                        endpoint=True\
+                       )
 
   """ Initializing the field variables """
 
@@ -24,38 +39,32 @@ def error(a):
   Bx = np.zeros(((len(x_center)), (len(y_center))), dtype=np.float)
   By = np.zeros(((len(x_center)), (len(y_center))), dtype=np.float)
 
-
-  x_right = np.linspace(-ghost_cells * dx / 2, 1 + (2 * ghost_cells + 1) * dx / 2, Nx + 1 + 2 * ghost_cells,\
-                          endpoint=True\
-                        )
-
-  y_top = np.linspace(-ghost_cells * dy / 2, 1 + (2 * ghost_cells + 1) * dy / 2, Ny + 1 + 2 * ghost_cells,\
-                        endpoint=True\
-                      )
-
   """ Getting the two dimension matrix for initializing the fields """
 
-  X_center_physical, Y_center_physical = np.meshgrid(x_center[ghost_cells:-ghost_cells], \
-                                                      y_center[ghost_cells:-ghost_cells] \
+  X_center_physical, Y_center_physical = np.meshgrid( x_center[ghost_cells:-ghost_cells],\
+                                                      y_center[ghost_cells:-ghost_cells]\
                                                     )
 
-  X_right_physical, Y_top_physical = np.meshgrid(x_right[ghost_cells:-ghost_cells], \
-                                                  y_top[ghost_cells:-ghost_cells] \
-                                                )
+  X_right_physical, Y_top_physical     = np.meshgrid( x_right[ghost_cells:-ghost_cells],\
+                                                      y_top[ghost_cells:-ghost_cells]\
+                                                    )
 
   """ [-ghostcells:ghostcells] selects the points located in the physical domain excluding the ghost cells """
 
   """ Assigning Field values to the physical physical domain """
-  Ez[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = initial_fields(X_center_physical, \
-                                                                          Y_center_physical
+  # You can change the initialization here but to get the correct convergence plots make sure error is
+  # computed correctly
+
+  Ez[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = initial_fields( X_center_physical,\
+                                                                           Y_center_physical
                                                                          )
 
-  Bx[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = initial_fields(X_center_physical, \
-                                                                          Y_top_physical \
+  Bx[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = initial_fields( X_center_physical,\
+                                                                           Y_top_physical\
                                                                          )
 
-  By[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = initial_fields(X_right_physical, \
-                                                                          Y_center_physical \
+  By[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = initial_fields( X_right_physical,\
+                                                                           Y_center_physical\
                                                                          )
 
   """ Implementing Periodic Boundary conditions using ghost cells """
@@ -77,42 +86,53 @@ def error(a):
   Bx_at_random = np.zeros(number_random_points)
   By_at_random = np.zeros(number_random_points)
 
-  """ Calculating Interpolated values at the randomly selected points """
+  """ Calculating interpolated values at the randomly selected points """
 
-  Ez_at_random = np.array(bilinear_interpolate(x=[x_random], y=[y_random], x_grid=x_center, \
-                                                y_grid=y_center, F=Ez), ghost_cells \
+  Ez_at_random = np.array( bilinear_interpolate( x=[x_random], y=[y_random], x_grid=x_center,\
+                                                 y_grid=y_center, F=Ez, ghost_cells = 1\
+                                               )\
                          )
 
-  Bx_at_random = np.array(bilinear_interpolate(x=[x_random], y=[y_random], x_grid=x_center, \
-                                                y_grid=y_top, F=Bx), ghost_cells \
-                          )
+  Bx_at_random = np.array( bilinear_interpolate( x=[x_random], y=[y_random], x_grid=x_center,\
+                                                 y_grid=y_top, F=Bx, ghost_cells = 1\
+                                               )\
+                         )
 
-  By_at_random = np.array(bilinear_interpolate(x=[x_random], y=[y_random], x_grid=x_right, \
-                                                y_grid=y_center, F=By), ghost_cells \
-                          )
+  By_at_random = np.array( bilinear_interpolate( x=[x_random], y=[y_random], x_grid=x_right,\
+                                                 y_grid=y_center, F=By, ghost_cells = 1\
+                                               )\
+                         )
 
-  Ez_error = sum(sum(abs(Ez_at_random - [initial_fields(x_random, y_random)]))) / number_random_points
-  Bx_error = sum(sum(abs(Bx_at_random - [initial_fields(x_random, y_random)]))) / number_random_points
-  By_error = sum(sum(abs(By_at_random - [initial_fields(x_random, y_random)]))) / number_random_points
+  """ Calculating average errors in the interpolated values at the randomly selected points """
+
+  # Make sure the analytical results at the interpolated points are correct to get 2nd order convergence
+
+  Ez_error = sumsum(Ez_at_random - [initial_fields(x_random, y_random)]) / number_random_points
+  Bx_error = sumsum(Bx_at_random - [initial_fields(x_random, y_random)]) / number_random_points
+  By_error = sumsum(By_at_random - [initial_fields(x_random, y_random)]) / number_random_points
 
   return np.array(Ez_error), np.array(Bx_error), np.array(By_error)
 
 
 """ Vectorizing the output of the error function"""
 
-error = np.vectorize(error)
+interpolation_error_convergence = np.vectorize(interpolation_error_convergence)
 
 """ Choosing test grid densities """
 
+# change N here as desired for the convergence test
+
 # N = np.array([32, 64, 128, 256, 512, 1024])
 
-N = np.arange(100, 2000, 50)
+N = np.arange(100, 3000, 100)
 
 """ Computing error at the corresponding grid densities """
 
-error_N_Ez, error_N_Bx, error_N_By = error(N)
+error_N_Ez, error_N_Bx, error_N_By = interpolation_error_convergence(N, N)
 
 """ Plotting error vs grid density """
+
+# Change this following segment to get plots as desired
 
 pl.loglog(N, error_N_Ez, '-o', lw=3, label='$E_z$ ')
 pl.legend()
