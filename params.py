@@ -46,11 +46,11 @@ c = 1
 
 """ Time for the simulation"""
 
-time_in_seconds = 1.5
+time_in_seconds = 2
 
 """ Size of domain in x and y directions"""
-Lx = 2
-Ly = 2
+Lx = 1
+Ly = 1
 
 """Currents for the current fdtd code all irrelevant"""
 Jx = 0
@@ -61,17 +61,19 @@ Jz = 0
 
 
 def sumsum(a):
+
   return sum(sum(abs(a)))
 
 def gauss2D(x,y):
 
-  return np.exp(-( (x - 0.5)**2 +(y - 0.5)**2  )/(2*spread**2))
+  return np.exp(-( (x - Lx/2)**2 +(y - Ly/2)**2  )/(2*spread**2))
 
 def gauss1D(x):
 
   return np.exp(-( (x - 0.5)**2 )/(2*spread**2))
 
 def initial_fields(x, y):
+
   function_value = np.sin(2 * np.pi * x * y) * np.cos(2 * np.pi * x * y)
 
   return function_value
