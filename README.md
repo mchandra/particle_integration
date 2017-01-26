@@ -1,8 +1,16 @@
 # particle_integration
 
+fields.py contains the finite difference EM solver for rectangular grids with uniform cell shaps and interpolator.py contains the function for bilinear interpolator. Users can edit field_diagnostics.py, interpolator_diagnostics.py and params.py to run the following tests:
+
+1. Divergence test for fdtd.
+
+2. error convergence tests for fdtd and interpolation.
+
+
+
 Usage regarding fdtd solver and interpolator:
 
-1. Download the params.py, fields.pu, fields_diagnostics.py, interpolator.py and interpolator_diagnostics.py. Place them all in one folder.  
+1. Download all the files in the current branch and place them in one folder.
 
 2. Change all user parameters in params.py
 
