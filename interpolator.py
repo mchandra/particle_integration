@@ -17,10 +17,10 @@ def bilinear_interpolate(x, y, x_grid, y_grid, F, ghost_cells):
 
   F_function = F
 
-  n = len(F_function[0, :]) - 1 - 2 * ghost_cells  # number of zones
+  n = (len(F_function[0, :]) - 1 - 2 * ghost_cells)  # number of zones
 
-  x_zone = int(n * (x - x_grid[0]))  # indexing from zero itself
-  y_zone = int(n * (y - y_grid[0]))
+  x_zone = int(n * np.float(x - x_grid[0]))  # indexing from zero itself
+  y_zone = int(n * np.float(y - y_grid[0]))
 
   # the 4*4 matrix for solving as mention in the wiki page
   A = np.matrix( \
@@ -48,13 +48,13 @@ def bilinear_interpolate(x, y, x_grid, y_grid, F, ghost_cells):
 
   # Calculating the interpolated value
 
-  F_interpolated = b.transpose() * Q
+  F_interpolated = np.float( b.transpose() * Q )
 
   return F_interpolated
 
 
 # Vectorizing the interpolator
 
-bilinear_interpolate = np.vectorize(bilinear_interpolate, excluded=(['x_grid', 'y_grid', 'F']))
+bilinear_interpolate = np.vectorize(bilinear_interpolate, excluded=(['x_grid', 'y_grid', 'F','ghost_cells']))
 
 """-------------------------------------------------------END--------------------------------------------------------"""
