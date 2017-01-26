@@ -192,13 +192,13 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """  Defining index grid for updating the fields  """
 
-  I, J = np.meshgrid( range(ghost_cells, x_number_of_points-ghost_cells), \
+  I, J = np.meshgrid( range(ghost_cells, x_number_of_points-ghost_cells),\
                       range(ghost_cells, y_number_of_points-ghost_cells)\
                     )
 
   """  Updating the Electric field  """
 
-  Ez_in_function[I, J] = Ez_in_function[I, J] + ( (dt_by_dx * (By_in_function[I, J] - By_in_function[I, J - 1]))\
+  Ez_in_function[I, J] = Ez_in_function[I, J] + (  (dt_by_dx * (By_in_function[I, J] - By_in_function[I, J - 1]))\
                                                  - (dt_by_dy * (Bx_in_function[I, J] - Bx_in_function[I - 1, J]))\
                                                 )
 
@@ -280,13 +280,13 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   """  Defining index grid for updating the fields  """
 
-  I, J = np.meshgrid(range(ghost_cells, x_number_of_points-ghost_cells), \
+  I, J = np.meshgrid(range(ghost_cells, x_number_of_points-ghost_cells),\
                       range(ghost_cells, y_number_of_points-ghost_cells)\
                     )
 
   """  Updating the Electric field  """
 
-  Bz_in_function[I, J] = Bz_in_function[I, J] - ((dt_by_dx * (Ey_in_function[I, J] - Ey_in_function[I, J - 1]))\
+  Bz_in_function[I, J] = Bz_in_function[I, J] - (   (dt_by_dx * (Ey_in_function[I, J] - Ey_in_function[I, J - 1]))\
                                                   - (dt_by_dy * (Ex_in_function[I, J] - Ex_in_function[I - 1, J]))\
                                                 )
 
