@@ -16,10 +16,8 @@ Usage regarding fdtd solver and interpolator:
 
 2. Download all the files in the current branch and place them in one folder.
 
-3. Change all user parameters in params.py
+3. All the input parameters for the fdtd code can be changed in params.py
 
-4. All the input parameters for the fdtd code can be changed in params.py
+4. Use ghostcells = 1 only, for the current solver.
 
-5. Use ghostcells = 1 only, for the current solver.
-
-6. This is a work in progress code and new features and updates will be added on to it.
+5. This is a work in progress code and new features and updates will be added on to it.
