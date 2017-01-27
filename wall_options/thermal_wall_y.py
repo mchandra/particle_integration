@@ -1,5 +1,5 @@
-from ../simulation_parameters import *
-from ../modules import *
+from simulation_parameters import *
+from modules import *
 
 def wall_y(sol):
 

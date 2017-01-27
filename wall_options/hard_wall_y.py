@@ -1,5 +1,5 @@
-from ../simulation_parameters import *
-from ../modules import *
+from simulation_parameters import *
+from modules import *
 
 def wall_y(sol):
 
@@ -18,10 +18,10 @@ def wall_y(sol):
   velocity_y[collided_top[0]]    = velocity_y[collided_top[0]]*(-1)
 
   if(simulation_dimension == 2):
-    sol[collided_top[0]+3*no_of_particles] = velocity_x[collided_top[0]]
+    sol[collided_top[0]+3*no_of_particles] = velocity_y[collided_top[0]]
     
   else:
-    sol[collided_top[0]+4*no_of_particles] = velocity_x[collided_top[0]]
+    sol[collided_top[0]+4*no_of_particles] = velocity_y[collided_top[0]]
     
   sol[collided_top[0]+no_of_particles] = y_coordinates[collided_top[0]]
 
@@ -29,10 +29,10 @@ def wall_y(sol):
   velocity_y[collided_bot[0]]    = velocity_y[collided_bot[0]]*(-1)
 
   if(simulation_dimension == 2):
-    sol[collided_bot[0]+3*no_of_particles] = velocity_x[collided_bot[0]]
+    sol[collided_bot[0]+3*no_of_particles] = velocity_y[collided_bot[0]]
     
   else:
-    sol[collided_bot[0]+4*no_of_particles] = velocity_x[collided_bot[0]]
+    sol[collided_bot[0]+4*no_of_particles] = velocity_y[collided_bot[0]]
     
   sol[collided_bot[0]+no_of_particles] = y_coordinates[collided_bot[0]]
   return(sol)

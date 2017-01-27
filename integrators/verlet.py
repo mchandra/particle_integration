@@ -47,13 +47,13 @@ def integrator(initial_conditions,dt,potential_steepness = 0):
 
   x_coordinates = initial_conditions[0:no_of_particles].copy()                     #x^{N}
   y_coordinates = initial_conditions[no_of_particles:2*no_of_particles].copy()     #y^{N}
-  velocity_x    = initial_conditions[2*no_of_particles:3*no_of_particles].copy()   #v_x^{N}
-  velocity_y    = initial_conditions[3*no_of_particles:4*no_of_particles].copy()   #v_y^{N}
+
+  if(simulation_dimension == 2):
+    velocity_x    = initial_conditions[2*no_of_particles:3*no_of_particles].copy()   #v_x^{N}
+    velocity_y    = initial_conditions[3*no_of_particles:4*no_of_particles].copy()   #v_y^{N}
 
   if(simulation_dimension == 3):
-
     z_coordinates = initial_conditions[2*no_of_particles:3*no_of_particles].copy()   #z^{N}
-
     velocity_x    = initial_conditions[3*no_of_particles:4*no_of_particles].copy()   #v_x^{N}
     velocity_y    = initial_conditions[4*no_of_particles:5*no_of_particles].copy()   #v_y^{N}
     velocity_z    = initial_conditions[5*no_of_particles:6*no_of_particles].copy()   #v_z^{N}
@@ -102,19 +102,24 @@ def integrator(initial_conditions,dt,potential_steepness = 0):
     if(simulation_dimension == 3):
     
       velocity_z = velocity_z + 0.5*(force_z/mass_particle)*dt #v_{y}^{N+1/2}
-
-    
+  
   x_coordinates = initial_conditions[0:no_of_particles].copy()                 #x^{N}          
   y_coordinates = initial_conditions[no_of_particles:2*no_of_particles].copy() #y^{N}
-  velocity_x    = initial_conditions[2*no_of_particles:3*no_of_particles].copy()   #v_x^{N}
-  velocity_y    = initial_conditions[3*no_of_particles:4*no_of_particles].copy()   #v_y^{N}
+
+  if(simulation_dimension == 2):
+    velocity_x    = initial_conditions[2*no_of_particles:3*no_of_particles].copy()   #v_x^{N}
+    velocity_y    = initial_conditions[3*no_of_particles:4*no_of_particles].copy()   #v_y^{N}
+
+  if(simulation_dimension == 3):
+    velocity_x    = initial_conditions[3*no_of_particles:4*no_of_particles].copy()   #v_x^{N}
+    velocity_y    = initial_conditions[4*no_of_particles:5*no_of_particles].copy()   #v_y^{N}
+    velocity_z    = initial_conditions[5*no_of_particles:6*no_of_particles].copy()   #v_y^{N}
+    z_coordinates = initial_conditions[2*no_of_particles:3*no_of_particles].copy()   #z^{N}
 
   x_coordinates_new = x_coordinates + velocity_x*dt #x^{N+1}
   y_coordinates_new = y_coordinates + velocity_y*dt #y^{N+1}
 
   if(simulation_dimension == 3):
-
-    z_coordinates     = initial_conditions[2*no_of_particles:3*no_of_particles].copy() #z^{N}
     z_coordinates_new = z_coordinates + velocity_z*dt                                  #z^{N+1}
 
   x_coordinates = x_coordinates_new.copy()     #x^{N+1}
@@ -136,8 +141,6 @@ def integrator(initial_conditions,dt,potential_steepness = 0):
 
       z_coordinates = z_coordinates * np.ones((no_of_particles,no_of_particles),dtype=np.float) #z^{N+1}
       z_coordinates = z_coordinates - np.transpose(z_coordinates)                               #z^{N+1}
-
-
 
     from collision_operators.potential import potential_gradient, potential
     
@@ -165,7 +168,7 @@ def integrator(initial_conditions,dt,potential_steepness = 0):
 
     if(simulation_dimension == 3):
     
-      velocity_z = velocity_z + 0.5*(force_z/mass_particle)*dt #v_{y}^{N+1}
+      velocity_z = velocity_z + 0.5*(force_z/mass_particle)*dt #v_{z}^{N+1}
 
   
   if(simulation_dimension == 2):

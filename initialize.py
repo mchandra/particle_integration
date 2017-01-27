@@ -1,4 +1,3 @@
-import modules
 from simulation_parameters import *
 from modules import *
 
@@ -23,8 +22,8 @@ initial_velocity_z = np.sqrt(2*T_initial)*erfinv(2*R3-1)
 """ Time parameters for the simulation """
 
 box_crossing_time_scale = (length_box_x/np.max(initial_velocity_x))
-final_time              = 60.0 * box_crossing_time_scale
-dt                      = 0.005 * box_crossing_time_scale
+final_time              = 5.0 #20.0 * box_crossing_time_scale
+dt                      = 0.001 * box_crossing_time_scale
 time                    = np.arange(0, final_time, dt)
 
 """ Combining initial conditions into a single vector """

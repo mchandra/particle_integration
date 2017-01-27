@@ -63,4 +63,5 @@ def wall_x(sol):
     sol[collided_left[0]+5*no_of_particles] = velocity_z[collided_left[0]]
     
   sol[collided_left[0]] = x_coordinates[collided_left[0]]
+  
   return(sol)

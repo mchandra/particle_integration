@@ -1,7 +1,7 @@
-no_of_particles      = 100000
+no_of_particles      = 20000
 mass_particle        = 1.0
 boltzmann_constant   = 1.0
-simulation_dimension = 2 # Change this value to 2 or 3 depending upon the need
+simulation_dimension = 2 # Change this value to 2 or 3 depending upon the scenario
 
 """Defining the choice for the integrator"""
 # The following options are available for integrators:
