@@ -94,60 +94,48 @@ def field_error_convergence(a, b):
   """  Starting the solver """
 
   for time_index in range(max_iterations):
-    print('N = ', a, 'time = ', time_index)
+    print('grid size = ', a, 'time = ', time_index)
 
     Ex, Ey, Ez, Bx, By, Bz = fdtd(Ex, Ey, Ez, Bx, By, Bz, c, Lx, Ly, ghost_cells, Jx, Jy, Jz)
 
-  # Optional Script for making movies ()
-  # Add scripts here for resulting in images for variables desired
-  # Adjust the scripts according to your needs
 
-    #Sample script for making movies
     #Divergence Computation
 
-    # div_B[I, J] = (Bx[I, J + 1]-Bx[I,J])/(dx) +  (By[I + 1, J]-By[I, J])/(dy)
 
-    # #movie plots
+    div_B[I, J] = (Bx[I, J + 1]-Bx[I,J])/(dx) +  (By[I + 1, J]-By[I, J])/(dy)
 
+    # Uncomment the following set of lines to write the data to disk
+    # make folders as neccessary
+    # these lines will write data from first timestep
 
-    # pl.figure(figsize = (13,10) )
-    # pl.contourf(x_center[ghost_cells:-ghost_cells], y_center[ghost_cells:-ghost_cells] ,\
-    #             div_B[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] ,100\
-    #            )
-    # pl.title( r'$\nabla \cdot \mathbf{B}$')
-    # pl.xlabel('$x$ ')
-    # pl.ylabel('$y$')
-    # pl.colorbar()
-    # pl.savefig('div/point_mass' + '%04d'%time_index + '.png')  # save it in the folder desired
-    # # pl.show()
-    # pl.clf()
-    # pl.close()
-    #
-    #
-    #
-    # pl.figure(figsize = (13,10) )
-    # pl.contourf(x_center[ghost_cells:-ghost_cells], y_center[ghost_cells:-ghost_cells] ,\
-    #             Ez[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] ,100\
-    #            )
-    # pl.title(' $E_z(x, y)$')
-    # pl.xlabel('$x$ ')
-    # pl.ylabel('$y$')
-    # pl.colorbar()
-    # pl.savefig('Ez/point_mass' + '%04d'%time_index + '.png')
-    # pl.clf()
-    # pl.close()
-    #
-    # pl.figure(figsize = (13,10) )
-    # pl.contourf(x_right[ghost_cells:-ghost_cells], y_top[ghost_cells:-ghost_cells] ,\
-    #             Bz[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] ,100\
-    #            )
-    # pl.title(' $B_z(x, y)$')
-    # pl.xlabel('$x$ ')
-    # pl.ylabel('$y$')
-    # pl.colorbar()
-    # pl.savefig('Bz/point_mass' + '%04d'%time_index + '.png')
-    # pl.clf()
-    # pl.close()
+    #h5f = h5py.File('Ex/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('Ex/solution_dataset_'+str(time_index), data=Ex)
+    #h5f.close()
+    
+    #h5f = h5py.File('Ey/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('Ey/solution_dataset_'+str(time_index), data=Ey)
+    #h5f.close()
+    
+    #h5f = h5py.File('Ez/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('Ez/solution_dataset_'+str(time_index), data=Ez)
+    #h5f.close()
+    
+    #h5f = h5py.File('Bx/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('Bx/solution_dataset_'+str(time_index), data=Bx)
+    #h5f.close()
+    
+    #h5f = h5py.File('By/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('By/solution_dataset_'+str(time_index), data=By)
+    #h5f.close()
+    
+    #h5f = h5py.File('Bz/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('Bz/solution_dataset_'+str(time_index), data=Bz)
+    #h5f.close()
+
+    #h5f = h5py.File('div/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('div/solution_dataset_'+str(time_index), data=div_B)
+    #h5f.close()
+
 
     # For arbitrary initial conditions set time_index == time step # where wave comes back to its initial conditions
     # if it is happening
@@ -193,7 +181,7 @@ N = np.array([32, 64, 128, 256])
 
 # for making movies for 100*100 comment the above statement and uncomment the following line
 
-# N = np.array([100])
+#N = np.array([100])
 
 ErrorNEz, ErrorNBx, ErrorNBy, ErrorNBz, ErrorNEx, ErrorNEy, = field_error_convergence(N, N)
 
