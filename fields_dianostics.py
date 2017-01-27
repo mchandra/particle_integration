@@ -137,6 +137,7 @@ def field_error_convergence(a, b):
     h5f.close()
 
 
+    # Computing Numerical error after two box crossing timescales
     # For arbitrary initial conditions set time_index == time step # where wave comes back to its initial conditions
     # if it is happening
 
