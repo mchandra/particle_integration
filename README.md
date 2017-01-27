@@ -6,6 +6,18 @@ fields.py contains the finite difference EM solver for rectangular grids with un
 
 Users can edit field_diagnostics.py, interpolator_diagnostics.py and params.py to run the following tests/tasks:
 
+### fields_diagnostics.py (How to use):
+
+1.   
+
+2. 
+
+### interpolator_diagnostics.py (How to use):
+
+1. 
+
+2. 
+
 ### Unit tests:
 
 1. Divergence test and error convergence test for fdtd by using fields_diagnostics.py
@@ -15,7 +27,6 @@ Users can edit field_diagnostics.py, interpolator_diagnostics.py and params.py t
 3. error convergence tests for interpolation using interpolator_diagnostics.py
 
 ## How to use the code:
-
 
 1. Read comments before every code segment to see if any thing can be edited as desired.
 
