@@ -53,3 +53,8 @@ ffmpeg -f image2 -i point_mass%04d.png -vcodec mpeg4 -mbd rd -trellis 2 -cmp 2 -
 4. Use ghostcells = 1 only, for the current solver.
 
 5. This is a work in progress code and new features and updates will be added on to it.
+
+
+> **Tip:** You can disable any **Markdown Extra** feature in the **Extensions** tab of the <i class="icon-cog"></i> **Settings** dialog.
+
+> **Note:** You can find more information about **Markdown** syntax [here][2] and **Markdown Extra** extension [here][3].
