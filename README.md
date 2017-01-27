@@ -10,7 +10,7 @@ Users can edit field_diagnostics.py, interpolator_diagnostics.py and params.py t
 
 For error convergence
 
-1. Edit N near the end of the file as required and run the code.
+1. Edit N (test grid size range) near the end of the file as required and run the code.
 
 For field evolution movies
 
