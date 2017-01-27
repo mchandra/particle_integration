@@ -6,7 +6,7 @@ fields.py contains the finite difference EM solver for rectangular grids with un
 
 Users can edit **field_diagnostics.py**, **interpolator_diagnostics.py** and **params.py** to run the following tests/tasks:
 > **Note:**
-> -  Input parameters for the codes can be edited in **params.py**.
+> -  Input parameters for the both **field_diagnostics.py** and **interpolator_diagnostics.py** can be edited in **params.py**.
 
 
 ### fields_diagnostics.py (How to use):
