@@ -6,7 +6,7 @@ fields.py contains the finite difference EM solver for rectangular grids with un
 
 Users can edit **field_diagnostics.py**, **interpolator_diagnostics.py** and **params.py** to run the following tests/tasks:
 > **Note:**
-> -  Input parameters for the both **field_diagnostics.py** and **interpolator_diagnostics.py** can be edited in **params.py**.
+> -  Input parameters for the both **field_diagnostics.py** and **interpolator_diagnostics.py**  collectively can be edited in **params.py**.
 
 
 ### fields_diagnostics.py (How to use):
@@ -26,7 +26,7 @@ N = np.array([32, 64, 128, 256])
 #### Divergence test
 movies showing the time evolution of fields and divergence can be made in the following manner.
 
-1. **Comment out** the code for various grid sizes(See near the end of fields_diagnostics.py)
+* **Comment out** the code for various grid sizes(See near the end of fields_diagnostics.py)
 ```python
 N = np.array([32, 64, 128, 256])
 ```
@@ -35,7 +35,37 @@ and **uncomment the code for fixed grid size** shown below:
 #N = np.array([100])
 ```
 
-2. Dont comment the file writing codes in the script to write data to disk. Make folders named **Ex, Ey, Ez, Bx, By, Bz and div**. The files are saved in the respective folders in h5 format. See code in post.py to read the data. The code below reads data for Ex electric field. 
+* Dont comment the following codes used for writing data to disk.
+```
+    h5f = h5py.File('Ex/solution_'+str(time_index)+'.h5', 'w')
+    h5f.create_dataset('Ex/solution_dataset_'+str(time_index), data=Ex)
+    h5f.close()
+    
+    h5f = h5py.File('Ey/solution_'+str(time_index)+'.h5', 'w')
+    h5f.create_dataset('Ey/solution_dataset_'+str(time_index), data=Ey)
+    h5f.close()
+    
+    h5f = h5py.File('Ez/solution_'+str(time_index)+'.h5', 'w')
+    h5f.create_dataset('Ez/solution_dataset_'+str(time_index), data=Ez)
+    h5f.close()
+    
+    h5f = h5py.File('Bx/solution_'+str(time_index)+'.h5', 'w')
+    h5f.create_dataset('Bx/solution_dataset_'+str(time_index), data=Bx)
+    h5f.close()
+    
+    h5f = h5py.File('By/solution_'+str(time_index)+'.h5', 'w')
+    h5f.create_dataset('By/solution_dataset_'+str(time_index), data=By)
+    h5f.close()
+    
+    h5f = h5py.File('Bz/solution_'+str(time_index)+'.h5', 'w')
+    h5f.create_dataset('Bz/solution_dataset_'+str(time_index), data=Bz)
+    h5f.close()
+    
+    h5f = h5py.File('div/solution_'+str(time_index)+'.h5', 'w')
+    h5f.create_dataset('div/solution_dataset_'+str(time_index), data=div_B)
+    h5f.close()
+```
+Make sure there are folders named **Ex, Ey, Ez, Bx, By, Bz and div** in your working directory. The data generated from the code will be saved in `.h5` format. See post.py to see scripts for reading the data. The code below shows a sample script for reading the data generated for `Ex` electric field. 
 
 ```python
 print('post processing for time_index = ', time_index)
@@ -44,9 +74,9 @@ Ex = h5f['Ex/solution_dataset_'+str(time_index)][:]
 h5f.close()
 ```
 
-3. ** Edit post.py** as required to post process the data 
+* ** Edit post.py** as required to post process the data 
 
-4. Use the code below to make a movie of the images generated. 
+* Use the code below to make a movie of the images generated. 
 ```
 ffmpeg -f image2 -i point_mass%04d.png -vcodec mpeg4 -mbd rd -trellis 2 -cmp 2 -g 300 -pass 1 -r 25 -b 18000000 movie.mp4
 ```
@@ -66,10 +96,33 @@ The second order error convergence test can be performed using **interpolator_di
 # N = np.array([32, 64, 128, 256, 512, 1024])
 N = np.arange(100, 3000, 100)
 ```
+*  Edit  the following set of statements to plot the desired variables.
 
-> **Note:**
+```
+pl.loglog(N, ErrorNEz, '-o', label='$E_z$ ')
+pl.legend()
+pl.loglog(N, ErrorNBx, '-o', label='$B_x$ ')
+pl.legend()
+pl.loglog(N, ErrorNBy, '-o', label='$B_y$ ')
+pl.legend()
+pl.loglog(N, ErrorNBz, label='$B_z$ ')
+pl.legend()
+pl.loglog(N, ErrorNEx, label='$E_x$ ')
+pl.legend()
+pl.loglog(N, ErrorNEy, label='$E_y$ ')
+pl.legend()
+pl.loglog(N, 1.5 * (N ** -1.999), '--', color='black', lw=2, label=' $O(N^{-2})$ ')
+pl.legend()
+pl.title('$\mathrm{Convergence\; plot}$ ')
+pl.xlabel('$\mathrm{N}$')
+pl.ylabel('$\mathrm{L_1\;norm\;of\;error}$')
+pl.show()
+pl.clf()
+```
 
-> -  Use `ghost_cells = 1` for the following code.
+> **Important Note:**
+
+> -  Use `ghost_cells = 1` for all the files.
 > - Read comments before every code segment to see if any thing can be edited as desired.
 > - This is a work in progress code and new features and updates will be added on to it.
 
