@@ -2,15 +2,17 @@
 
 ## features
 
-fields.py contains the finite difference EM solver for rectangular grids with uniform cell shaps and interpolator.py contains the function for bilinear interpolator. Users can edit field_diagnostics.py, interpolator_diagnostics.py and params.py to run the following tests/tasks:
+fields.py contains the finite difference EM solver for rectangular grids with uniform cell shapes and interpolator.py contains the function for bilinear interpolation. 
+
+Users can edit field_diagnostics.py, interpolator_diagnostics.py and params.py to run the following tests/tasks:
 
 ### Unit tests:
 
 1. Divergence test and error convergence test for fdtd by using fields_diagnostics.py
 
-2. Making movies for field evoulution by editing field_diagnostics.py
+2. Making movies for field evolution by editing field_diagnostics.py
 
-3. error convergence tests for interpolation using 
+3. error convergence tests for interpolation using interpolator_diagnostics.py
 
 ## How to use the code:
 
