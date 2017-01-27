@@ -3,6 +3,7 @@ import pylab as pl
 import numpy.linalg as la
 from interpolator import bilinear_interpolate
 from fields import *
+import h5py
 
 # Plotting parameters
 pl.rcParams['figure.figsize']     = 12, 7.5
