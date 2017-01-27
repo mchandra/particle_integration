@@ -16,7 +16,12 @@ For field evolution movies
 
 1. Comment out the code for various grid sizes(See near the end of fields_diagnostics.py) and uncomment the code for fixed grid size.
 
-2. Uncomment the file writing codes in the script to write data to disk. Make folders named Ex, Ey, Ez, Bx, By, Bz and div.  
+2. Uncomment the file writing codes in the script to write data to disk. Make folders named Ex, Ey, Ez, Bx, By, Bz and div. The files are saved in the respective folders in h5 format. See code in post.py to read the data. The code below reads data for Ex electric field. 
+
+print('post processing for time_index = ', time_index)
+h5f = h5py.File('Ex/solution_'+str(time_index)+'.h5', 'r')
+Ex = h5f['Ex/solution_dataset_'+str(time_index)][:]
+h5f.close()
 
 3. Edit post.py as required to post process the data 
 
