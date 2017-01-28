@@ -1,6 +1,5 @@
 from params import *
 
-
 """ Reading data from generated files"""
 
 # Set the time_range to the number of solution files generated
@@ -34,6 +33,9 @@ y_top = np.linspace(-ghost_cells * dy / 2, Ly + (2 * ghost_cells + 1) * dy / 2, 
 
 
 for time_index in range(time_range):
+
+  """ Scripts down below for reading data. Edit these to read the data required"""
+
   print('post processing for time_index = ', time_index)
   h5f = h5py.File('Ex/solution_'+str(time_index)+'.h5', 'r')
   Ex = h5f['Ex/solution_dataset_'+str(time_index)][:]
@@ -60,10 +62,12 @@ for time_index in range(time_range):
   h5f.close()
 
   ##movie plots
+
   # Scripts down below to make movies out of the generated data.
   # Make sure indentation is aligned with the above set of lines
   # By default Ez plots are being saved.
 
+  # script for divergence down below
 
   #pl.figure(figsize = (13,10) )
   #pl.contourf(x_center[ghost_cells:-ghost_cells], y_center[ghost_cells:-ghost_cells] ,\
@@ -81,9 +85,9 @@ for time_index in range(time_range):
 
 
   pl.figure(figsize = (13,10) )
-  pl.contourf(x_center[ghost_cells:-ghost_cells], y_center[ghost_cells:-ghost_cells] ,\
+  pl.contourf(x_center[ghost_cells:-ghost_cells], y_center[ghost_cells:-ghost_cells],\
               Ez[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells] ,100\
-            )
+             )
   pl.title(' $E_z(x, y)$')
   pl.xlabel('$x$ ')
   pl.ylabel('$y$')
@@ -91,6 +95,8 @@ for time_index in range(time_range):
   pl.savefig('Ez/point_mass' + '%04d'%time_index + '.png')
   pl.clf()
   pl.close()
+
+  # script for plotting Bz from mode 2 down below:
 
   #pl.figure(figsize = (13,10) )
   #pl.contourf(x_right[ghost_cells:-ghost_cells], y_top[ghost_cells:-ghost_cells] ,\
