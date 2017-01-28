@@ -24,7 +24,7 @@ N = np.array([32, 64, 128, 256])
 ```
 
 #### Divergence test
-movies showing the time evolution of fields and divergence can be made in the following manner.
+Movies showing the time evolution of fields and divergence can be made in the following manner.
 
 * **Comment out** the code for various grid sizes(See near the end of fields_diagnostics.py)
 ```python
@@ -35,7 +35,7 @@ and **uncomment the code for fixed grid size** shown below:
 #N = np.array([100])
 ```
 
-* Uncomment the following set of lines used for writing data to disk. They have been commented out by default.
+* Uncomment the following set of lines used for writing data to disk.
 
 ```
     h5f = h5py.File('Ex/solution_'+str(time_index)+'.h5', 'w')
@@ -76,7 +76,12 @@ Ex = h5f['Ex/solution_dataset_'+str(time_index)][:]
 h5f.close()
 ```
 
-* ** Edit post.py** as required to post process the data
+* ** Edit post.py** as required to post process the data. Change Nx and Ny to the values chosen in fields_diagnostics.py. (Default = 100,100).
+
+```python
+Nx = 100
+Ny = 100
+```
 
 * Use the code below to make a movie of the images generated.
 
@@ -86,7 +91,7 @@ ffmpeg -f image2 -i point_mass%04d.png -vcodec mpeg4 -mbd rd -trellis 2 -cmp 2 -
 
 ### interpolator_diagnostics.py (How to use):
 
-The **second order error convergence** test can be performed using **interpolator_diagnostics.py**
+The second order error convergence test can be performed using **interpolator_diagnostics.py**
 
 
 * Change number of random points taken by editing the line:
