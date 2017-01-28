@@ -86,7 +86,7 @@ ffmpeg -f image2 -i point_mass%04d.png -vcodec mpeg4 -mbd rd -trellis 2 -cmp 2 -
 
 ### interpolator_diagnostics.py (How to use):
 
-The second order error convergence test can be performed using **interpolator_diagnostics.py**
+The **second order error convergence** test can be performed using **interpolator_diagnostics.py**
 
 
 * Change number of random points taken by editing the line:
