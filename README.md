@@ -2,7 +2,7 @@
 
 ## Overview
 
-fields.py contains the finite difference EM solver for rectangular grids with uniform cell shapes and interpolator.py contains the function for bilinear interpolation.
+**fields.py** contains the finite difference EM solver for rectangular grids with uniform cell shapes and **interpolator.py** contains the function for bilinear interpolation.
 
 Users can edit **field_diagnostics.py**, **interpolator_diagnostics.py** and **params.py** to run the following tests/tasks:
 > **Note:**
