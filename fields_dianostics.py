@@ -104,40 +104,41 @@ def field_error_convergence(a, b):
 
     div_B[I, J] = (Bx[I, J + 1]-Bx[I,J])/(dx) +  (By[I + 1, J]-By[I, J])/(dy)
 
-    # Comment the following set of lines to not write the data to disk
+    # Uncomment the following set of lines to write the data to disk
     # make folders as neccessary
     # these lines will write data from first timestep
 
-    h5f = h5py.File('Ex/solution_'+str(time_index)+'.h5', 'w')
-    h5f.create_dataset('Ex/solution_dataset_'+str(time_index), data=Ex)
-    h5f.close()
+    #h5f = h5py.File('Ex/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('Ex/solution_dataset_'+str(time_index), data=Ex)
+    #h5f.close()
     
-    h5f = h5py.File('Ey/solution_'+str(time_index)+'.h5', 'w')
-    h5f.create_dataset('Ey/solution_dataset_'+str(time_index), data=Ey)
-    h5f.close()
+    #h5f = h5py.File('Ey/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('Ey/solution_dataset_'+str(time_index), data=Ey)
+    #h5f.close()
     
-    h5f = h5py.File('Ez/solution_'+str(time_index)+'.h5', 'w')
-    h5f.create_dataset('Ez/solution_dataset_'+str(time_index), data=Ez)
-    h5f.close()
+    #h5f = h5py.File('Ez/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('Ez/solution_dataset_'+str(time_index), data=Ez)
+    #h5f.close()
     
-    h5f = h5py.File('Bx/solution_'+str(time_index)+'.h5', 'w')
-    h5f.create_dataset('Bx/solution_dataset_'+str(time_index), data=Bx)
-    h5f.close()
+    #h5f = h5py.File('Bx/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('Bx/solution_dataset_'+str(time_index), data=Bx)
+    #h5f.close()
     
-    h5f = h5py.File('By/solution_'+str(time_index)+'.h5', 'w')
-    h5f.create_dataset('By/solution_dataset_'+str(time_index), data=By)
-    h5f.close()
+    #h5f = h5py.File('By/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('By/solution_dataset_'+str(time_index), data=By)
+    #h5f.close()
     
-    h5f = h5py.File('Bz/solution_'+str(time_index)+'.h5', 'w')
-    h5f.create_dataset('Bz/solution_dataset_'+str(time_index), data=Bz)
-    h5f.close()
+    #h5f = h5py.File('Bz/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('Bz/solution_dataset_'+str(time_index), data=Bz)
+    #h5f.close()
     
-    h5f = h5py.File('div/solution_'+str(time_index)+'.h5', 'w')
-    h5f.create_dataset('div/solution_dataset_'+str(time_index), data=div_B)
-    h5f.close()
+    #h5f = h5py.File('div/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('div/solution_dataset_'+str(time_index), data=div_B)
+    #h5f.close()
 
 
     # Computing Numerical error after two box crossing timescales
+    
     # For arbitrary initial conditions set time_index == time step # where wave comes back to its initial conditions
     # if it is happening
 
@@ -169,7 +170,7 @@ def field_error_convergence(a, b):
       return Ez_error, Bx_error, By_error, Bz_error, Ex_error, Ey_error
 
 
-"""Vectorizng the function """
+"""Vectorizing the function """
 
 field_error_convergence = np.vectorize(field_error_convergence)
 
