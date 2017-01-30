@@ -9,10 +9,10 @@ from scipy.integrate import odeint
 
 """ Setting number of particles and other parameters"""
 
-no_of_particles = 3
+no_of_particles = 1
 
-Nx = 100
-Ny = 100
+Nx = 300
+Ny = 300
 
 dx = Lx/Nx
 dy = Ly/Ny
@@ -61,15 +61,12 @@ initial_conditions_velocity_y = np.zeros(no_of_particles, dtype=np.float)
 initial_conditions_velocity_z = np.zeros(no_of_particles, dtype=np.float)
 
 initial_conditions_velocity_y[:] = 2
-
-
 """ Combining the initial conditions into one vector"""
 
 initial_conditions = np.concatenate([initial_conditions_position_x, initial_conditions_position_y,\
                                      initial_conditions_position_z, initial_conditions_velocity_x,\
                                      initial_conditions_velocity_y, initial_conditions_velocity_z], axis=0)
 
-initial_conditions_analytical = initial_conditions.copy()
 
 """ Electric and Magnetic field """
 
@@ -112,7 +109,7 @@ Bz[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = np.sin(2*np.pi*(-X_righ
 
 """ Discretizing time and making sure scaling is done right """
 
-box_crossing_time_scale = length_of_box_x / np.max(initial_conditions_velocity_x)
+# box_crossing_time_scale = length_of_box_x / np.max(initial_conditions_velocity_x)
 
 final_time = 5
 dt = np.float(dx / (2 * c))
@@ -135,6 +132,11 @@ def mag_Verlet(initial_conditions, t, F_interpolated):
     Bx = F_interpolated[3,0:no_of_particles]
     By = F_interpolated[4,0:no_of_particles]
     Bz = F_interpolated[5,0:no_of_particles]
+
+    print('Expected magnetic field = ', np.sin(2*np.pi*(t[0] - x[0])))
+    print('Numerical magnetic field = ', Bz )
+
+
 
     x_new = x + v_x * (t[1] - t[0])
     y_new = y + v_y * (t[1] - t[0])
@@ -177,21 +179,31 @@ def mag_Verlet(initial_conditions, t, F_interpolated):
 #mag_Verlet = np.vectorize(mag_Verlet,excluded=(['x_grid', 'y_grid', 'F','ghost_cells']))
 
 
-def analytical(x,t):
-  
-  #print(x[0], x[1], x[2])
-  return [ x[1],  x[2],  ((2*np.pi*np.cos(2*np.pi*(t-x[0]))*x[2] /(np.sin(2*np.pi*(t-x[0]))*x[2]) ) - (x[1] * np.sin(2*np.pi*(t-x[0]))**2 )+\
-                                                                  np.sin(2*np.pi*(t-x[0]))\
-                          )\
+
+def analytical(y,t):
+  x, xdash, xddash = y
+  dydt = [xdash, xddash, (2*np.pi*np.cos(2*np.pi*(t-x))*xddash /(np.sin(2*np.pi*(t-x))) ) -\
+            (xdash * np.sin(2*np.pi*(t-x))**2 )+np.sin(2*np.pi*(t-x))\
          ]
+  return dydt
 
-initial_conditions_analytical = [initial_conditions_position_x[0], 0, 0]
+initial_conditions_analytical = [initial_conditions_position_x[0], initial_conditions_velocity_x[0],initial_conditions_velocity_y[0] * np.sin(2*np.pi*(-initial_conditions_position_x[0]))]
 
+
+Num_error = np.zeros(len(time), dtype = np.float)
 
 """ Solving """
 
 old = np.zeros(6 * no_of_particles, dtype=np.float)
+
+
+
 old_analytical = np.zeros(6 * no_of_particles, dtype=np.float)
+
+
+time_ana = np.arange(0, final_time, dt)
+sol_analytical = odeint(analytical,initial_conditions_analytical,time_ana)
+print(sol_analytical.shape)
 """ Solver """
 
 for time_index, t0 in enumerate(time):
@@ -203,46 +215,48 @@ for time_index, t0 in enumerate(time):
     t = [t0, t1]
     if (time_index == 0):
         initial_conditions = initial_conditions
-        initial_conditions_analytical = initial_conditions_analytical
+        #initial_conditions_analytical = initial_conditions_analytical
     else:
         initial_conditions = old
-        initial_conditions_analytical = old_analytical
+        #initial_conditions_analytical = old_analytical
 
 
     Ex_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_center,\
-                                                 y_grid=y_top, F=Ex, ghost_cells = ghost_cells\
-                                               )\
-                         )
+                                                  y_grid=y_top, F=Ex, ghost_cells = ghost_cells\
+                                                )\
+                          )
 
     Ey_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_right,\
-                                          y_grid=y_top, F=Ey, ghost_cells = ghost_cells\
-                                       )\
+                                                  y_grid=y_top, F=Ey, ghost_cells = ghost_cells\
+                                                )\
                           )
+    
     Ez_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_center,\
-                                                 y_grid=y_top, F=Ez, ghost_cells = ghost_cells\
-                                               )\
-                         )
+                                                  y_grid=y_top, F=Ez, ghost_cells = ghost_cells\
+                                                )\
+                          )
 
     Bx_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_right,\
-                                          y_grid=y_top, F=Bx, ghost_cells = ghost_cells\
-                                       )\
+                                                  y_grid=y_top, F=Bx, ghost_cells = ghost_cells\
+                                                )\
                           )
+    
     By_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_center,\
-                                                 y_grid=y_top, F=By, ghost_cells = ghost_cells\
-                                               )\
-                         )
+                                                  y_grid=y_top, F=By, ghost_cells = ghost_cells\
+                                                )\
+                          )
 
     Bz_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_right,\
-                                          y_grid=y_top, F=Bz, ghost_cells = ghost_cells\
-                                       )\
+                                                  y_grid=y_top, F=Bz, ghost_cells = ghost_cells\
+                                                )\
                           )
 
     F_interpolated = np.concatenate([Ex_particle, Ey_particle, Ez_particle, Bx_particle, By_particle, Bz_particle], axis = 0)
     #print('Interpolated magnetic fields = ', F_interpolated[5,:])
     sol = mag_Verlet(initial_conditions, t, F_interpolated)
     
-    sol_analytical = odeint(analytical,initial_conditions_analytical,t)
-    sol_analytical = sol_analytical[-1,:]
+    
+
     #print('Analytical solution at current timestep = ',sol_analytical)
     Ex, Ey, Ez, Bx, By, Bz = fdtd(Ex, Ey, Ez, Bx, By, Bz, c, Lx, Ly, ghost_cells, Jx, Jy, Jz)
     
@@ -250,7 +264,15 @@ for time_index, t0 in enumerate(time):
     #pl.contourf(x_right[ghost_cells:-ghost_cells], y_top[ghost_cells:-ghost_cells],Bz[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells], 100)
     #pl.show()
     #pl.clf()
-    
+    #print('Bz = ', Ey)
+    #pl.contourf(x_right[ghost_cells:-ghost_cells],y_top[ghost_cells:-ghost_cells],Bz[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells],100)
+    #pl.plot(x_right[ghost_cells:-ghost_cells], Bz[5,ghost_cells:-ghost_cells], '-o')
+    #pl.plot(x_center[ghost_cells:-ghost_cells],np.sin(2*np.pi*((time_index*dt)-x_center[ghost_cells:-ghost_cells])),'--')
+    #pl.plot(x_right[ghost_cells:-ghost_cells], Ey[5,ghost_cells:-ghost_cells], '-o')
+    #pl.plot(x_center[ghost_cells:-ghost_cells],np.sin(2*np.pi*((time_index*dt)-x_center[ghost_cells:-ghost_cells])),'--')
+    #pl.ylim(-1,1)
+    #pl.show()
+    #pl.clf()
     
     for i in range(3 * no_of_particles):
         if (sol[i] >= right_boundary):
@@ -258,17 +280,28 @@ for time_index, t0 in enumerate(time):
         if (sol[i] <= left_boundary):
             sol[i] = sol[i] + Lx
 
-    h5f = h5py.File('solution_all/solution_'+str(time_index)+'.h5', 'w')
-    h5f.create_dataset('solution_all/solution_dataset_'+str(time_index), data=sol)
-    h5f.close()
-
-    h5f = h5py.File('analytical_all/solution_'+str(time_index)+'.h5', 'w')
-    h5f.create_dataset('analytical_all/solution_dataset_'+str(time_index), data=sol_analytical)
-    h5f.close()
-
+    
     old = sol
     
-    old_analytical = sol_analytical
+    #old_analytical = sol_analytical[1, :]
+    #sol_analytical = sol_analytical[1, :]
+    #print(sol_analytical.shape)
+    #print(sol_analytical)
+    #print(sol_analytical[0])
+    #Num_error[time_index] = abs ( old[0]-sol_analytical[0] )
+    print('Numnerical x position = ', old[0])
+    print('Analytical x position = ', sol_analytical[time_index + 1,0])
+    zzz = input()
+    #print('analytical x = ',sol_analytical)
+    #h5f = h5py.File('solution_all/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('solution_all/solution_dataset_'+str(time_index), data=sol)
+    #h5f.close()
+
+    #h5f = h5py.File('analytical_all/solution_'+str(time_index)+'.h5', 'w')
+    #h5f.create_dataset('analytical_all/solution_dataset_'+str(time_index), data=sol_analytical)
+    #h5f.close()
+
     #print('shape is ', old_analytical.shape)
 
 print(' the time scale is ', dt)
+print('Error array  = ', Num_error)
