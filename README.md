@@ -1,4 +1,4 @@
-# FDTD Solver(work in progress)
+# Modules for finite difference EM solver and interpolation
 
 ## Overview
 
