@@ -89,17 +89,17 @@ def interpolation_error_convergence(a, b):
   """ Calculating interpolated values at the randomly selected points """
 
   Ez_at_random = np.array( bilinear_interpolate( x=[x_random], y=[y_random], x_grid=x_center,\
-                                                 y_grid=y_center, F=Ez, ghost_cells = 1\
+                                                 y_grid=y_center, F=Ez, ghost_cells = 1, Lx = Lx, Ly = Ly\
                                                )\
                          )
 
   Bx_at_random = np.array( bilinear_interpolate( x=[x_random], y=[y_random], x_grid=x_center,\
-                                                 y_grid=y_top, F=Bx, ghost_cells = 1\
+                                                 y_grid=y_top, F=Bx, ghost_cells = 1, Lx = Lx, Ly = Ly\
                                                )\
                          )
 
   By_at_random = np.array( bilinear_interpolate( x=[x_random], y=[y_random], x_grid=x_right,\
-                                                 y_grid=y_center, F=By, ghost_cells = 1\
+                                                 y_grid=y_center, F=By, ghost_cells = 1, Lx = Lx, Ly = Ly\
                                                )\
                          )
 
