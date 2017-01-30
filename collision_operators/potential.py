@@ -1,6 +1,70 @@
-from simulation_parameters import *
-from modules import *
+import numpy as np
+from scipy.special import erfinv
+import h5py
+import arrayfire as af  
+import params
 
+"""
+This script is used to test out how particles may be 
+scattered by utilizing the fact that collisions are modelled 
+by the means of a potential that acts in short range distances between
+particles.
+"""
+
+"""Here we shall assign values as set in params"""
+
+no_of_particles      = params.no_of_particles
+simulation_dimension = params.simulation_dimension
+restart_simulation   = params.restart_simulation
+arrayfire_backend    = params.arrayfire_backend
+choice_integrator    = params.choice_integrator
+collision_operator   = params.collision_operator
+
+if(collision_operator == "hardsphere"):
+  scattering_distance = params.scattering_distance
+
+elif(collision_operator == "potential-based"):
+  potential_steepness     = params.potential_steepness
+  potential_amplitude     = params.potential_amplitude
+  order_finite_difference = params.order_finite_difference
+
+elif(collision_operator == "montecarlo"):
+  x_zones            = params.x_zones
+  y_zones            = params.y_zones
+  scattered_fraction = params.scattered_fraction
+
+mass_particle      = params.mass_particle
+boltzmann_constant = params.boltzmann_constant
+T_initial          = params.T_initial
+wall_condition_x   = params.wall_condition_x
+wall_condition_y   = params.wall_condition_y
+wall_condition_z   = params.wall_condition_z
+
+if(wall_condition_x == "thermal"):
+  T_left_wall  = params.T_left_wall
+  T_right_wall = params.T_right_wall
+
+if(wall_condition_y == "thermal"):
+  T_top_wall = params.T_top_wall
+  T_bot_wall = params.T_bot_wall
+
+if(wall_condition_z == "thermal"):
+  T_front_wall = params.T_front_wall
+  T_back_wall  = params.T_back_wall
+
+left_boundary    = params.left_boundary
+right_boundary   = params.right_boundary
+length_box_x     = params.length_box_x
+
+bottom_boundary  = params.bottom_boundary
+top_boundary     = params.top_boundary
+length_box_y     = params.length_box_y
+
+back_boundary    = params.back_boundary
+front_boundary   = params.front_boundary
+length_box_z     = params.length_box_z
+
+#Here we complete import of all the variable from the parameters file
 def potential(x):
   potential= (potential_amplitude/2) * ( -1 * np.tanh(potential_steepness*x) + 1)
   return(potential)
@@ -47,7 +111,7 @@ def potential_gradient(x, order):
 # This function calculates and returns the potential energy of the entire system
 # This is done by summing over all the potentials of the particles in the system
 
-def calc_potential_energy(sol):
+def calculate_potential_energy(sol):
 
   x = sol[0:no_of_particles].copy()               
   y = sol[no_of_particles:2*no_of_particles].copy() 

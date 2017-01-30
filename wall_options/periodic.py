@@ -3,17 +3,15 @@ from scipy.special import erfinv
 import h5py
 import arrayfire as af  
 import params
-import numexpr as ne
+""" 
+This file contains 3 functions, which define periodic B.C's in 3 directions
+Depending upon the choice of the user, periodic boundary conditions may be set
+to either of the x,y and z directions.
 
+A periodic B.C means that a particle that encounters such a boundary will result
+in the particle reaching the other side of the box. Effectively, this means that
+the particle in moving on a ring
 """
-This model uses the HS model for scattering the particles.
-By this model the particles are effectively scattered in the 
-same way as to how one models collisions amongst billiard 
-balls. By this model we shall condsider only 2-body collisions.
-Multi-body collisions are treated as 2 body collisions, with the 
-choice of the 2 bodies being random.
-"""
-
 """Here we shall assign values as set in params"""
 
 no_of_particles      = params.no_of_particles
@@ -69,41 +67,42 @@ length_box_z     = params.length_box_z
 
 #Here we complete import of all the variable from the parameters file
 
-def collision_operator(sol):
+def wall_x(sol):
 
-  if(simulation_dimension == 3):
-    print("HS Scattering in 3D still in development! Please change to 2D mode")
-
-  for i in range(no_of_particles):
-    j=sol[(i+1):no_of_particles]        
-    k=sol[(i+1+no_of_particles):2*no_of_particles]
-    velx=sol[i+2*no_of_particles]*np.ones(j.size)
-    vely=sol[i+3*no_of_particles]*np.ones(j.size)
-    velx_others=sol[(i+1+2*no_of_particles):3*no_of_particles]
-    vely_others=sol[(i+1+3*no_of_particles):4*no_of_particles]
-    x_particle=sol[i]
-    y_particle=sol[i+no_of_particles]        
-    j=ne.evaluate("j-x_particle")
-    k=ne.evaluate("k-y_particle")
-    dist=ne.evaluate("sqrt(j**2+k**2)")
-    j=j/dist
-    k=k/dist
-    test_collision=ne.evaluate("dist<0.01") 
-    test_collision=ne.evaluate("where(test_collision,1,0)")
-    indices=np.nonzero(test_collision)
-    
-    if(np.sum(test_collision)!=0):
-      p=(velx*j+vely*k-velx_others*j-vely_others*k)*test_collision
-      velx=velx*test_collision-p*j
-      velx_others=velx_others+p*j
-      vely=vely*test_collision-p*k
-      vely_others=vely_others+p*k 
-      index=np.random.randint(0,(indices[0].size))
-      sol[i+1+indices[0][index]+2*no_of_particles] = velx_others[indices[0][index]]
-
-      sol[i+1+indices[0][index]+3*no_of_particles] = vely_others[indices[0][index]]
-
-      sol[i+2*no_of_particles]=velx[indices[0][index]]
-      sol[i+3*no_of_particles]=vely[indices[0][index]]
-
+  x_coordinates = sol[0:no_of_particles]
+  wall_x_left   = np.where(x_coordinates<left_boundary)
+  wall_x_right  = np.where(x_coordinates>right_boundary)
+  
+  x_coordinates[wall_x_left[0]]  = x_coordinates[wall_x_left[0]]  + length_box_x
+  x_coordinates[wall_x_right[0]] = x_coordinates[wall_x_right[0]] - length_box_x
+  
+  sol[wall_x_left[0]]  = x_coordinates[wall_x_left[0]]
+  sol[wall_x_right[0]] = x_coordinates[wall_x_right[0]]
   return(sol)
+
+def wall_y(sol):
+
+  y_coordinates = sol[no_of_particles:2*no_of_particles]
+  wall_y_bot    = np.where(y_coordinates<bottom_boundary)
+  wall_y_top    = np.where(y_coordinates>top_boundary)
+  
+  y_coordinates[wall_y_bot[0]] = y_coordinates[wall_y_bot[0]] + length_box_y
+  y_coordinates[wall_y_top[0]] = y_coordinates[wall_y_top[0]] - length_box_y
+  
+  sol[no_of_particles+wall_y_bot[0]] = y_coordinates[wall_y_bot[0]]
+  sol[no_of_particles+wall_y_top[0]] = y_coordinates[wall_y_top[0]]
+  return(sol)
+
+def wall_z(sol):
+
+  z_coordinates = sol[2*no_of_particles:3*no_of_particles]
+  wall_z_back   = np.where(z_coordinates<back_boundary)
+  wall_z_front  = np.where(z_coordinates>front_boundary)
+  
+  z_coordinates[wall_z_back[0]]  = z_coordinates[wall_z_back[0]]  + length_box_z
+  z_coordinates[wall_z_front[0]] = z_coordinates[wall_z_front[0]] - length_box_z
+  
+  sol[2*no_of_particles+wall_z_back[0]]  = z_coordinates[wall_z_back[0]]
+  sol[2*no_of_particles+wall_z_front[0]] = z_coordinates[wall_z_front[0]]
+  return(sol)
+
