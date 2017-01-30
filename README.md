@@ -30,7 +30,7 @@ N = np.array([32, 64, 128, 256])
 
 Movies showing the time evolution of fields and divergence can be made in the following manner.
 
-1. **Comment out** the code for various grid sizes(See near the end of fields_diagnostics.py)
+* **Comment out** the code for various grid sizes(See near the end of fields_diagnostics.py)
 ```python
 N = np.array([32, 64, 128, 256])
 ```
@@ -39,7 +39,7 @@ and **uncomment the code for fixed grid size** shown below:
 #N = np.array([100])
 ```
 
-2. Uncomment the following set of lines used for writing data to disk.
+* Uncomment the following set of lines used for writing data to disk.
 
 ```
     h5f = h5py.File('Ex/solution_'+str(time_index)+'.h5', 'w')
@@ -71,7 +71,7 @@ and **uncomment the code for fixed grid size** shown below:
     h5f.close()
 ```
 
-3. Make sure there are folders named **Ex, Ey, Ez, Bx, By, Bz and div** in your working directory. The data generated from the code will be saved in `.h5` format. See post.py to see scripts for reading the data. The code below shows a sample script for reading the data generated for `Ex` electric field.
+* Make sure there are folders named **Ex, Ey, Ez, Bx, By, Bz and div** in your working directory. The data generated from the code will be saved in `.h5` format. See post.py to see scripts for reading the data. The code below shows a sample script for reading the data generated for `Ex` electric field.
 
 ```python
 print('post processing for time_index = ', time_index)
@@ -80,14 +80,14 @@ Ex = h5f['Ex/solution_dataset_'+str(time_index)][:]
 h5f.close()
 ```
 
-4. ** Edit post.py** as required to post process the data. Change Nx and Ny to the values chosen in fields_diagnostics.py. (Default = 100,100).
+* ** Edit post.py** as required to post process the data. Change Nx and Ny to the values chosen in fields_diagnostics.py. (Default = 100,100).
 
 ```python
 Nx = 100
 Ny = 100
 ```
 
-5. Using the terminal, change your current directory to the one contianing the images generated and use the code below to make a movie of the images generated.
+* Using the terminal, change your current directory to the one contianing the images generated and use the code below to make a movie of the images generated.
 
 ```
 ffmpeg -f image2 -i point_mass%04d.png -vcodec mpeg4 -mbd rd -trellis 2 -cmp 2 -g 300 -pass 1 -r 25 -b 18000000 movie.mp4
@@ -98,17 +98,18 @@ ffmpeg -f image2 -i point_mass%04d.png -vcodec mpeg4 -mbd rd -trellis 2 -cmp 2 -
 The second order error convergence test can be performed using **interpolator_diagnostics.py**
 
 
-1. Change number of random points taken by editing the line:
+* Change number of random points taken by editing the line:
 ```python
   number_random_points = 100
 ```
 
-2.  Change the range for N by editing the lines:
+*  Change the range for N by editing the lines:
+
 ```python
 # N = np.array([32, 64, 128, 256, 512, 1024])
 N = np.arange(100, 3000, 100)
 ```
-3.  Edit  the following set of statements to plot the desired variables.
+*  Edit  the following set of statements to plot the desired variables.
 
 ```
 pl.loglog(N, ErrorNEz, '-o', label='$E_z$ ')
