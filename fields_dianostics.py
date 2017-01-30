@@ -1,5 +1,8 @@
 from params import *
 
+# field_error_convergence(a, b) returns the errors in field variables calculated after the waves come 
+# back to their initial position on a spatial grid with a*b dimensions
+
 def field_error_convergence(a, b):
   """ Number of divisions in the physical domain"""
 
