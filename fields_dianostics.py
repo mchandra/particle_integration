@@ -44,7 +44,7 @@ def field_error_convergence(a, b):
                                                   y_top[ghost_cells:-ghost_cells]\
                                                 )
 
-  I, J = np.meshgrid( range(ghost_cells, len(x_center) - ghost_cells),\
+  X_index, Y_index = np.meshgrid( range(ghost_cells, len(x_center) - ghost_cells),\
                       range(ghost_cells, len(y_center) - ghost_cells)\
                     )
 
@@ -102,7 +102,7 @@ def field_error_convergence(a, b):
     #Divergence Computation
 
 
-    div_B[I, J] = (Bx[I, J + 1]-Bx[I,J])/(dx) +  (By[I + 1, J]-By[I, J])/(dy)
+    div_B[X_index, Y_index] = (Bx[X_index, Y_index + 1]-Bx[X_index,Y_index])/(dx) +  (By[X_index + 1, Y_index]-By[X_index, Y_index])/(dy)
 
     # Uncomment the following set of lines to write the data to disk
     # make folders as neccessary
