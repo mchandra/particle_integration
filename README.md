@@ -9,8 +9,9 @@ Users can edit **field_diagnostics.py**, **interpolator_diagnostics.py** and **p
 > **Note:**
 > -  Input parameters for the both **field_diagnostics.py** and **interpolator_diagnostics.py**  collectively can be edited in **params.py**. Users can modify dimensions of spatial domain taken (Lx and Ly), speed of light (c=1 by default) and number of ghost cells (ghost_cells). The file also contains some user defined functions.
 
-
 ### How to use fields_diagnostics.py:
+
+Clone the github branch and navigate into the folder created. Create folders named **Ex, Ey, Ez, Bx, By, Bz and div** inside this folder.
 
 The **unit tests** that can be performed with field_diagnostics.py
 
@@ -94,6 +95,8 @@ ffmpeg -f image2 -i point_mass%04d.png -vcodec mpeg4 -mbd rd -trellis 2 -cmp 2 -
 ```
 
 ### How to use interpolator_diagnostics.py:
+
+Clone the github branch and navigate into the folder created.
 
 The second order error convergence test can be performed using **interpolator_diagnostics.py**
 
