@@ -20,16 +20,16 @@ def interpolation_error_convergence(a, b):
 
   #np.linspace(start point, endpoint, number of points, endpoint = Tue/False)
 
-  x_center = np.linspace(-ghost_cells*dx, 1 + ghost_cells*dx, Nx + 1 + 2 * ghost_cells, endpoint=True)
-  y_center = np.linspace(-ghost_cells*dy, 1 + ghost_cells*dy, Ny + 1 + 2 * ghost_cells, endpoint=True)
+  x_center = np.linspace(-ghost_cells*dx, Lx + ghost_cells*dx, Nx + 1 + 2 * ghost_cells, endpoint=True)
+  y_center = np.linspace(-ghost_cells*dy, Ly + ghost_cells*dy, Ny + 1 + 2 * ghost_cells, endpoint=True)
 
 
 
-  x_right = np.linspace(-ghost_cells * dx / 2, 1 + (2 * ghost_cells + 1) * dx / 2, Nx + 1 + 2 * ghost_cells,\
+  x_right = np.linspace(-ghost_cells * dx / 2, Lx + (2 * ghost_cells + 1) * dx / 2, Nx + 1 + 2 * ghost_cells,\
                           endpoint=True\
                        )
 
-  y_top   = np.linspace(-ghost_cells * dy / 2, 1 + (2 * ghost_cells + 1) * dy / 2, Ny + 1 + 2 * ghost_cells,\
+  y_top   = np.linspace(-ghost_cells * dy / 2, Ly + (2 * ghost_cells + 1) * dy / 2, Ny + 1 + 2 * ghost_cells,\
                         endpoint=True\
                        )
 
