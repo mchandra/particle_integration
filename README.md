@@ -7,7 +7,7 @@
 Users can edit **field_diagnostics.py**, **interpolator_diagnostics.py** and **params.py** to run the following tests/tasks:
 
 > **Note:**
-> -  Input parameters for the both **field_diagnostics.py** and **interpolator_diagnostics.py**  collectively can be edited in **params.py**. Users can modify dimensions of spatial domain taken (Lx and Ly), speed of light (c=1 by default) and number of ghost cells (ghost_cells). The file also contains some user defined functions taken for convenience.
+> -  Input parameters for the both **field_diagnostics.py** and **interpolator_diagnostics.py**  collectively can be edited in **params.py**. Users can modify dimensions of spatial domain taken (Lx and Ly), speed of light (c=1 by default) and number of ghost cells (ghost_cells). The file also contains some user defined functions.
 
 
 ### How to use fields_diagnostics.py:
