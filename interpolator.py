@@ -9,6 +9,8 @@ https://en.wikipedia.org/wiki/Bilinear_interpolation
 for more details regarding the algorithm used.
 """
 
+# returns the interpolated field at x,y position on the particles spatial grid with the field's grid systems
+# ( x_grid and y_grid), field values at these grid locations and number of ghost cells provided to the function  
 
 def bilinear_interpolate(x, y, x_grid, y_grid, F, ghost_cells):
   # x, y are the coordinates at which Interpolated fields have to found
@@ -26,7 +28,7 @@ def bilinear_interpolate(x, y, x_grid, y_grid, F, ghost_cells):
 
   # the 4*4 matrix for solving as mention in the wiki page
 
-  A = np.matrix( \
+  A = np.matrix(\
                   [ [1, x_grid[x_zone], y_grid[y_zone], x_grid[x_zone] * y_grid[y_zone]                ], \
                     [1, x_grid[x_zone], y_grid[y_zone + 1], x_grid[x_zone] * y_grid[y_zone + 1]        ], \
                     [1, x_grid[x_zone + 1], y_grid[y_zone], x_grid[x_zone + 1] * y_grid[y_zone]        ], \
