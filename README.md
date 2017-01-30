@@ -16,7 +16,7 @@ The **unit tests** that can be performed with field_diagnostics.py
 
 * **Second order error convergence test**: This computes the numerical errors in calculating the fields by subtracting the field values obtained using the fdtd algorithm from the expected values at a given time. A second order convergence of error with increasing grid sizes is expected out of this test.
 
-* **Divergence test**: This test shows that the divergence in the system initialized correctly is conserved with machine level precision.
+* **Divergence test**: This test shows that the divergence in the system initialized correctly is conserved at machine precision.
 
 #### Error convergence
 
