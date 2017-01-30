@@ -2,9 +2,10 @@
 
 ## Overview
 
-**fields.py** contains the finite difference EM solver for rectangular grids with uniform cell shapes and **interpolator.py** contains the function for bilinear interpolation.
+**fields.py** contains the finite difference EM solver for rectangular grids with uniform cell shapes and **interpolator.py** contains the function for bilinear interpolation. **field_diagnostics.py** and **interpolator_diagnostics.py** both use fdtd solver and bilinear interpolation function effectively to perform unit tests to validate the solvers.
 
 Users can edit **field_diagnostics.py**, **interpolator_diagnostics.py** and **params.py** to run the following tests/tasks:
+
 > **Note:**
 > -  Input parameters for the both **field_diagnostics.py** and **interpolator_diagnostics.py**  collectively can be edited in **params.py**.
 
@@ -13,17 +14,20 @@ Users can edit **field_diagnostics.py**, **interpolator_diagnostics.py** and **p
 
 The **unit tests** that can be performed with field_diagnostics.py
 
-* Second order error convergence test
-* Divergence test
+* **Second order error convergence test**: This computes the numerical errors in calculating the fields by subtracting the field values obtained using the fdtd algorithm from the expected values at a given time. A second order convergence of error with increasing grid sizes is expected out of this test.
+
+* **Divergence test**: This test shows that the divergence in the system initialized correctly is conserved with machine level precision.
 
 #### Error convergence
 
 *  Edit **N** (test grid size range) found near the end of the file as required and run the code.
+
 ```python
 N = np.array([32, 64, 128, 256])
 ```
 
 #### Divergence test
+
 Movies showing the time evolution of fields and divergence can be made in the following manner.
 
 * **Comment out** the code for various grid sizes(See near the end of fields_diagnostics.py)
@@ -83,7 +87,7 @@ Nx = 100
 Ny = 100
 ```
 
-* Use the code below to make a movie of the images generated.
+* Using the terminal, change your current directory to the one contianing the images generated and use the code below to make a movie of the images generated.
 
 ```
 ffmpeg -f image2 -i point_mass%04d.png -vcodec mpeg4 -mbd rd -trellis 2 -cmp 2 -g 300 -pass 1 -r 25 -b 18000000 movie.mp4
