@@ -11,8 +11,8 @@ from scipy.integrate import odeint
 
 no_of_particles = 1
 
-Nx = 300
-Ny = 300
+Nx = 100
+Ny = 100
 
 dx = Lx/Nx
 dy = Ly/Ny
@@ -125,7 +125,7 @@ def mag_Verlet(initial_conditions, t, F_interpolated):
     v_x = initial_conditions[3 * no_of_particles:4 * no_of_particles]
     v_y = initial_conditions[4 * no_of_particles:5 * no_of_particles]
     v_z = initial_conditions[5 * no_of_particles:6 * no_of_particles]
-    
+
     Ex = F_interpolated[0,0:no_of_particles]
     Ey = F_interpolated[1,0:no_of_particles]
     Ez = F_interpolated[2,0:no_of_particles]
@@ -133,11 +133,12 @@ def mag_Verlet(initial_conditions, t, F_interpolated):
     By = F_interpolated[4,0:no_of_particles]
     Bz = F_interpolated[5,0:no_of_particles]
 
-    print('Expected magnetic field = ', np.sin(2*np.pi*(t[0] - x[0])))
-    print('Numerical magnetic field = ', Bz )
-
-
-
+    # print('Expected magnetic field = ', np.sin(2*np.pi*(t[0] - x[0])))
+    # print('Numerical magnetic field = ', Bz )
+    #
+    # print('Expected Electric field = ', np.sin(2*np.pi*(t[0] - x[0])))
+    # print('Numerical Electric field = ', Ey )
+    # print('\n')
     x_new = x + v_x * (t[1] - t[0])
     y_new = y + v_y * (t[1] - t[0])
     z_new = z + v_z * (t[1] - t[0])
@@ -180,17 +181,24 @@ def mag_Verlet(initial_conditions, t, F_interpolated):
 
 
 
-def analytical(y,t):
-  x, xdash, xddash = y
-  dydt = [xdash, xddash, (2*np.pi*np.cos(2*np.pi*(t-x))*xddash /(np.sin(2*np.pi*(t-x))) ) -\
-            (xdash * np.sin(2*np.pi*(t-x))**2 )+np.sin(2*np.pi*(t-x))\
-         ]
+def analytical(Y,t):
+  x, y, vx, vy = Y
+  dydt = [ vx, vy, vy*np.sin(2*np.pi*(t-x)), (1-vx)*np.sin(2*np.pi*(t-x)) ]
   return dydt
 
-initial_conditions_analytical = [initial_conditions_position_x[0], initial_conditions_velocity_x[0],initial_conditions_velocity_y[0] * np.sin(2*np.pi*(-initial_conditions_position_x[0]))]
+initial_conditions_analytical = [ \
+                                   initial_conditions_position_x[0],initial_conditions_position_y[0] , \
+                                   initial_conditions_velocity_x[0], initial_conditions_velocity_y[0]\
+                                ]
 
+position_analytical = np.zeros((len(time),2), dtype = np.float)
+velocity_analytical = np.zeros((len(time),2), dtype = np.float)
 
-Num_error = np.zeros(len(time), dtype = np.float)
+position_numerical = np.zeros((len(time),2), dtype = np.float)
+velocity_numerical = np.zeros((len(time),2), dtype = np.float)
+
+Num_error = np.zeros((len(time),2), dtype = np.float)
+
 
 """ Solving """
 
@@ -202,12 +210,15 @@ old_analytical = np.zeros(6 * no_of_particles, dtype=np.float)
 
 
 time_ana = np.arange(0, final_time, dt)
-sol_analytical = odeint(analytical,initial_conditions_analytical,time_ana)
-print(sol_analytical.shape)
+# sol_analytical = odeint(analytical,initial_conditions_analytical,time_ana)
+
+# print(sol_analytical.shape)
+
 """ Solver """
 
 for time_index, t0 in enumerate(time):
     print("Computing for TimeIndex = ", time_index)
+    # print('\n \n')
     t0 = time[time_index]
     if (time_index == time.size - 1):
         break
@@ -215,52 +226,52 @@ for time_index, t0 in enumerate(time):
     t = [t0, t1]
     if (time_index == 0):
         initial_conditions = initial_conditions
-        #initial_conditions_analytical = initial_conditions_analytical
+        initial_conditions_analytical = initial_conditions_analytical
     else:
         initial_conditions = old
-        #initial_conditions_analytical = old_analytical
+        initial_conditions_analytical = old_analytical
 
 
     Ex_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_center,\
-                                                  y_grid=y_top, F=Ex, ghost_cells = ghost_cells\
+                                                  y_grid=y_top, F=Ex, ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
                                                 )\
                           )
 
     Ey_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_right,\
-                                                  y_grid=y_top, F=Ey, ghost_cells = ghost_cells\
+                                                  y_grid=y_top, F=Ey, ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
                                                 )\
                           )
-    
+
     Ez_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_center,\
-                                                  y_grid=y_top, F=Ez, ghost_cells = ghost_cells\
+                                                  y_grid=y_top, F=Ez, ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
                                                 )\
                           )
 
     Bx_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_right,\
-                                                  y_grid=y_top, F=Bx, ghost_cells = ghost_cells\
+                                                  y_grid=y_top, F=Bx, ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
                                                 )\
                           )
-    
+
     By_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_center,\
-                                                  y_grid=y_top, F=By, ghost_cells = ghost_cells\
+                                                  y_grid=y_top, F=By, ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
                                                 )\
                           )
 
     Bz_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_right,\
-                                                  y_grid=y_top, F=Bz, ghost_cells = ghost_cells\
+                                                  y_grid=y_top, F=Bz, ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
                                                 )\
                           )
 
     F_interpolated = np.concatenate([Ex_particle, Ey_particle, Ez_particle, Bx_particle, By_particle, Bz_particle], axis = 0)
     #print('Interpolated magnetic fields = ', F_interpolated[5,:])
     sol = mag_Verlet(initial_conditions, t, F_interpolated)
-    
-    
+    sol_analytical = odeint(analytical,initial_conditions_analytical,t)
 
+    # print(sol_analytical.shape)
     #print('Analytical solution at current timestep = ',sol_analytical)
     Ex, Ey, Ez, Bx, By, Bz = fdtd(Ex, Ey, Ez, Bx, By, Bz, c, Lx, Ly, ghost_cells, Jx, Jy, Jz)
-    
-    
+
+
     #pl.contourf(x_right[ghost_cells:-ghost_cells], y_top[ghost_cells:-ghost_cells],Bz[ghost_cells:-ghost_cells,ghost_cells:-ghost_cells], 100)
     #pl.show()
     #pl.clf()
@@ -273,25 +284,50 @@ for time_index, t0 in enumerate(time):
     #pl.ylim(-1,1)
     #pl.show()
     #pl.clf()
-    
+
     for i in range(3 * no_of_particles):
         if (sol[i] >= right_boundary):
             sol[i] = sol[i] - Lx
         if (sol[i] <= left_boundary):
             sol[i] = sol[i] + Lx
 
-    
+    if(sol_analytical[1, 0] > right_boundary):
+        sol_analytical[1, 0]-=Lx
+    if(sol_analytical[1, 0] < left_boundary):
+        sol_analytical[1, 0]+=Lx
+
+
+    if(sol_analytical[1, 1] > top_boundary):
+        sol_analytical[1, 1]-=Ly
+    if(sol_analytical[1, 1] < bottom_boundary):
+        sol_analytical[1, 1]+=Ly
+
+
     old = sol
-    
-    #old_analytical = sol_analytical[1, :]
-    #sol_analytical = sol_analytical[1, :]
+
+    old_analytical = sol_analytical[1, :]
+    sol_analytical = sol_analytical[1, :]
+
+    position_analytical[time_index,0] = sol_analytical[0]
+    position_analytical[time_index,1] = sol_analytical[1]
+
+    velocity_analytical[time_index,0] = sol_analytical[2]
+    velocity_analytical[time_index,1] = sol_analytical[3]
+
+    position_numerical[time_index, 0] = sol[0]
+    position_numerical[time_index, 1] = sol[no_of_particles+0]
+    velocity_numerical[time_index, 0] = sol[3*no_of_particles + 0]
+    velocity_numerical[time_index, 1] = sol[4*no_of_particles + 0]
     #print(sol_analytical.shape)
     #print(sol_analytical)
     #print(sol_analytical[0])
     #Num_error[time_index] = abs ( old[0]-sol_analytical[0] )
-    print('Numnerical x position = ', old[0])
-    print('Analytical x position = ', sol_analytical[time_index + 1,0])
-    zzz = input()
+    # print('Numerical x position = ', old[0])
+    # print('Analytical x position = ', sol_analytical[0])
+    Num_error[time_index, 0] = abs ( old[0]-sol_analytical[0] )
+    Num_error[time_index, 1] = abs ( old[no_of_particles + 0]-sol_analytical[1] )
+    # print('\n')
+    # zzz = input()
     #print('analytical x = ',sol_analytical)
     #h5f = h5py.File('solution_all/solution_'+str(time_index)+'.h5', 'w')
     #h5f.create_dataset('solution_all/solution_dataset_'+str(time_index), data=sol)
@@ -303,5 +339,74 @@ for time_index, t0 in enumerate(time):
 
     #print('shape is ', old_analytical.shape)
 
-print(' the time scale is ', dt)
+h5f = h5py.File('posa/solution.h5', 'w')
+h5f.create_dataset('posa/solution_dataset', data=position_analytical)
+h5f.close()
+
+h5f = h5py.File('posn/solution.h5', 'w')
+h5f.create_dataset('posn/solution_dataset', data=position_numerical)
+h5f.close()
+
+h5f = h5py.File('vela/solution.h5', 'w')
+h5f.create_dataset('vela/solution_dataset', data=velocity_analytical)
+h5f.close()
+
+h5f = h5py.File('veln/solution.h5', 'w')
+h5f.create_dataset('veln/solution_dataset', data=velocity_numerical)
+h5f.close()
+
+pl.semilogy(time,Num_error[:, 0], label='$\mathrm{Error\;in\;x}$')
+pl.legend().draggable()
+pl.semilogy(time,Num_error[:, 1], label='$\mathrm{Error\;in\;y}$')
+pl.legend().draggable()
+pl.xlabel('$\mathrm{Time\;(\;in\;seconds\;)}$')
+pl.ylabel('$\mathrm{Error}$')
+pl.title('$\mathrm{Numerical\;vs\;Analytical}$')
+pl.show()
+# pl.savefig('NumericalVsAnalytical.png')
+pl.clf()
 print('Error array  = ', Num_error)
+
+
+
+pl.plot(time,position_analytical[:,0],'--' ,label='$\mathrm{analytical\;position(x)}$')
+pl.legend().draggable()
+pl.plot(time,position_numerical[:,0], '-o', label='$\mathrm{numerical\;position(x)}$')
+pl.legend().draggable()
+pl.xlabel('$\mathrm{Time\;(\;in\;seconds\;)}$')
+pl.ylabel('$\mathrm{position\;x}$')
+pl.title('$\mathrm{Numerical\;vs\;Analytical}$')
+pl.show()
+# pl.savefig('NumericalVsAnalytical.png')
+pl.clf()
+
+pl.plot(time,position_analytical[:,1],'--', label='$\mathrm{analytical\;position(y)}$')
+pl.legend().draggable()
+pl.plot(time,position_numerical[:,1], label='$\mathrm{numerical\;position(y)}$')
+pl.legend().draggable()
+pl.xlabel('$\mathrm{Time\;(\;in\;seconds\;)}$')
+pl.ylabel('$\mathrm{position\;y}$')
+pl.title('$\mathrm{Numerical\;vs\;Analytical}$')
+pl.show()
+# pl.savefig('NumericalVsAnalytical.png')
+pl.clf()
+
+pl.plot(time,velocity_analytical[:,0],'--', label='$\mathrm{analytical\;velocity(v_x)}$')
+pl.plot(time,velocity_numerical[:,0], '-o', label='$\mathrm{numerical\;velocity(v_x)}$')
+pl.legend().draggable()
+pl.xlabel('$\mathrm{Time\;(\;in\;seconds\;)}$')
+pl.ylabel('$\mathrm{velocity\;x}$')
+pl.title('$\mathrm{Numerical\;vs\;Analytical}$')
+pl.show()
+# pl.savefig('NumericalVsAnalytical.png')
+pl.clf()
+
+
+pl.plot(time,velocity_analytical[:,1],'--', label='$\mathrm{analytical\;velocity(v_y)}$')
+pl.plot(time,velocity_numerical[:,1], '-o', label='$\mathrm{numerical\;velocity(v_y)}$')
+pl.xlabel('$\mathrm{Time\;(\;in\;seconds\;)}$')
+pl.ylabel('$\mathrm{velocity\;y}$')
+pl.title('$\mathrm{Numerical\;vs\;Analytical}$')
+pl.show()
+# pl.savefig('NumericalVsAnalytical.png')
+pl.clf()
