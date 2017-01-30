@@ -2,7 +2,7 @@
 
 ## Overview
 
-**fields.py** contains the finite difference EM solver for rectangular grids with uniform cell shapes and **interpolator.py** contains the function for bilinear interpolation. **field_diagnostics.py** and **interpolator_diagnostics.py** both use fdtd solver and bilinear interpolation function effectively to perform unit tests to validate the solvers.
+**fields.py** contains a finite difference EM solver which solves for electric and magnetic fields on rectangular grids with uniform cell shapes using the Yee's algorithm. **interpolator.py** contains the function for bilinear interpolation which the returns the interpolated field at any arbitrary point on the rectangular grid. **field_diagnostics.py** and **interpolator_diagnostics.py** both use the fdtd solver and bilinear interpolation function effectively to perform unit tests to validate the solvers.
 
 Users can edit **field_diagnostics.py**, **interpolator_diagnostics.py** and **params.py** to run the following tests/tasks:
 
