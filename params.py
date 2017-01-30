@@ -41,19 +41,21 @@ spread = 0.1
 
 ghost_cells = 1
 
-""" Speed of light"""
+""" Speed of light (in natural units)"""
 
 c = 1
 
-""" Time for the simulation"""
+""" Time for the simulation (in natural units) """
 
 time_in_seconds = 2
 
-""" Size of domain in x and y directions"""
+""" Size of domain in x and y directions (in natural units)"""
+
 Lx = 1
 Ly = 1
 
 """Currents for the current fdtd code all irrelevant"""
+
 Jx = 0
 Jy = 0
 Jz = 0
