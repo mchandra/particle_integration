@@ -37,6 +37,7 @@ for time_index in range(time_range):
   """ Scripts down below for reading data. Edit these to read the data required"""
 
   print('post processing for time_index = ', time_index)
+  
   h5f = h5py.File('Ex/solution_'+str(time_index)+'.h5', 'r')
   Ex = h5f['Ex/solution_dataset_'+str(time_index)][:]
   h5f.close()
