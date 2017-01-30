@@ -10,7 +10,7 @@ Users can edit **field_diagnostics.py**, **interpolator_diagnostics.py** and **p
 > -  Input parameters for the both **field_diagnostics.py** and **interpolator_diagnostics.py**  collectively can be edited in **params.py**.
 
 
-### fields_diagnostics.py (How to use):
+### How to use fields_diagnostics.py:
 
 The **unit tests** that can be performed with field_diagnostics.py
 
@@ -93,7 +93,7 @@ Ny = 100
 ffmpeg -f image2 -i point_mass%04d.png -vcodec mpeg4 -mbd rd -trellis 2 -cmp 2 -g 300 -pass 1 -r 25 -b 18000000 movie.mp4
 ```
 
-### interpolator_diagnostics.py (How to use):
+### How to use interpolator_diagnostics.py:
 
 The second order error convergence test can be performed using **interpolator_diagnostics.py**
 
