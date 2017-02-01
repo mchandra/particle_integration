@@ -284,19 +284,8 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
                       range(ghost_cells, y_number_of_points-ghost_cells)\
                     )
 
-  """  Updating the Electric field  """
-
-  Bz_in_function[X_index, Y_index] = Bz_in_function[X_index, Y_index] - (   (dt_by_dx * (Ey_in_function[X_index, Y_index] - Ey_in_function[X_index, Y_index - 1]))\
-                                                  - (dt_by_dy * (Ex_in_function[X_index, Y_index] - Ex_in_function[X_index - 1, Y_index]))\
-                                                )
-
-  # dBz/dt = - ( dEy/dx - dEx/dy )
-
-  """  Implementing periodic boundary conditions using ghost cells  """
-
-  Bz_in_function = periodic(Bz_in_function, x_number_of_points, y_number_of_points, ghost_cells)
-
-  """  Updating the Magnetic fields   """
+          
+  """  Updating the Electric fields   """
 
   Ex_in_function[X_index, Y_index] = Ex_in_function[X_index, Y_index] + (dt_by_dy * (Bz_in_function[X_index + 1, Y_index] - Bz_in_function[X_index, Y_index]))
 
@@ -310,7 +299,20 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   Ex_in_function = periodic(Ex_in_function, x_number_of_points, y_number_of_points, ghost_cells)
 
-  Ey_in_function = periodic(Ey_in_function, x_number_of_points, y_number_of_points, ghost_cells)
+  Ey_in_function = periodic(Ey_in_function, x_number_of_points, y_number_of_points, ghost_cells)        
+  """  Updating the Magnetic field  """
+
+  Bz_in_function[X_index, Y_index] = Bz_in_function[X_index, Y_index] - (   (dt_by_dx * (Ey_in_function[X_index, Y_index] - Ey_in_function[X_index, Y_index - 1]))\
+                                                  - (dt_by_dy * (Ex_in_function[X_index, Y_index] - Ex_in_function[X_index - 1, Y_index]))\
+                                                )
+
+  # dBz/dt = - ( dEy/dx - dEx/dy )
+
+  """  Implementing periodic boundary conditions using ghost cells  """
+
+  Bz_in_function = periodic(Bz_in_function, x_number_of_points, y_number_of_points, ghost_cells)
+
+
 
   return Bz_in_function, Ex_in_function, Ey_in_function
 
