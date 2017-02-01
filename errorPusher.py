@@ -6,6 +6,16 @@ from scipy.integrate import odeint
 # dBz/dt = - dEy/dx
 # dEy/dt = - dBz/dx
 
+# x, E in time n, n+1.............
+# v, B in time n +0.5, n + 1.5 .....
+# for Boris Algorithm : x(n+1) = x(n) + v(n+0.5)dt
+#  v(n+1.5) = v(n + 0.5) + fields(E(n+1), B(avg(n+1.5,n+0.5)))
+
+
+# For analytical comparision
+# for x start from x(n+1) and for vx start from time (n+1)
+
+
 def error(a,b):
     """ Setting number of particles and other parameters"""
 
@@ -35,32 +45,32 @@ def error(a,b):
                        )
 
 
-    """ Initial conditions """
-
+    """ Initial conditions for positions """
+    # At n = 0
     left_boundary = 0
     right_boundary = Lx
     length_of_box_x = right_boundary - left_boundary
     # initial_conditions_position_x = left_boundary + length_of_box_x * np.random.rand(no_of_particles)
     initial_conditions_position_x = np.ones((no_of_particles), dtype = np.float)*Lx/2
-
+    # At n = 0
     bottom_boundary = 0
     top_boundary = Ly
     length_of_box_y = length_of_box_x
     #initial_conditions_position_y = bottom_boundary + length_of_box_y * np.random.rand(no_of_particles)
     initial_conditions_position_y = np.ones((no_of_particles), dtype = np.float)*Ly/2
-
+    # At n = 0
     back_boundary = 0
     front_boundary = Ly
     length_of_box_z = length_of_box_x
     initial_conditions_position_z = back_boundary + length_of_box_z * np.random.rand(no_of_particles)
 
     """ Setting velocities according to maxwellian distribution """
-
+    # At n = 0.5
     initial_conditions_velocity_x = np.zeros(no_of_particles, dtype=np.float)
     initial_conditions_velocity_y = np.zeros(no_of_particles, dtype=np.float)
     initial_conditions_velocity_z = np.zeros(no_of_particles, dtype=np.float)
 
-    initial_conditions_velocity_y[:] = 2
+    initial_conditions_velocity_y[:] = 1
     """ Combining the initial conditions into one vector"""
 
     initial_conditions = np.concatenate([initial_conditions_position_x, initial_conditions_position_y,\
@@ -83,12 +93,20 @@ def error(a,b):
     me = 1
     charge = 1
 
-
     """ Writing the spatial grids as a two dimension matrix for vectorization purposes """
 
     X_center_physical, Y_center_physical = np.meshgrid( x_center[ghost_cells:-ghost_cells],\
                                                         y_center[ghost_cells:-ghost_cells]\
                                                       )
+
+
+    """ Discretizing time and making sure scaling is done right """
+
+    # box_crossing_time_scale = length_of_box_x / np.max(initial_conditions_velocity_x)
+
+    final_time = 7
+    dt = np.float(dx / (2 * c))
+    time = np.arange(0, final_time, dt)
 
     """ Writing the offset spatial grids and indices as a two dimension matrix for vectorization purposes """
 
@@ -102,17 +120,11 @@ def error(a,b):
     # Initializing the non relevant fields:
 
     Ey[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = np.sin(2*np.pi*(-X_right_physical))
-    Bz[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = np.sin(2*np.pi*(-X_right_physical))
+    Bz[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = np.sin(2*np.pi*((dt/2)-X_right_physical))
 
     #Bz[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = 20
 
-    """ Discretizing time and making sure scaling is done right """
 
-    # box_crossing_time_scale = length_of_box_x / np.max(initial_conditions_velocity_x)
-
-    final_time = 5
-    dt = np.float(dx / (2 * c))
-    time = np.arange(0, final_time, dt)
 
     """ Boris method modified Verlet Integrator """
 
@@ -171,13 +183,8 @@ def error(a,b):
 
     def analytical(Y,t):
       x, y, vx, vy = Y
-      dydt = [ vx, vy, vy*np.sin(2*np.pi*(t-x)), (1-vx)*np.sin(2*np.pi*(t-x)) ]
+      dydt = [ vx, vy, vy*np.sin(2*np.pi*(t + dt - x)), (1-vx)*np.sin(2*np.pi*(t + dt - x)) ]
       return dydt
-
-    initial_conditions_analytical = [ \
-                                       initial_conditions_position_x[0],initial_conditions_position_y[0] , \
-                                       initial_conditions_velocity_x[0], initial_conditions_velocity_y[0]\
-                                    ]
 
     position_analytical = np.zeros((len(time),2), dtype = np.float)
     velocity_analytical = np.zeros((len(time),2), dtype = np.float)
@@ -208,10 +215,10 @@ def error(a,b):
         t = [t0, t1]
         if (time_index == 0):
             initial_conditions = initial_conditions
-            initial_conditions_analytical = initial_conditions_analytical
+
         else:
             initial_conditions = old
-            initial_conditions_analytical = old_analytical
+
 
         Ex_updated, Ey_updated, Ez_updated, Bx_updated, By_updated, Bz_updated = fdtd(Ex, Ey, Ez, Bx, By, Bz, c, Lx, Ly, ghost_cells, Jx, Jy, Jz)
 
@@ -247,7 +254,31 @@ def error(a,b):
                               )
 
         F_interpolated = np.concatenate([Ex_particle, Ey_particle, Ez_particle, Bx_particle, By_particle, Bz_particle], axis = 0)
+
         sol = mag_Verlet(initial_conditions, t, F_interpolated)
+
+
+        if (time_index == 0):
+            initial_conditions_analytical = [ \
+                                               sol[0],sol[no_of_particles + 0] , \
+                                               ((initial_conditions_velocity_x[0]+sol[3*no_of_particles+0])/2), ((initial_conditions_velocity_y[0]+sol[4*no_of_particles+0])/2)\
+                                            ]
+            # x,initial = x(n+1), vx_initial = avg(v(n+0.5,n+1.5)
+
+            # all below from n = 1 (start is n = 0)
+
+            initial_conditions_analytical = initial_conditions_analytical
+            position_analytical[time_index,0] = initial_conditions_analytical[0] # x
+            position_analytical[time_index,1] = initial_conditions_analytical[1] # y
+            velocity_analytical[time_index, 0] = initial_conditions_analytical[2] # vx
+            velocity_analytical[time_index, 1] = initial_conditions_analytical[3] # vy
+
+        else:
+            initial_conditions_analytical = old_analytical
+
+
+
+
         sol_analytical = odeint(analytical,initial_conditions_analytical,t)
 
 
@@ -270,26 +301,36 @@ def error(a,b):
         if(sol_analytical[1, 1] < bottom_boundary):
             sol_analytical[1, 1]+=Ly
 
+
+
+
+        # saving numerical data for position from n =1 timestep
+        position_numerical[time_index, 0] = sol[0]
+        position_numerical[time_index, 1] = sol[no_of_particles+0]
+
+        # saving numerical data for velocity from n =1 timestep
+
+        if(time_index == 0) :
+            velocity_numerical[time_index, 0] = (sol[3*no_of_particles + 0] + initial_conditions_velocity_x[0])/2 # n+1.5 and n+0.5
+            velocity_numerical[time_index, 1] = (sol[4*no_of_particles + 0] + initial_conditions_velocity_y[0])/2
+        else:
+            velocity_numerical[time_index, 0] = (sol[3*no_of_particles + 0] + old[3*no_of_particles + 0])/2
+            velocity_numerical[time_index, 1] = (sol[4*no_of_particles + 0] + old[4*no_of_particles + 0])/2
+
+
         Ex, Ey, Ez, Bx, By, Bz= Ex_updated, Ey_updated, Ez_updated, Bx_updated, By_updated, Bz_updated
+
         old = sol
 
         old_analytical = sol_analytical[1, :]
         sol_analytical = sol_analytical[1, :]
 
-        position_analytical[time_index,0] = sol_analytical[0]
-        position_analytical[time_index,1] = sol_analytical[1]
+        # saving analytical data starting from n = 1 timestep for both x and y, THat is 1st entry is n =1 timestep data for all
 
-        velocity_analytical[time_index,0] = sol_analytical[2]
-        velocity_analytical[time_index,1] = sol_analytical[3]
-
-        position_numerical[time_index, 0] = sol[0]
-        position_numerical[time_index, 1] = sol[no_of_particles+0]
-        velocity_numerical[time_index, 0] = sol[3*no_of_particles + 0]
-        velocity_numerical[time_index, 1] = sol[4*no_of_particles + 0]
-
-        Num_error[time_index, 0] = abs ( old[0]-sol_analytical[0] )
-        Num_error[time_index, 1] = abs ( old[no_of_particles + 0]-sol_analytical[1] )
-
+        position_analytical[time_index + 1, 0] = sol_analytical[0]
+        position_analytical[time_index + 1, 1] = sol_analytical[1]
+        velocity_analytical[time_index + 1, 0] = sol_analytical[2]
+        velocity_analytical[time_index + 1, 1] = sol_analytical[3]
 
 
     h5f = h5py.File('time/solution'+str(a)+'.h5', 'w')
@@ -315,7 +356,7 @@ def error(a,b):
     return 1
 
 error = np.vectorize(error)
-N = np.array( [32, 64, 128 ] )
+N = np.array( [32, 64, 128, 256 ] )
 
 
 x = error(N, N)
