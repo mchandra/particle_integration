@@ -299,7 +299,8 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
 
   Ex_in_function = periodic(Ex_in_function, x_number_of_points, y_number_of_points, ghost_cells)
 
-  Ey_in_function = periodic(Ey_in_function, x_number_of_points, y_number_of_points, ghost_cells)        
+  Ey_in_function = periodic(Ey_in_function, x_number_of_points, y_number_of_points, ghost_cells)
+          
   """  Updating the Magnetic field  """
 
   Bz_in_function[X_index, Y_index] = Bz_in_function[X_index, Y_index] - (   (dt_by_dx * (Ey_in_function[X_index, Y_index] - Ey_in_function[X_index, Y_index - 1]))\
