@@ -70,7 +70,9 @@ def error(a,b):
     initial_conditions_velocity_y = np.zeros(no_of_particles, dtype=np.float)
     initial_conditions_velocity_z = np.zeros(no_of_particles, dtype=np.float)
 
-    initial_conditions_velocity_y[:] = 1
+    initial_conditions_velocity_x[:] = 0.2
+    initial_conditions_velocity_y[:] = 0.2
+
     """ Combining the initial conditions into one vector"""
 
     initial_conditions = np.concatenate([initial_conditions_position_x, initial_conditions_position_y,\
@@ -104,7 +106,7 @@ def error(a,b):
 
     # box_crossing_time_scale = length_of_box_x / np.max(initial_conditions_velocity_x)
 
-    final_time = 7
+    final_time = 5
     dt = np.float(dx / (2 * c))
     time = np.arange(0, final_time, dt)
 
@@ -356,7 +358,7 @@ def error(a,b):
     return 1
 
 error = np.vectorize(error)
-N = np.array( [32, 64, 128, 256 ] )
+N = np.array( [32, 64, 128, 256, 512 ] )
 
 
 x = error(N, N)
