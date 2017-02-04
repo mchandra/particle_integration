@@ -46,7 +46,7 @@ def charge_b0_depositor(x, y, x_grid, y_grid, J, ghost_cells, Lx, Ly):
 
 charge_b0_depositor = np.vectorize(charge_b0_depositor, excluded=(['x_grid', 'y_grid', 'J','ghost_cells', 'Lx', 'Ly']))
 
-# Example of usage
+# Example of usage Charge depositor
 
 x = np.array([0.9, 0.1])
 y = np.array([0.2, 0.6])
@@ -92,7 +92,7 @@ def current_b0_depositor(x, y, velocity_required, x_grid, y_grid, J, ghost_cells
 
 current_b0_depositor = np.vectorize(current_b0_depositor, excluded=(['x_grid', 'y_grid', 'J','ghost_cells', 'Lx', 'Ly']))
 
-# Example of usage
+# Example of usage Current depositor
 
 
 x = np.array([0.2, 0.6])
