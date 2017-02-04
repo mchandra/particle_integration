@@ -62,6 +62,6 @@ def bilinear_interpolate(x, y, x_grid, y_grid, F, ghost_cells, Lx, Ly):
 
 # Vectorizing the interpolation function
 
-bilinear_interpolate = np.vectorize(bilinear_interpolate, excluded=(['x_grid', 'y_grid', 'F','ghost_cells']))
+bilinear_interpolate = np.vectorize(bilinear_interpolate, excluded=(['x_grid', 'y_grid', 'F','ghost_cells', 'Lx', 'Ly']))
 
 """-------------------------------------------------------END--------------------------------------------------------"""
