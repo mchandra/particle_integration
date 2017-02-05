@@ -1,7 +1,5 @@
 from params import *
 
-
-
 #Equations are:
 # dBz/dt = - dEy/dx
 # dEy/dt = - dBz/dx
@@ -40,25 +38,27 @@ x_right = np.linspace(-ghost_cells * dx / 2, Lx + (2 * ghost_cells + 1) * dx / 2
                         endpoint=True\
                      )
 
-y_top = np.linspace(-ghost_cells * dy / 2, Ly + (2 * ghost_cells + 1) * dy / 2, Ny + 1 + 2 * ghost_cells,\
+y_top   = np.linspace(-ghost_cells * dy / 2, Ly + (2 * ghost_cells + 1) * dy / 2, Ny + 1 + 2 * ghost_cells,\
                       endpoint=True\
-                   )
+                     )
 
 """ Initial conditions for positions """
 # At n = 0
-left_boundary = 0
-right_boundary = Lx
-length_of_box_x = right_boundary - left_boundary
+left_boundary                 = 0
+right_boundary                = Lx
+length_of_box_x               = right_boundary - left_boundary
 initial_conditions_position_x = left_boundary + length_of_box_x * np.random.rand(no_of_particles)
+
 # At n = 0
-bottom_boundary = 0
-top_boundary = Ly
-length_of_box_y = length_of_box_x
+bottom_boundary               = 0
+top_boundary                  = Ly
+length_of_box_y               = length_of_box_x
 initial_conditions_position_y = bottom_boundary + length_of_box_y * np.random.rand(no_of_particles)
+
 # At n = 0
-back_boundary = 0
-front_boundary = Ly
-length_of_box_z = length_of_box_x
+back_boundary                 = 0
+front_boundary                = Ly
+length_of_box_z               = length_of_box_x
 initial_conditions_position_z = back_boundary + length_of_box_z * np.random.rand(no_of_particles)
 
 """ Setting velocities according to maxwellian distribution """
@@ -76,17 +76,17 @@ initial_conditions = np.concatenate([initial_conditions_position_x, initial_cond
 
 """ Electric and Magnetic field """
 
-Ez = np.zeros((len(x_center), len(y_center)), dtype=np.float)
-Bx = np.zeros((len(x_center), len(y_top)   ), dtype=np.float)
-By = np.zeros((len(x_right), len(y_center) ), dtype=np.float)
+Ez = np.zeros((len(x_center), len(y_center)),  dtype=np.float)
+Bx = np.zeros((len(x_center), len(y_top)   ),  dtype=np.float)
+By = np.zeros((len(x_right),  len(y_center) ), dtype=np.float)
 
-Bz = np.zeros((len(x_center), len(y_center)), dtype=np.float)
-Ex = np.zeros((len(x_center), len(y_top)   ), dtype=np.float)
-Ey = np.zeros((len(x_right), len(y_center) ), dtype=np.float)
+Bz = np.zeros((len(x_center), len(y_center)),  dtype=np.float)
+Ex = np.zeros((len(x_center), len(y_top)   ),  dtype=np.float)
+Ey = np.zeros((len(x_right),  len(y_center) ), dtype=np.float)
 
-Jx = np.zeros((len(x_center), len(y_center)), dtype=np.float)
-Jy = np.zeros((len(x_center), len(y_top)   ), dtype=np.float)
-Jz = np.zeros((len(x_right), len(y_center) ), dtype=np.float)
+Jx = np.zeros((len(x_center), len(y_center)),  dtype=np.float)
+Jy = np.zeros((len(x_center), len(y_top)   ),  dtype=np.float)
+Jz = np.zeros((len(x_right),  len(y_center) ), dtype=np.float)
 
 """ Writing the spatial grids as a two dimension matrix for vectorization purposes """
 
@@ -99,8 +99,8 @@ X_center_physical, Y_center_physical = np.meshgrid( x_center[ghost_cells:-ghost_
 # box_crossing_time_scale = length_of_box_x / np.max(initial_conditions_velocity_x)
 
 final_time = 5
-dt = np.float(dx / (2 * c))
-time = np.arange(0, final_time, dt)
+dt         = np.float(dx / (2 * c))
+time       = np.arange(0, final_time, dt)
 
 """ Writing the offset spatial grids and indices as a two dimension matrix for vectorization purposes """
 
@@ -123,9 +123,9 @@ Bz[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = np.sin(2*np.pi*((dt/2)-
 
 
 def mag_Verlet(initial_conditions, t, F_interpolated):
-    x = initial_conditions[0:no_of_particles]
-    y = initial_conditions[no_of_particles:2 * no_of_particles]
-    z = initial_conditions[2 * no_of_particles:3 * no_of_particles]
+    x   = initial_conditions[0:no_of_particles]
+    y   = initial_conditions[no_of_particles:2 * no_of_particles]
+    z   = initial_conditions[2 * no_of_particles:3 * no_of_particles]
     v_x = initial_conditions[3 * no_of_particles:4 * no_of_particles]
     v_y = initial_conditions[4 * no_of_particles:5 * no_of_particles]
     v_z = initial_conditions[5 * no_of_particles:6 * no_of_particles]
@@ -142,9 +142,9 @@ def mag_Verlet(initial_conditions, t, F_interpolated):
     v_y_minus = v_y + (charge * Ey * (t[1] - t[0])) / (2 * me)
     v_z_minus = v_z + (charge * Ez * (t[1] - t[0])) / (2 * me)
 
-    t_magx = (charge * Bx * (t[1] - t[0])) / (2 * me)
-    t_magy = (charge * By * (t[1] - t[0])) / (2 * me)
-    t_magz = (charge * Bz * (t[1] - t[0])) / (2 * me)
+    t_magx    = (charge * Bx * (t[1] - t[0])) / (2 * me)
+    t_magy    = (charge * By * (t[1] - t[0])) / (2 * me)
+    t_magz    = (charge * Bz * (t[1] - t[0])) / (2 * me)
 
     vminus_cross_t_x = (v_y_minus * t_magz) - (v_z_minus * t_magy)
     vminus_cross_t_y = -((v_x_minus * t_magz) - (v_z_minus * t_magx))
@@ -164,9 +164,9 @@ def mag_Verlet(initial_conditions, t, F_interpolated):
     v_y_plus = v_y_minus + -((v_dashx * s_z) - (v_dashz * s_x))
     v_z_plus = v_z_minus + ((v_dashx * s_y) - (v_dashy * s_x))
 
-    v_x_new = v_x_plus + (charge * Ex * (t[1] - t[0])) / (2 * me)
-    v_y_new = v_y_plus + (charge * Ey * (t[1] - t[0])) / (2 * me)
-    v_z_new = v_z_plus + (charge * Ez * (t[1] - t[0])) / (2 * me)
+    v_x_new  = v_x_plus + (charge * Ex * (t[1] - t[0])) / (2 * me)
+    v_y_new  = v_y_plus + (charge * Ey * (t[1] - t[0])) / (2 * me)
+    v_z_new  = v_z_plus + (charge * Ez * (t[1] - t[0])) / (2 * me)
 
     # Using v at (n+0.5) dt to push x at (n)dt
 
@@ -187,7 +187,7 @@ def analytical(Y,t):
 position_numerical = np.zeros((len(time),2), dtype = np.float)
 velocity_numerical = np.zeros((len(time),2), dtype = np.float)
 
-Num_error = np.zeros((len(time),2), dtype = np.float)
+Num_error          = np.zeros((len(time),2), dtype = np.float)
 
 """ Solving """
 
@@ -202,7 +202,7 @@ for time_index, t0 in enumerate(time):
     if (time_index == time.size - 1):
         break
     t1 = time[time_index + 1]
-    t = [t0, t1]
+    t  = [t0, t1]
     if (time_index == 0):
         initial_conditions = initial_conditions.copy()
 
@@ -279,10 +279,11 @@ for time_index, t0 in enumerate(time):
     sol = mag_Verlet(initial_conditions, t, F_interpolated)
 
 
-    indices_right = np.where(sol[0:3*no_of_particles]>right_boundary)
-    indices_left = np.where(sol[0:3*no_of_particles]<left_boundary)
+    indices_right       = np.where(sol[0:3*no_of_particles]>right_boundary)
+    indices_left        = np.where(sol[0:3*no_of_particles]<left_boundary)
     sol[indices_right] -= Lx
-    sol[indices_left] += Lx
+    sol[indices_left]  += Lx
+    
     print('x positions', sol[0])
     print('y positions', sol[1])
 
