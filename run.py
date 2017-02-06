@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.special import erfinv
 import h5py
-import arrayfire as af  
 import params
 
 """Here we shall assign values as set in params"""
@@ -9,7 +8,6 @@ import params
 no_of_particles      = params.no_of_particles
 simulation_dimension = params.simulation_dimension
 restart_simulation   = params.restart_simulation
-arrayfire_backend    = params.arrayfire_backend
 choice_integrator    = params.choice_integrator
 collision_operator   = params.collision_operator
 
@@ -31,6 +29,8 @@ elif(collision_operator == "potential-based"):
   order_finite_difference = params.order_finite_difference
 
 elif(collision_operator == "montecarlo"):
+  print("true")
+  wait = input("get")
   x_zones            = params.x_zones
   y_zones            = params.y_zones
   scattered_fraction = params.scattered_fraction
@@ -68,25 +68,34 @@ length_box_z     = params.length_box_z
 
 #Here we complete import of all the variable from the parameters file
 
-if(simulation_dimension == 2):
-  sol = np.zeros(4*no_of_particles,dtype=np.float)
-  old = np.zeros(4*no_of_particles,dtype=np.float)
+h5f           = h5py.File('data_files/initial_conditions/initial_data.h5', 'r')
+x_initial     = h5f['x_coords'][:]
+y_initial     = h5f['y_coords'][:]
+vel_x_initial = h5f['vel_x'][:]
+vel_y_initial = h5f['vel_y'][:]
+time          = h5f['time'][:]
 
 if(simulation_dimension == 3):
-  sol = np.zeros(6*no_of_particles,dtype=np.float)
-  old = np.zeros(6*no_of_particles,dtype=np.float)
+  z_initial     = h5f['z_coords'][:]
+  vel_z_initial = h5f['vel_z'][:]
 
-h5f                = h5py.File('data_files/initial_conditions/initial_data.h5', 'r')
-initial_conditions = h5f['initial_conditions'][:]
-time               = h5f['time'][:]
 h5f.close()
 
 if(restart_simulation == "true"):
-  h5f                = h5py.File('data_files/timestepped_data/solution_'+str(restart_time_index)+'.h5', 'r')
-  initial_conditions = h5f['sol'][:]
+  h5f           = h5py.File('data_files/timestepped_data/solution_'+str(restart_time_index)+'.h5', 'r')
+  x_initial     = h5f['x_coords'][:]
+  y_initial     = h5f['y_coords'][:]
+  vel_x_initial = h5f['vel_x'][:]
+  vel_y_initial = h5f['vel_y'][:]
   time               = h5f['time'][:]
+  
+  if(simulation_dimension == 3):
+    z_initial          = h5f['z_coords'][:]
+    vel_z_initial = h5f['vel_z'][:]
+
   h5f.close()
 
+# Considering a non-adaptive time-stepping
 dt = time[1]
 
 """Declaring data variables which shall be used in post-processing"""
@@ -116,7 +125,7 @@ elif(choice_integrator == "4th-order"):
 """Setting the wall options"""
 
 if(wall_condition_x == "thermal"):
-  from wall_options.thermal  import wall_x
+  from wall_options.thermal import wall_x
 elif(wall_condition_x == "hardwall"):
   from wall_options.hard_wall import wall_x
 elif(wall_condition_x == "periodic"):
@@ -145,6 +154,15 @@ if(collision_operator == "hardsphere"):
 if(collision_operator == "montecarlo"):
   from collision_operators.monte_carlo import collision_operator
 
+# We shall define a collision operator for the potential based model and collisionless models as well,
+# Although integrator takes care of the scattering itself. The operator shall return the values as is
+# This is to avoid condition checking inside the loop
+if(collision_operator == "potential-based"):
+  from collision_operators.potential import collision_operator
+
+if(collision_operator == "potential-based"):
+  from collision_operators.potential import collision_operator
+  
 # Now we shall proceed to evolve the system with time:
 
 for time_index,t0 in enumerate(time):
@@ -154,61 +172,70 @@ for time_index,t0 in enumerate(time):
 
   print("Computing For Time Index = ",time_index)
   
-  
   if(time_index == time.size-1):
     break
+
+  if(time_index!=0):
+    x_initial     = old_x
+    y_initial     = old_y
+    vel_x_initial = old_vel_x
+    vel_y_initial = old_vel_y
+    
+    if(simulation_dimension == 3):
+      z_initial     = old_z
+      vel_z_initial = old_v_z
+
+  if(simulation_dimension == 2):
+    (x_coords, y_coords, vel_x, vel_y) = integrator(x_initial,     y_initial,\
+                                                    vel_x_initial, vel_y_initial,dt
+                                                   )
+
+
+  if(simulation_dimension == 3):
+    (x_coords, y_coords, z_coords, vel_x, vel_y, vel_z) = integrator(x_initial,     y_initial,     z_initial,\
+                                                                     vel_x_initial, vel_y_initial, vel_z_initial, dt\
+                                                                    )
   
-  if(time_index==0):
-    initial_conditions = initial_conditions
-  else:
-    initial_conditions = old
-  
-  sol = integrator(initial_conditions,dt)
-  sol = wall_x(sol)
-  sol = wall_y(sol)
+  x_coords = wall_x(x_coords)
+  y_coords = wall_y(y_coords)
   
   if(simulation_dimension == 3):
-    sol = wall_z(sol)
+    z_coords = wall_z(z_coords)
+
+  if(simulation_dimension == 2):
+    (x_coords, y_coords, vel_x, vel_y) = collision_operator(x_initial,     y_initial,\
+                                                            vel_x_initial, vel_y_initial,dt\
+                                                           )
+
+
+  if(simulation_dimension == 3):
+    (x_coords, y_coords, z_coords, vel_x, vel_y, vel_z) = collision_operator(x_initial,     y_initial,     z_initial, \
+                                                                             vel_x_initial, vel_y_initial, vel_z_initial, dt\
+                                                                            )
   
-  if(collision_operator == "hardwall" or collision_operator == "montecarlo"):
-    sol = collision_operator(sol)
-  
-  old = sol
+  old_x = x_coords
+  old_y = y_coords
+  old_z = z_coords
+
+  old_vel_x = vel_x
+  old_vel_y = vel_y
+  old_vel_z = vel_z
 
   """Declaring variables used in calculation for post-processor"""
 
-  if(simulation_dimension == 2):
-    x_coordinates = sol[0:no_of_particles]
-    y_coordinates = sol[no_of_particles:2*no_of_particles] 
-    velocity_x    = sol[2*no_of_particles:3*no_of_particles]
-    velocity_y    = sol[3*no_of_particles:4*no_of_particles]
-
-  if(simulation_dimension == 3):
-    x_coordinates = sol[0:no_of_particles]
-    y_coordinates = sol[no_of_particles:2*no_of_particles] 
-    z_coordinates = sol[2*no_of_particles:3*no_of_particles]
-    velocity_x    = sol[3*no_of_particles:4*no_of_particles]
-    velocity_y    = sol[4*no_of_particles:5*no_of_particles]
-    velocity_z    = sol[5*no_of_particles:6*no_of_particles]
-
-  if(collision_operator == "montecarlo"):
-    from collision_operators.monte_carlo import collision_operator
-    sol = collision_operator(sol)
-
   if(plot_spatial_temperature_profile == "true" and time_index%100 == 0):
-    particle_xzone   = (x_zones/length_box_x) * sol[0:no_of_particles]
-    particle_yzone   = (y_zones/length_box_y) * sol[no_of_particles:2*no_of_particles]
+    particle_xzone   = (x_zones/length_box_x) * x_coords
+    particle_yzone   = (y_zones/length_box_y) * y_coords
     particle_xzone   = particle_xzone.astype(int)
     particle_yzone   = particle_yzone.astype(int)
     particle_zone    = x_zones * particle_yzone + particle_xzone
     zonecount        = np.bincount(particle_zone)
     
     temperature_spatial = np.zeros(zonecount.size)
-    
-
+  
     for i in range(x_zones*y_zones):
       indices = np.where(particle_zone == i)[0]
-      temperature_spatial[i] = 0.5*np.sum(sol[indices+2*no_of_particles]**2 + sol[indices+3*no_of_particles]**2)
+      temperature_spatial[i] = 0.5*np.sum(vel_x[indices]**2 + vel_y[indices]**2)
     
     temperature_spatial = temperature_spatial/zonecount
     temperature_spatial = temperature_spatial.reshape(x_zones,y_zones)
@@ -216,25 +243,25 @@ for time_index,t0 in enumerate(time):
   """Calculation of the functions which will be used to post-process the results of the simulation run"""
 
   if(simulation_dimension == 2):
-    momentum_x[time_index]     = mass_particle * np.sum(velocity_x)
-    momentum_y[time_index]     = mass_particle * np.sum(velocity_y)
-    kinetic_energy[time_index] = 0.5*mass_particle*np.sum(velocity_x**2 + velocity_y**2)
-    pressure[time_index]       = np.sum(velocity_x**2 + velocity_y**2)/no_of_particles
-    heatflux_x[time_index]     = np.sum(velocity_x*(velocity_x**2 + velocity_y**2))/no_of_particles
-    heatflux_y[time_index]     = np.sum(velocity_y*(velocity_x**2 + velocity_y**2))/no_of_particles
+    momentum_x[time_index]     = mass_particle * np.sum(vel_x)
+    momentum_y[time_index]     = mass_particle * np.sum(vel_y)
+    kinetic_energy[time_index] = 0.5*mass_particle*np.sum(vel_x**2 + vel**2)
+    pressure[time_index]       = np.sum(vel_x**2 + vel_y**2)/no_of_particles
+    heatflux_x[time_index]     = np.sum(vel_x*(vel_x**2 + vel_y**2))/no_of_particles
+    heatflux_y[time_index]     = np.sum(vel_y*(vel_x**2 + vel_y**2))/no_of_particles
 
   if(simulation_dimension == 3):
-    momentum_x[time_index]     = mass_particle * np.sum(velocity_x)
-    momentum_y[time_index]     = mass_particle * np.sum(velocity_y)
-    momentum_z[time_index]     = mass_particle * np.sum(velocity_z)
+    momentum_x[time_index]     = mass_particle * np.sum(vel_x)
+    momentum_y[time_index]     = mass_particle * np.sum(vel_y)
+    momentum_z[time_index]     = mass_particle * np.sum(vel_z)
 
-    kinetic_energy[time_index] = 0.5*mass_particle*np.sum(velocity_x**2 + velocity_y**2 + velocity_z**2)
+    kinetic_energy[time_index] = 0.5*mass_particle*np.sum(vel_x**2 + vel_y**2 + vel_z**2)
     
-    pressure[time_index]       = np.sum(velocity_x**2 + velocity_y**2 + velocity_z**2)/no_of_particles
+    pressure[time_index]       = np.sum(vel_x**2 + vel_y**2 + vel_z**2)/no_of_particles
     
-    heatflux_x[time_index]     = np.sum(velocity_x*(velocity_x**2 + velocity_y**2 + velocity_z**2))/no_of_particles
-    heatflux_y[time_index]     = np.sum(velocity_y*(velocity_x**2 + velocity_y**2 + velocity_z**2))/no_of_particles
-    heatflux_z[time_index]     = np.sum(velocity_z*(velocity_x**2 + velocity_y**2 + velocity_z**2))/no_of_particles
+    heatflux_x[time_index]     = np.sum(vel_x*(vel_x**2 + vel_y**2 + vel_z**2))/no_of_particles
+    heatflux_y[time_index]     = np.sum(vel_y*(vel_x**2 + vel_y**2 + vel_z**2))/no_of_particles
+    heatflux_z[time_index]     = np.sum(vel_z*(vel_x**2 + vel_y**2 + vel_z**2))/no_of_particles
 
   if(collision_operator == "potential-based"):
     from collision_operators.potential import calculate_potential_energy
@@ -247,19 +274,30 @@ for time_index,t0 in enumerate(time):
   
   if((time_index%100)==0):
     h5f = h5py.File('data_files/timestepped_data/solution_'+str(time_index)+'.h5', 'w')
-    h5f.create_dataset('sol',                data = sol)
-    h5f.create_dataset('momentum_x',         data = momentum_x)
-    h5f.create_dataset('momentum_y',         data = momentum_y)
-    h5f.create_dataset('heatflux_x',         data = heatflux_x)
-    h5f.create_dataset('heatflux_y',         data = heatflux_y)
+    h5f.create_dataset('x_coords',   data = x_coords)
+    h5f.create_dataset('y_coords',   data = y_coords)
+    h5f.create_dataset('z_coords',   data = z_coords)
+    h5f.create_dataset('vel_x',      data = vel_x)
+    h5f.create_dataset('vel_y',      data = vel_y)
+    h5f.create_dataset('vel_z',      data = vel_z)
+    h5f.create_dataset('momentum_x', data = momentum_x)
+    h5f.create_dataset('momentum_y', data = momentum_y)
+    h5f.create_dataset('heatflux_x', data = heatflux_x)
+    h5f.create_dataset('heatflux_y', data = heatflux_y)
+    
     if(simulation_dimension == 3):
-      h5f.create_dataset('heatflux_z',       data = heatflux_z)
-      h5f.create_dataset('momentum_z',       data = momentum_z)
-    h5f.create_dataset('kinetic_energy',     data = kinetic_energy)
-    h5f.create_dataset('pressure',           data = pressure)
+      h5f.create_dataset('heatflux_z', data = heatflux_z)
+      h5f.create_dataset('momentum_z', data = momentum_z)
+    
+    h5f.create_dataset('kinetic_energy', data = kinetic_energy)
+    h5f.create_dataset('pressure',       data = pressure)
+    h5f.create_dataset('time',           data = time)
+    
     if(collision_operator == "potential-based"):
-      h5f.create_dataset('potential_energy', data = potential_energy)
+      h5f.create_dataset('potential_energy',    data = potential_energy)
+    
     if(plot_spatial_temperature_profile == "true"):
       h5f.create_dataset('temperature_spatial', data = temperature_spatial)
-    h5f.create_dataset('time',               data = time)
+    
+
     h5f.close()

@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.special import erfinv
 import h5py
-import arrayfire as af  
 import params
 
 """Here we shall assign values as set in params"""
@@ -9,7 +8,6 @@ import params
 no_of_particles      = params.no_of_particles
 simulation_dimension = params.simulation_dimension
 restart_simulation   = params.restart_simulation
-arrayfire_backend    = params.arrayfire_backend
 choice_integrator    = params.choice_integrator
 collision_operator   = params.collision_operator
 
@@ -91,21 +89,24 @@ final_time              = 5.0  #20 * box_crossing_time_scale
 dt                      = 0.001 * box_crossing_time_scale
 time                    = np.arange(0, final_time, dt)
 
-""" Combining initial conditions into a single vector """
+""" Writing the data to a file """
+
+if(simulation_dimension == 3):
+  h5f = h5py.File('data_files/initial_conditions/initial_data.h5', 'w')
+  h5f.create_dataset('time',          data = time)
+  h5f.create_dataset('x_coordinates', data = initial_position_x)
+  h5f.create_dataset('y_coordinates', data = initial_position_y)
+  h5f.create_dataset('z_coordinates', data = initial_position_z)
+  h5f.create_dataset('velocity_x',    data = initial_velocity_x)
+  h5f.create_dataset('velocity_y',    data = initial_velocity_y)
+  h5f.create_dataset('velocity_z',    data = initial_velocity_z)
+  h5f.close()
 
 if(simulation_dimension == 2):
-  initial_conditions = np.concatenate([initial_position_x, initial_position_y, \
-                                       initial_velocity_x, initial_velocity_y, \
-                                      ], axis = 0 \
-                                     )
-
-else:
-  initial_conditions = np.concatenate([initial_position_x, initial_position_y, initial_position_z, \
-                                       initial_velocity_x, initial_velocity_y, initial_velocity_z, \
-                                      ], axis = 0 \
-                                     )
-
-h5f = h5py.File('data_files/initial_conditions/initial_data.h5', 'w')
-h5f.create_dataset('time',                data = time)
-h5f.create_dataset('initial_conditions',  data = initial_conditions)
-h5f.close()
+  h5f = h5py.File('data_files/initial_conditions/initial_data.h5', 'w')
+  h5f.create_dataset('time',          data = time)
+  h5f.create_dataset('x_coordinates', data = initial_position_x)
+  h5f.create_dataset('y_coordinates', data = initial_position_y)
+  h5f.create_dataset('velocity_x',    data = initial_velocity_x)
+  h5f.create_dataset('velocity_y',    data = initial_velocity_y)
+  h5f.close()

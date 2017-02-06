@@ -138,3 +138,13 @@ def calculate_potential_energy(sol):
   # Of the system at a particular time-step
   potential_energy = 0.5*(np.sum(potential(dist)-(potential_amplitude/2)*np.identity(no_of_particles)))
   return(potential_energy)
+
+if(simulation_dimension == 3):
+
+  def collision_operator(xcoords, ycoords, zcoords, vel_x, vel_y, vel_z, dt):
+   return(xcoords, ycoords, zcoords, vel_x, vel_y, vel_z)
+
+if(simulation_dimension == 2):
+
+  def collision_operator(xcoords, ycoords, vel_x, vel_y, dt):
+   return(xcoords, ycoords, vel_x, vel_y)

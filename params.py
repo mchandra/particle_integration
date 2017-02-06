@@ -1,4 +1,4 @@
-no_of_particles      = 1000
+no_of_particles      = 100000
 mass_particle        = 1.0
 boltzmann_constant   = 1.0
 # Change this value to 2 or 3 depending upon whether simulation is in 2D or 3D
@@ -11,7 +11,9 @@ simulation_dimension = 2
 restart_simulation   = "false"
 if(restart_simulation  == "true"):
   restart_time_index = 100
-arrayfire_backend    = "cpu"
+  
+
+"""End of options in current developement"""
 
 # If the user requests the written data files will contain the spacial temperature array of each time-step
 
@@ -38,7 +40,7 @@ choice_integrator = "verlet"
 # Option "potential-based" - Potential Based Scattering
 # Option "montecarlo"      - MonteCarlo Scattering
 
-collision_operator = "potential-based"
+collision_operator = "montecarlo"
 
 # scattering_distance is the distance between 2 particles below which scattering kernel is activated
 if(collision_operator == "hardsphere"):
