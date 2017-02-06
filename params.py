@@ -54,8 +54,14 @@ time_in_seconds = 2
 Lx = 1
 Ly = 1
 
-"""Currents for the current fdtd code all irrelevant"""
+""" Setting number of particles """
 
+no_of_particles = 1
+
+""" Setting number of zones along x and y """
+
+Nx = 100
+Ny = 100
 
 """Charge/Mass of the particle"""
 # mass and charge of particle:
