@@ -19,3 +19,5 @@
 * While running the code make sure all the numerical stability criterion are satisfied(described in the document). Keep charges low and velocites low in general.
 
 * currentdepositer.py contains the commented scripts that show the inner workings of the current depositor function.
+
+* There might be case of misplaced particle/error due to the current stratergy of interpolation of positions at half timesteps, due to Periodic Boundary conditions. But for this sufficiently small time steps this should not be of concern.
