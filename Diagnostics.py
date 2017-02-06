@@ -13,12 +13,7 @@ from params import *
 # For analytical comparision
 # for x start from x(n+1) and for vx start from time (n+1)
 
-""" Setting number of particles and other parameters"""
-
-no_of_particles = 1
-
-Nx = 100
-Ny = 100
+""" Setting dx and dy using Length and number of zones"""
 
 dx = Lx/Nx
 dy = Ly/Ny
