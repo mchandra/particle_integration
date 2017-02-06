@@ -123,59 +123,59 @@ Bz[ghost_cells:-ghost_cells, ghost_cells:-ghost_cells] = np.sin(2*np.pi*((dt/2)-
 
 
 def mag_Verlet(initial_conditions, t, F_interpolated):
-    x   = initial_conditions[0:no_of_particles]
-    y   = initial_conditions[no_of_particles:2 * no_of_particles]
-    z   = initial_conditions[2 * no_of_particles:3 * no_of_particles]
-    v_x = initial_conditions[3 * no_of_particles:4 * no_of_particles]
-    v_y = initial_conditions[4 * no_of_particles:5 * no_of_particles]
-    v_z = initial_conditions[5 * no_of_particles:6 * no_of_particles]
+  x   = initial_conditions[0:no_of_particles]
+  y   = initial_conditions[no_of_particles:2 * no_of_particles]
+  z   = initial_conditions[2 * no_of_particles:3 * no_of_particles]
+  v_x = initial_conditions[3 * no_of_particles:4 * no_of_particles]
+  v_y = initial_conditions[4 * no_of_particles:5 * no_of_particles]
+  v_z = initial_conditions[5 * no_of_particles:6 * no_of_particles]
 
-    Ex = F_interpolated[0,0:no_of_particles]
-    Ey = F_interpolated[1,0:no_of_particles]
-    Ez = F_interpolated[2,0:no_of_particles]
-    Bx = F_interpolated[3,0:no_of_particles]
-    By = F_interpolated[4,0:no_of_particles]
-    Bz = F_interpolated[5,0:no_of_particles]
+  Ex = F_interpolated[0,0:no_of_particles]
+  Ey = F_interpolated[1,0:no_of_particles]
+  Ez = F_interpolated[2,0:no_of_particles]
+  Bx = F_interpolated[3,0:no_of_particles]
+  By = F_interpolated[4,0:no_of_particles]
+  Bz = F_interpolated[5,0:no_of_particles]
 
 
-    v_x_minus = v_x + (charge * Ex * (t[1] - t[0])) / (2 * me)
-    v_y_minus = v_y + (charge * Ey * (t[1] - t[0])) / (2 * me)
-    v_z_minus = v_z + (charge * Ez * (t[1] - t[0])) / (2 * me)
+  v_x_minus = v_x + (charge * Ex * (t[1] - t[0])) / (2 * me)
+  v_y_minus = v_y + (charge * Ey * (t[1] - t[0])) / (2 * me)
+  v_z_minus = v_z + (charge * Ez * (t[1] - t[0])) / (2 * me)
 
-    t_magx    = (charge * Bx * (t[1] - t[0])) / (2 * me)
-    t_magy    = (charge * By * (t[1] - t[0])) / (2 * me)
-    t_magz    = (charge * Bz * (t[1] - t[0])) / (2 * me)
+  t_magx    = (charge * Bx * (t[1] - t[0])) / (2 * me)
+  t_magy    = (charge * By * (t[1] - t[0])) / (2 * me)
+  t_magz    = (charge * Bz * (t[1] - t[0])) / (2 * me)
 
-    vminus_cross_t_x = (v_y_minus * t_magz) - (v_z_minus * t_magy)
-    vminus_cross_t_y = -((v_x_minus * t_magz) - (v_z_minus * t_magx))
-    vminus_cross_t_z = (v_x_minus * t_magy) - (v_y_minus * t_magx)
+  vminus_cross_t_x = (v_y_minus * t_magz) - (v_z_minus * t_magy)
+  vminus_cross_t_y = -((v_x_minus * t_magz) - (v_z_minus * t_magx))
+  vminus_cross_t_z = (v_x_minus * t_magy) - (v_y_minus * t_magx)
 
-    v_dashx = v_x_minus + vminus_cross_t_x
-    v_dashy = v_y_minus + vminus_cross_t_y
-    v_dashz = v_z_minus + vminus_cross_t_z
+  v_dashx = v_x_minus + vminus_cross_t_x
+  v_dashy = v_y_minus + vminus_cross_t_y
+  v_dashz = v_z_minus + vminus_cross_t_z
 
-    t_mag = np.sqrt(t_magx ** 2 + t_magy ** 2 + t_magz ** 2)
+  t_mag = np.sqrt(t_magx ** 2 + t_magy ** 2 + t_magz ** 2)
 
-    s_x = (2 * t_magx) / (1 + abs(t_mag ** 2))
-    s_y = (2 * t_magy) / (1 + abs(t_mag ** 2))
-    s_z = (2 * t_magz) / (1 + abs(t_mag ** 2))
+  s_x = (2 * t_magx) / (1 + abs(t_mag ** 2))
+  s_y = (2 * t_magy) / (1 + abs(t_mag ** 2))
+  s_z = (2 * t_magz) / (1 + abs(t_mag ** 2))
 
-    v_x_plus = v_x_minus + ((v_dashy * s_z) - (v_dashz * s_y))
-    v_y_plus = v_y_minus + -((v_dashx * s_z) - (v_dashz * s_x))
-    v_z_plus = v_z_minus + ((v_dashx * s_y) - (v_dashy * s_x))
+  v_x_plus = v_x_minus + ((v_dashy * s_z) - (v_dashz * s_y))
+  v_y_plus = v_y_minus + -((v_dashx * s_z) - (v_dashz * s_x))
+  v_z_plus = v_z_minus + ((v_dashx * s_y) - (v_dashy * s_x))
 
-    v_x_new  = v_x_plus + (charge * Ex * (t[1] - t[0])) / (2 * me)
-    v_y_new  = v_y_plus + (charge * Ey * (t[1] - t[0])) / (2 * me)
-    v_z_new  = v_z_plus + (charge * Ez * (t[1] - t[0])) / (2 * me)
+  v_x_new  = v_x_plus + (charge * Ex * (t[1] - t[0])) / (2 * me)
+  v_y_new  = v_y_plus + (charge * Ey * (t[1] - t[0])) / (2 * me)
+  v_z_new  = v_z_plus + (charge * Ez * (t[1] - t[0])) / (2 * me)
 
-    # Using v at (n+0.5) dt to push x at (n)dt
+  # Using v at (n+0.5) dt to push x at (n)dt
 
-    x_new = x + v_x_new * (t[1] - t[0])
-    y_new = y + v_y_new * (t[1] - t[0])
-    z_new = z + v_z_new * (t[1] - t[0])
+  x_new = x + v_x_new * (t[1] - t[0])
+  y_new = y + v_y_new * (t[1] - t[0])
+  z_new = z + v_z_new * (t[1] - t[0])
 
-    nextstep = np.concatenate([x_new, y_new, z_new, v_x_new, v_y_new, v_z_new], axis=0)
-    return (nextstep)
+  nextstep = np.concatenate([x_new, y_new, z_new, v_x_new, v_y_new, v_z_new], axis=0)
+  return (nextstep)
 
 
 
@@ -196,101 +196,80 @@ old = initial_conditions.copy()
 """ Solver """
 
 for time_index, t0 in enumerate(time):
-    print("Computing for TimeIndex = ", time_index)
-    # print('\n \n')
-    t0 = time[time_index]
-    if (time_index == time.size - 1):
-        break
-    t1 = time[time_index + 1]
-    t  = [t0, t1]
-    if (time_index == 0):
-        initial_conditions = initial_conditions.copy()
+  print("Computing for TimeIndex = ", time_index)
+  # print('\n \n')
+  t0 = time[time_index]
+  if (time_index == time.size - 1):
+    break
+  t1 = time[time_index + 1]
+  t  = [t0, t1]
+  if (time_index == 0):
+    initial_conditions = initial_conditions.copy()
 
-    else:
-        initial_conditions = old.copy()
-
-
-    # Currents of 1/2 time steps minus
-
-    # print('Initial conditions positions at t = 0dt',old[:3*no_of_particles])
-    #
-    # print('Initial conditions  velocities at t = -0.5dt',old[:3*no_of_particles])
-    #
-    # print('multiplied  velocities at t = -0.5dt',old[3*no_of_particles:6*no_of_particles]*(dt/2))
-    # print('Subtracted ',(old[:3*no_of_particles]-old[3*no_of_particles:6*no_of_particles]*(dt/2)))
-    print('y going into function',initial_conditions[1])
+  else:
+    initial_conditions = old.copy()
 
 
-    Jx, Jy, Jz = dcd(   charge = charge, no_of_particles= no_of_particles,   positions_plus_half = (old[:3*no_of_particles]-old[3*no_of_particles:6*no_of_particles]*(dt/2)) ,\
-                        velocities_plus_half = old[3*no_of_particles:6*no_of_particles], \
-                        x_center_grid = x_center, y_center_grid = y_center,shape_function = current_b0_depositor, ghost_cells = ghost_cells\
-                        , Lx = Lx, Ly = Ly, dx = dx, dy = dy\
-                    )
+  # Currents of 1/2 time steps minus
 
-    # This mod will work only of periodic BC's
-
-    # Jx, Jy, Jz = dcd(   charge = charge, no_of_particles= no_of_particles,   positions_plus_half = (old[:3*no_of_particles]-old[3*no_of_particles:6*no_of_particles]*(dt/2)) ,\
-    #                     velocities_plus_half = old[3*no_of_particles:6*no_of_particles], \
-    #                     x_center_grid = x_center, y_center_grid = y_center,shape_function = current_b0_depositor, ghost_cells = ghost_cells\
-    #                     , Lx = Lx, Ly = Ly, dx = dx, dy = dy\
-    #                 )
+  Jx, Jy, Jz = dcd(   charge = charge, no_of_particles= no_of_particles,   positions_plus_half = (old[:3*no_of_particles]-old[3*no_of_particles:6*no_of_particles]*(dt/2)) ,\
+                      velocities_plus_half = old[3*no_of_particles:6*no_of_particles], \
+                      x_center_grid = x_center, y_center_grid = y_center,shape_function = current_b0_depositor, ghost_cells = ghost_cells\
+                      , Lx = Lx, Ly = Ly, dx = dx, dy = dy\
+                  )
 
 
+  Ex_updated, Ey_updated, Ez_updated, Bx_updated, By_updated, Bz_updated = fdtd(Ex, Ey, Ez, Bx, By, Bz, c, Lx, Ly, ghost_cells, Jx, Jy, Jz)
 
-    Ex_updated, Ey_updated, Ez_updated, Bx_updated, By_updated, Bz_updated = fdtd(Ex, Ey, Ez, Bx, By, Bz, c, Lx, Ly, ghost_cells, Jx, Jy, Jz)
-
-    # Updated fields info: Electric fields at (n+1)dt, and Magnetic fieds at (n+0.5)dt from (E at ndt and B at (n-0.5)dt)
-
-
-    # E at ndt and B averaged at ndt to push v at (n-0.5)dt
-
-    Ex_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_center,\
-                                                  y_grid=y_top, F=Ex, ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
-                                                )\
-                          )
-
-    Ey_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_right,\
-                                                  y_grid=y_top, F=Ey, ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
-                                                )\
-                          )
-
-    Ez_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_center,\
-                                                  y_grid=y_top, F=Ez, ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
-                                                )\
-                          )
-
-    Bx_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_right,\
-                                                  y_grid=y_top, F=((Bx+Bx_updated)/2), ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
-                                                )\
-                          )
-
-    By_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_center,\
-                                                  y_grid=y_top, F=((By+By_updated)/2), ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
-                                                )\
-                          )
-
-    Bz_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_right,\
-                                                  y_grid=y_top, F=((Bz+Bz_updated)/2), ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
-                                                )\
-                          )
-
-    F_interpolated = np.concatenate([Ex_particle, Ey_particle, Ez_particle, Bx_particle, By_particle, Bz_particle], axis = 0)
-
-    sol = mag_Verlet(initial_conditions, t, F_interpolated)
+  # Updated fields info: Electric fields at (n+1)dt, and Magnetic fieds at (n+0.5)dt from (E at ndt and B at (n-0.5)dt)
 
 
-    indices_right       = np.where(sol[0:3*no_of_particles]>right_boundary)
-    indices_left        = np.where(sol[0:3*no_of_particles]<left_boundary)
-    sol[indices_right] -= Lx
-    sol[indices_left]  += Lx
-    
-    print('x positions', sol[0])
-    print('y positions', sol[1])
+  # E at ndt and B averaged at ndt to push v at (n-0.5)dt
 
-    Ex, Ey, Ez, Bx, By, Bz= Ex_updated, Ey_updated, Ez_updated, Bx_updated, By_updated, Bz_updated
+  Ex_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_center,\
+                                                y_grid=y_top, F=Ex, ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
+                                              )\
+                        )
 
-    old = sol.copy()
+  Ey_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_right,\
+                                                y_grid=y_top, F=Ey, ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
+                                              )\
+                        )
 
-    h5f = h5py.File('solution_all/solution_'+str(time_index)+'.h5', 'w')
-    h5f.create_dataset('solution_all/solution_dataset_'+str(time_index), data=sol)
-    h5f.close()
+  Ez_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_center,\
+                                                y_grid=y_top, F=Ez, ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
+                                              )\
+                        )
+
+  Bx_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_right,\
+                                                y_grid=y_top, F=((Bx+Bx_updated)/2), ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
+                                              )\
+                        )
+
+  By_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_center,\
+                                                y_grid=y_top, F=((By+By_updated)/2), ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
+                                              )\
+                        )
+
+  Bz_particle = np.array( bilinear_interpolate( x=[initial_conditions[:no_of_particles]], y=[initial_conditions[no_of_particles:2*no_of_particles]], x_grid=x_right,\
+                                                y_grid=y_top, F=((Bz+Bz_updated)/2), ghost_cells = ghost_cells, Lx = Lx, Ly = Ly\
+                                              )\
+                        )
+
+  F_interpolated = np.concatenate([Ex_particle, Ey_particle, Ez_particle, Bx_particle, By_particle, Bz_particle], axis = 0)
+
+  sol = mag_Verlet(initial_conditions, t, F_interpolated)
+
+
+  indices_right       = np.where(sol[0:3*no_of_particles]>right_boundary)
+  indices_left        = np.where(sol[0:3*no_of_particles]<left_boundary)
+  sol[indices_right] -= Lx
+  sol[indices_left]  += Lx
+
+  Ex, Ey, Ez, Bx, By, Bz= Ex_updated, Ey_updated, Ez_updated, Bx_updated, By_updated, Bz_updated
+
+  old = sol.copy()
+
+  # h5f = h5py.File('solution_all/solution_'+str(time_index)+'.h5', 'w')
+  # h5f.create_dataset('solution_all/solution_dataset_'+str(time_index), data=sol)
+  # h5f.close()
