@@ -10,7 +10,7 @@ bNumPy = np.random.rand(100, 100)
 
 np_time_start = time.time()
 
-for i in range(1e6):
+for i in range(1000000):
   cNumPy = aNumPy + bNumPy
 
 np_time_end     = time.time()
@@ -19,18 +19,25 @@ np_time_elapsed = np_time_end - np_time_start
 #print("numpy answer is = ", cNumPy)
 print("numpy implementation run took time =", np_time_elapsed," seconds")
 
+kernel_compilation_time_start = time.time()
+
 aArrayFire = af.Array(aNumPy.ctypes.data, aNumPy.shape, aNumPy.dtype.char)
 bArrayFire = af.Array(bNumPy.ctypes.data, bNumPy.shape, bNumPy.dtype.char)
 cArrayFire = aArrayFire + bArrayFire
-cArrayFire.eval()
+af.eval(cArrayFire)
 af.sync()
+
+kernel_compilation_time_end     = time.time()
+kernel_compilation_time_elapsed = kernel_compilation_time_end - kernel_compilation_time_start
+
+print("Kernel compilation complete. Compilation time = ", kernel_compilation_time_elapsed)
 
 af_time_start = time.time()
 
-for i in range(1e6):
+for i in range(1000000):
   cArrayFire = aArrayFire + bArrayFire
-  cArrayFire.eval()
-
+  af.eval(cArrayFire)
+ 
 af.sync()
 af_time_end     = time.time()
 af_time_elapsed = af_time_end - af_time_start
