@@ -196,11 +196,11 @@ for time_index,t0 in enumerate(time):
                                                                      vel_x_initial, vel_y_initial, vel_z_initial, dt\
                                                                     )
   
-  x_coords = wall_x(x_coords)
-  y_coords = wall_y(y_coords)
+  (x_coords, vel_x, vel_y, vel_z) = wall_x(x_coords, vel_x, vel_y, vel_z)
+  (y_coords, vel_x, vel_y, vel_z) = wall_y(y_coords, vel_x, vel_y, vel_z)
   
   if(simulation_dimension == 3):
-    z_coords = wall_z(z_coords)
+    (z_coords, vel_x, vel_y, vel_z) = wall_z(z_coords, vel_x, vel_y, vel_z)
 
   if(simulation_dimension == 2):
     (x_coords, y_coords, vel_x, vel_y) = collision_operator(x_initial,     y_initial,\

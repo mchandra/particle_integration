@@ -67,24 +67,32 @@ length_box_z     = params.length_box_z
 
 #Here we complete import of all the variable from the parameters file
 
-def periodic(coordinates, direction):
+def wall_x(x_coords, vel_x, vel_y, vel_z):
 
-  if(direction == 'x'):
-    boundary          = right_boundary
-    boundary_opposite = left_boundary
+  collided_right = np.where(x_coords > right_boundary)
+  collided_left  = np.where(x_coords < left_boundary)
 
-  if(direction == 'y'):
-    boundary          = top_boundary
-    boundary_opposite = bottom_boundary
-
-  if(direction == 'z'):
-    boundary          = front_boundary
-    boundary_opposite = back_boundary
-
-  collided          = np.where(coordinates > boundary)
-  collided_opposite = np.where(coordinates < boundary_opposite)
+  x_coords[collided_left[0]]  = x_coords[collided_left[0]]  + length_box_x 
+  x_coords[collided_right[0]] = x_coords[collided_right[0]] - length_box_x
   
-  coordinates[collided[0]]          = coordinates[collided[0]]  - length_box_x
-  coordinates[collided_opposite[0]] = coordinates[collided[0]]  + length_box_x
+  return(x_coords, vel_x, vel_y, vel_z)
+
+def wall_y(y_coords, vel_x, vel_y, vel_z):
+
+  collided_top = np.where(y_coords > top_boundary)
+  collided_bot = np.where(y_coords < bot_boundary)
+
+  y_coords[collided_bot[0]] = y_coords[collided_bot[0]] + length_box_y
+  y_coords[collided_top[0]] = y_coords[collided_top[0]] - length_box_y
+
+  return(y_coords, vel_x, vel_y, vel_z)
+
+def wall_z(z_coords, vel_x, vel_y, vel_z):
+
+  collided_front = np.where(z_coords > front_boundary)
+  collided_back  = np.where(z_coords < back_boundary)
+
+  z_coords[collided_back[0]]  = z_coords[collided_back[0]]  + length_box_z
+  z_coords[collided_front[0]] = z_coords[collided_front[0]] - length_box_z
   
-  return(coordinates)
+  return(z_coords, vel_x, vel_y, vel_z)

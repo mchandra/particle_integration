@@ -120,11 +120,11 @@ for time_index,t0 in enumerate(time):
   sol[wall_y_bot]   = sol[wall_y_bot] + 1
   sol[wall_y_top]   = sol[wall_y_top] - 1
     
-  for i in range(no_of_particles):
-    j    = sol[(i+1):no_of_particles]        
-    k    = sol[(i+1+no_of_particles):2*no_of_particles]
-    velx = af.data.constant(af.algorithm.sum(sol[i+2*no_of_particles]),af.Array.elements(j))
-    vely = af.data.constant(af.algorithm.sum(sol[i+3*no_of_particles]),af.Array.elements(k))
+for i in range(no_of_particles):
+	j    = sol[(i+1):no_of_particles]        
+	k    = sol[(i+1+no_of_particles):2*no_of_particles]
+	velx = af.data.constant(af.algorithm.sum(sol[i+2*no_of_particles]),af.Array.elements(j))
+	vely = af.data.constant(af.algorithm.sum(sol[i+3*no_of_particles]),af.Array.elements(k))
     
     velx_others = sol[(i+1+2*no_of_particles):3*no_of_particles]
     vely_others = sol[(i+1+3*no_of_particles):4*no_of_particles]

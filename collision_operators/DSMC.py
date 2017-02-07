@@ -64,43 +64,17 @@ back_boundary    = params.back_boundary
 front_boundary   = params.front_boundary
 length_box_z     = params.length_box_z
 
-#Here we complete import of all the variable from the parameters file
+#Here we complete import of all the variable from the parameters file'
 
-def collision_operator(sol):
-
-  if(simulation_dimension == 3):
-    print("HS Scattering in 3D still in development! Please change to 2D mode")
-
-  for i in range(no_of_particles):
-    j=sol[(i+1):no_of_particles]        
-    k=sol[(i+1+no_of_particles):2*no_of_particles]
-    velx=sol[i+2*no_of_particles]*np.ones(j.size)
-    vely=sol[i+3*no_of_particles]*np.ones(j.size)
-    velx_others=sol[(i+1+2*no_of_particles):3*no_of_particles]
-    vely_others=sol[(i+1+3*no_of_particles):4*no_of_particles]
-    x_particle=sol[i]
-    y_particle=sol[i+no_of_particles]        
-    j=ne.evaluate("j-x_particle")
-    k=ne.evaluate("k-y_particle")
-    dist=ne.evaluate("sqrt(j**2+k**2)")
-    j=j/dist
-    k=k/dist
-    test_collision=ne.evaluate("dist<0.01") 
-    test_collision=ne.evaluate("where(test_collision,1,0)")
-    indices=np.nonzero(test_collision)
-    
-    if(np.sum(test_collision)!=0):
-      p=(velx*j+vely*k-velx_others*j-vely_others*k)*test_collision
-      velx=velx*test_collision-p*j
-      velx_others=velx_others+p*j
-      vely=vely*test_collision-p*k
-      vely_others=vely_others+p*k 
-      index=np.random.randint(0,(indices[0].size))
-      sol[i+1+indices[0][index]+2*no_of_particles] = velx_others[indices[0][index]]
-
-      sol[i+1+indices[0][index]+3*no_of_particles] = vely_others[indices[0][index]]
-
-      sol[i+2*no_of_particles]=velx[indices[0][index]]
-      sol[i+3*no_of_particles]=vely[indices[0][index]]
-
-  return(sol)
+def collision_operator(x_coords, y_coords, z_coords, vel_x, vel_y, vel_z):
+  sigma = np.pi * d**2
+  # In the above equation d is the value of the diameter of the particles
+  make_square_matrix = np.ones(no_of_particles)
+  vel_x              = vel_x*make_square_matrix
+  vel_x              = vel_x - vel_x.transpose()
+  vel_y              = vel_y*make_square_matrix
+  vel_y              = vel_y - vel_y.transpose()
+  vel_z              = vel_z*make_square_matrix
+  vel_z              = vel_z - vel_z.transpose()
+  g                  = np.sqrt(vel_x**2 + vel_y**2 + vel_z**2)
+  probability        = sigma*g*dt/(

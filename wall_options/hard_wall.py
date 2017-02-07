@@ -67,28 +67,41 @@ length_box_z     = params.length_box_z
 
 #Here we complete import of all the variable from the parameters file
 
-def wall_x(x_coordinates, velocity_x):
+def wall_x(x_coords, vel_x, vel_y, vel_z):
 
-  if(direction == 'x'):
-    boundary          = right_boundary
-    boundary_opposite = left_boundary
+  collided_right = np.where(x_coords > right_boundary)
+  collided_left  = np.where(x_coords < left_boundary)
 
-  if(direction == 'y'):
-    boundary          = top_boundary
-    boundary_opposite = bottom_boundary
+  x_coords[collided_left[0]] = left_boundary
+  vel_x[collided_left[0]]    = vel_x[collided_left[0]]*(-1)    
 
-  if(direction == 'z'):
-    boundary          = front_boundary
-    boundary_opposite = back_boundary
+  x_coords[collided_right[0]] = right_boundary
+  vel_x[collided_right[0]]    = vel_x[collided_right[0]]*(-1)    
 
+  return(x_coords, vel_x, vel_y, vel_z)
 
-  collided          = np.where(coordinates > boundary)
-  collided_opposite = np.where(coordinates < boundary_opposite)
+def wall_y(y_coords, vel_x, vel_y, vel_z):
 
-  coordinates[collided[0]] = boundary
-  velocity[collided[0]]    = velocity[collided[0]]*(-1)    
+  collided_top = np.where(y_coords > top_boundary)
+  collided_bot = np.where(y_coords < bot_boundary)
 
-  coordinates[collided_opposite[0]] = boundary_opposite
-  velocity[collided_opposite[0]]    = velocity[collided_opposite[0]]*(-1)    
+  y_coords[collided_bot[0]] = bot_boundary
+  vel_y[collided_bot[0]]    = vel_y[collided_bot[0]]*(-1)    
 
-  return(coordinates, velocity)
+  y_coords[collided_top[0]] = top_boundary
+  vel_y[collided_top[0]]    = vel_y[collided_top[0]]*(-1)    
+
+  return(y_coords, vel_x, vel_y, vel_z)
+
+def wall_z(z_coords, vel_x, vel_y, vel_z):
+
+  collided_front = np.where(z_coords > front_boundary)
+  collided_back  = np.where(z_coords < back_boundary)
+
+  z_coords[collided_back[0]] = back_boundary
+  vel_z[collided_back[0]]    = vel_z[collided_back[0]]*(-1)    
+
+  z_coords[collided_front[0]] = front_boundary
+  vel_z[collided_front[0]]    = vel_z[collided_front[0]]*(-1)    
+
+  return(z_coords, vel_x, vel_y, vel_z)
