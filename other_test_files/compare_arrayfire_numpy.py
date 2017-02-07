@@ -5,6 +5,10 @@ af.set_backend("opencl")
 
 # This is a benchmark test to compare numpy and arrayfire:
 
+print("The following line displays the ArrayFire build and device details:")
+af.info()
+
+
 aNumPy = np.random.rand(100, 100)
 bNumPy = np.random.rand(100, 100)
 
@@ -19,10 +23,11 @@ np_time_elapsed = np_time_end - np_time_start
 #print("numpy answer is = ", cNumPy)
 print("numpy implementation run took time =", np_time_elapsed," seconds")
 
-kernel_compilation_time_start = time.time()
-
 aArrayFire = af.Array(aNumPy.ctypes.data, aNumPy.shape, aNumPy.dtype.char)
 bArrayFire = af.Array(bNumPy.ctypes.data, bNumPy.shape, bNumPy.dtype.char)
+
+kernel_compilation_time_start = time.time()
+
 cArrayFire = aArrayFire + bArrayFire
 af.eval(cArrayFire)
 af.sync()
