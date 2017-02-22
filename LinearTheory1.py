@@ -66,13 +66,13 @@ velocity_x = np.linspace(velocity_min, velocity_max, number_of_velocities_points
 # D_f_initial = (0.01) * np.exp(1j * velocity_x)
 D_f_initial = 0.01 * f_0(velocity_x)
 
-final_time = 8
+final_time = 4
 dt = 0.001
 time = np.arange(0, final_time, dt)
 
 initial_conditions = np.zeros((len(velocity_x), 2), dtype = np.float)
 
-max_amplitude = np.zeros(len(time), dtype = np.float)
+DeltaRho = np.zeros(len(time), dtype = np.float)
 
 for time_index, t0 in enumerate(time):
 
@@ -113,7 +113,6 @@ for time_index, t0 in enumerate(time):
     for i in range(len(velocity_x)):
 
         sol = odeint(diff_Df, initial_conditions[i], t, args=(velocity_x[i],int_Df_r, int_Df_i))[1]
-        # print('SOlution is ',sol)
         diff_f_all[i] += sol[0] + 1j * sol[1]
             # print('inside ')
 
@@ -123,14 +122,12 @@ for time_index, t0 in enumerate(time):
     # h5f.close()
 
     # print('Solution', D_f_initial)
-    max_amplitude[time_index] = sum(diff_f_all.real)
+    DeltaRho[time_index] = np.log(abs(sum(diff_f_all.real)))
     # print('Solution', max(diff_f_all.real))
     old = diff_f_all.copy()
-    # zzz = input('Whats up')
 
-
-pl.plot(time, max_amplitude)
+pl.plot(time, DeltaRho)
 pl.xlabel('$\mathrm{time}$')
-pl.ylabel(r'$\rho\left(t\right)$')
+pl.ylabel(r'$\delta \rho\left(t\right)$')
 pl.title('$\mathrm{Linear\;decay}$')
 pl.show()
