@@ -1,3 +1,4 @@
+# REFER TO THE LATEX DOCUMENT FOR DETAILS ON THE DIFFERENTIAL EQUATIONS TO BE INTEGRATED
 import numpy as np
 import pylab as pl
 from scipy.integrate import odeint
@@ -30,103 +31,109 @@ pl.rcParams['ytick.color']      = 'k'
 pl.rcParams['ytick.labelsize']  = 'medium'
 pl.rcParams['ytick.direction']  = 'in'
 
+# Setting the variables in the maxwell distribution
 m = 1
 K = 1
 T = 1
-# Fourier Mode
-# k = 2 * np.pi
+
+# k for the mode in fourier space
 k = 1
 
+# The maxwell Boltzman function
 def f_0(v):
     return np.sqrt(m/(2*np.pi*K*T))*np.exp(-m*v**2/(2*K*T))
 
+# This the function which returns the derivative of the maxwell boltzmann equation
 def diff_f_0_v(v):
     return np.sqrt(m/(2*np.pi*K*T))*np.exp(-m*v**2/(2*K*T)) * ( -m * v / (K * T))
 
-def diff_Df(Y,t, v, int_Df_r, int_Df_i):
-    f_r, f_i = Y
-    # print('The first dYdt Term is ', (k * v * f_i) - (m * int_Df_i * diff_f_0_v(v)/k ))
-    # print('The second dYdt Term is ', -(k * v * f_r) + (m * int_Df_r * diff_f_0_v(v)/k ))
-    dYdt =[\
-             (k * v * f_i) - (m * int_Df_i * diff_f_0_v(v)/k ),\
-            -(k * v * f_r) + (m * int_Df_r * diff_f_0_v(v)/k )\
-          ]
-    # print(dYdt)
-    return dYdt
-
-
+# Assign the maxim and minimum velocity for the velocity grid
 velocity_max =  +10
 velocity_min =  -10
 
-number_of_velocities_points = 100
+# Set the divisions for the velocity grid
+number_of_velocities_points = 101
 velocity_x = np.linspace(velocity_min, velocity_max, number_of_velocities_points)
-# velocity_x = np.array([1])
+dv = velocity_x[1] - velocity_x[0]
 
+# Function that returns df_i/dt and df_r/dt used for odeint function
+# See the latex document for more details on the differential equations
+# This has been done to split the imaginary and real part of the ODE
+def diff_delta_f(Y,t):
+    f_r = Y[0:len(velocity_x)]  # Initial conditions for odeint
+    f_i = Y[len(velocity_x): 2 * len(velocity_x)] 
+    
+    int_Df_i = np.sum(f_i)
+    int_Df_r = np.sum(f_r)
 
-# D_f_initial = (0.01) * np.exp(1j * velocity_x)
-D_f_initial = 0.01 * f_0(velocity_x)
+    # This the derivate for f_r and f_i given in the latex document
+    dYdt =np.concatenate([(k * velocity_x * f_i) - (m * int_Df_i * diff_f_0_v(velocity_x)/k ), \
+                           -(k * velocity_x * f_r) + (m * int_Df_r * diff_f_0_v(velocity_x)/k )\
+                         ], axis = 0)
+    # This returns the derivative for the coupled set of ODE
 
-final_time = 4
+    return dYdt
+
+# Set the initial conditions for delta f(v,t) here
+delta_f_initial = np.zeros((2 * len(velocity_x)), dtype = np.float)
+delta_f_initial[0: len(velocity_x)] = 0.01 * f_0(velocity_x)
+
+# Setting the parameters for time here
+final_time = 20
 dt = 0.001
 time = np.arange(0, final_time, dt)
 
-initial_conditions = np.zeros((len(velocity_x), 2), dtype = np.float)
 
-DeltaRho = np.zeros(len(time), dtype = np.float)
+# In[ ]:
+
+# Variable for temperorily storing the real and imaginary parts of delta f used for odeint
+initial_conditions_delta_f = np.zeros((2 * len(velocity_x)), dtype = np.float)
+old_delta_f = np.zeros((2 * len(velocity_x)), dtype = np.float)
+# Variable for storing delta rho
+
+delta_rho = np.zeros(len(time), dtype = np.float)
+delta_f_temp = np.zeros(2 * len(velocity_x), dtype=np.float)
+
+# In[ ]:
 
 for time_index, t0 in enumerate(time):
-
-    print("Computing for TimeIndex = ", time_index)
+    if(time_index%100==0):
+        print("Computing for TimeIndex = ", time_index)
     t0 = time[time_index]
     if (time_index == time.size - 1):
         break
     t1 = time[time_index + 1]
     t = [t0, t1]
 
-    int_Df_r = 0
-    int_Df_i = 0
-    diff_f_all = np.zeros(len(velocity_x), dtype=np.complex128)
+    # delta f is defined on the velocity grid
 
+
+    # Initial conditions for the odeint 
     if(time_index == 0):
-
-        initial_conditions[:, 0] = D_f_initial.real
-        initial_conditions[:, 1] = D_f_initial.imag
-
-        int_Df_r = np.sum(D_f_initial.real)
-        int_Df_i = np.sum(D_f_initial.imag)
+        # Initial conditions for the odeint for the 2 ODE's respectively for the first time step
+        # First column for storing the real values of delta f and 2nd column for the imaginary values
+        initial_conditions_delta_f                 = delta_f_initial.copy()
+        # Storing the integral sum of delta f dv used in odeint
 
     else:
+        # Initial conditions for the odeint for the 2 ODE's respectively for all other time steps
+        # First column for storing the real values of delta f and 2nd column for the imaginary values
+        initial_conditions_delta_f= old_delta_f.copy()
+        # Storing the integral sum of delta f dv used in odeint
 
-        initial_conditions[:, 0] = old.real
-        initial_conditions[:, 1] = old.imag
+    # Integrating delta f
+    
+    temperory_delta_f = odeint(diff_delta_f, initial_conditions_delta_f, t)[1]
 
-        int_Df_r = np.sum(old.real)
-        int_Df_i = np.sum(old.imag)
-
-    # print('D_f_initial are',D_f_initial)
-    # print('initial_conditions are',initial_conditions)
-    # print('int_Df_r are', int_Df_r)
-    # print('int_Df_i are', int_Df_i)
-
-    # print('time is ', t)
-    # print('initial_conditions is ',initial_conditions )
-    for i in range(len(velocity_x)):
-
-        sol = odeint(diff_Df, initial_conditions[i], t, args=(velocity_x[i],int_Df_r, int_Df_i))[1]
-        diff_f_all[i] += sol[0] + 1j * sol[1]
-            # print('inside ')
+    # Saving delta rho for current time_index
+    delta_rho[time_index] = ((sum(dv * temperory_delta_f[0: len(velocity_x)])))
+    
+    # Saving the solution for to use it for the next time step
+    old_delta_f = temperory_delta_f.copy()
 
 
-    # h5f = h5py.File('data_files/solution' + str(time_index) + '.h5', 'w')
-    # h5f.create_dataset('data_files/solution_dataset' + str(time_index), data=diff_f_all)
-    # h5f.close()
-
-    # print('Solution', D_f_initial)
-    DeltaRho[time_index] = np.log(abs(sum(diff_f_all.real)))
-    # print('Solution', max(diff_f_all.real))
-    old = diff_f_all.copy()
-
-pl.plot(time, DeltaRho)
+# Plotting the required quantities here
+pl.plot(time, delta_rho)
 pl.xlabel('$\mathrm{time}$')
 pl.ylabel(r'$\delta \rho\left(t\right)$')
 pl.title('$\mathrm{Linear\;decay}$')
