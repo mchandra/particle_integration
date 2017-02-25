@@ -38,7 +38,7 @@ pl.rcParams['ytick.direction']  = 'in'
 # In[ ]:
 
 # Setting the variables in the maxwell distribution
-m = 20
+m = 1
 K = 1
 T = 1
 # In[ ]:
