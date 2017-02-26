@@ -45,7 +45,7 @@ e =-1
 # In[ ]:
 
 # k for the mode in fourier space
-k = 2*np.pi
+k = 1
 
 
 # In[ ]:
@@ -84,8 +84,8 @@ def diff_delta_f(Y,t):
     int_Df_r = np.sum(f_r) * (velocity_x[1]-velocity_x[0])
 
     # This the derivate for f_r and f_i given in the latex document
-    dYdt =np.concatenate([(k * velocity_x * f_i) - e*(int_Df_i * diff_f_0_v(velocity_x)/k ), \
-                           -(k * velocity_x * f_r) + e*(int_Df_r * diff_f_0_v(velocity_x)/k )\
+    dYdt =np.concatenate([(k * velocity_x * f_i) - e*e*(int_Df_i * diff_f_0_v(velocity_x)/k ), \
+                           -(k * velocity_x * f_r) + e*e*(int_Df_r * diff_f_0_v(velocity_x)/k )\
                          ], axis = 0)
     # This returns the derivative for the coupled set of ODE
 
@@ -98,8 +98,8 @@ def diff_delta_f_Ex(Y,t):
     E_x_r = Y[2 * len(velocity_x)]
     E_x_i = Y[2 * len(velocity_x) + 1]
 
-    int_v_delta_f_dv_i = np.sum(f_i * velocity_x) * (dv)
-    int_v_delta_f_dv_r = np.sum(f_r * velocity_x) * (dv)
+    int_v_delta_f_dv_i = e * np.sum(f_i * velocity_x) * (dv)
+    int_v_delta_f_dv_r = e * np.sum(f_r * velocity_x) * (dv)
     int_v_delta_f_dv = np.array([int_v_delta_f_dv_r, int_v_delta_f_dv_i ] )
 
     # This the derivate for f_r and f_i given in the latex document
@@ -120,12 +120,12 @@ delta_f_initial[0: len(velocity_x)] = 0.5 * f_0(velocity_x)
 
 delta_f_Ex_initial = np.zeros((2 * len(velocity_x)+2), dtype = np.float)
 delta_f_Ex_initial[0 : len(velocity_x)] = 0.5 * f_0(velocity_x)
-delta_f_Ex_initial[2 * len(velocity_x) + 1] = -1 * (1/k) * np.sum(delta_f_Ex_initial[0: len(velocity_x)] ) * dv
+delta_f_Ex_initial[2 * len(velocity_x) + 1] = -1 * e * (1/k) * np.sum(delta_f_Ex_initial[0: len(velocity_x)] ) * dv
 
 # In[ ]:
 
 # Setting the parameters for time here
-final_time = 40
+final_time = 20
 dt = 0.001
 time = np.arange(0, final_time, dt)
 
@@ -212,5 +212,3 @@ pl.title('$\mathrm{Linear\;Landau\;damping}$')
 pl.legend()
 pl.show()
 pl.clf()
-
-# In[ ]:
