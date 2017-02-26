@@ -41,10 +41,11 @@ pl.rcParams['ytick.direction']  = 'in'
 m = 1
 K = 1
 T = 1
+e =-1
 # In[ ]:
 
 # k for the mode in fourier space
-k = 1
+k = 2*np.pi
 
 
 # In[ ]:
@@ -77,14 +78,14 @@ dv = velocity_x[1] - velocity_x[0]
 # This has been done to split the imaginary and real part of the ODE
 def diff_delta_f(Y,t):
     f_r = Y[0:len(velocity_x)]  # Initial conditions for odeint
-    f_i = Y[len(velocity_x): 2 * len(velocity_x)] 
-    
+    f_i = Y[len(velocity_x): 2 * len(velocity_x)]
+
     int_Df_i = np.sum(f_i) * (velocity_x[1]-velocity_x[0])
     int_Df_r = np.sum(f_r) * (velocity_x[1]-velocity_x[0])
 
     # This the derivate for f_r and f_i given in the latex document
-    dYdt =np.concatenate([(k * velocity_x * f_i) - (int_Df_i * diff_f_0_v(velocity_x)/k ), \
-                           -(k * velocity_x * f_r) + (int_Df_r * diff_f_0_v(velocity_x)/k )\
+    dYdt =np.concatenate([(k * velocity_x * f_i) - e*(int_Df_i * diff_f_0_v(velocity_x)/k ), \
+                           -(k * velocity_x * f_r) + e*(int_Df_r * diff_f_0_v(velocity_x)/k )\
                          ], axis = 0)
     # This returns the derivative for the coupled set of ODE
 
@@ -94,39 +95,37 @@ def diff_delta_f_Ex(Y,t):
 
     f_r = Y[0:len(velocity_x)]  # Initial conditions for odeint
     f_i = Y[len(velocity_x): 2 * len(velocity_x)]
-    E_x_r = Y[2 * len(velocity_x)] 
+    E_x_r = Y[2 * len(velocity_x)]
     E_x_i = Y[2 * len(velocity_x) + 1]
-    #print('Er', E_x_r)
-    #print('Ei', E_x_i)
-    #input('whats up')
+
     int_v_delta_f_dv_i = np.sum(f_i * velocity_x) * (dv)
     int_v_delta_f_dv_r = np.sum(f_r * velocity_x) * (dv)
     int_v_delta_f_dv = np.array([int_v_delta_f_dv_r, int_v_delta_f_dv_i ] )
 
     # This the derivate for f_r and f_i given in the latex document
-    dYdt =np.concatenate([(    k * velocity_x * f_i) - (E_x_r * diff_f_0_v(velocity_x) ), \
-                            - (k * velocity_x * f_r) - (E_x_i * diff_f_0_v(velocity_x) ), \
+    dYdt =np.concatenate([(    k * velocity_x * f_i) - e*(E_x_r * diff_f_0_v(velocity_x) ), \
+                            - (k * velocity_x * f_r) - e*(E_x_i * diff_f_0_v(velocity_x) ), \
                                 -1 * int_v_delta_f_dv\
                          ], axis = 0\
                         )
     # This returns the derivative for the coupled set of ODE
-    
+
     return dYdt
-    
+
 # In[ ]:
 
 # Set the initial conditions for delta f(v,t) here
 delta_f_initial = np.zeros((2 * len(velocity_x)), dtype = np.float)
-delta_f_initial[0: len(velocity_x)] = 0.01 * f_0(velocity_x)
+delta_f_initial[0: len(velocity_x)] = 0.5 * f_0(velocity_x)
 
 delta_f_Ex_initial = np.zeros((2 * len(velocity_x)+2), dtype = np.float)
-delta_f_Ex_initial[0 : len(velocity_x)] = 0.01 * f_0(velocity_x)
+delta_f_Ex_initial[0 : len(velocity_x)] = 0.5 * f_0(velocity_x)
 delta_f_Ex_initial[2 * len(velocity_x) + 1] = -1 * (1/k) * np.sum(delta_f_Ex_initial[0: len(velocity_x)] ) * dv
 
 # In[ ]:
 
 # Setting the parameters for time here
-final_time = 10
+final_time = 40
 dt = 0.001
 time = np.arange(0, final_time, dt)
 
@@ -160,7 +159,7 @@ for time_index, t0 in enumerate(time):
     # delta f is defined on the velocity grid
 
 
-    # Initial conditions for the odeint 
+    # Initial conditions for the odeint
     if(time_index == 0):
         # Initial conditions for the odeint for the 2 ODE's respectively for the first time step
         # First column for storing the real values of delta f and 2nd column for the imaginary values
@@ -176,14 +175,14 @@ for time_index, t0 in enumerate(time):
         # Storing the integral sum of delta f dv used in odeint
 
     # Integrating delta f
-    
+
     temperory_delta_f = odeint(diff_delta_f, initial_conditions_delta_f, t)[1]
     temperory_delta_f_Ex = odeint(diff_delta_f_Ex, initial_conditions_delta_f_Ex, t)[1]
 
     # Saving delta rho for current time_index
     delta_rho1[time_index] = ((sum(dv * temperory_delta_f[0: len(velocity_x)])))
     delta_rho2[time_index] = ((sum(dv * temperory_delta_f_Ex[0: len(velocity_x)])))
-    
+
     # Saving the solution for to use it for the next time step
     old_delta_f = temperory_delta_f.copy()
     old_delta_f_Ex = temperory_delta_f_Ex.copy()
@@ -193,16 +192,25 @@ for time_index, t0 in enumerate(time):
 # In[ ]:
 
 # Plotting the required quantities here
-pl.plot(time, np.log(abs(delta_rho1)), '-o' ,label = '$\mathrm{First\;Approach}$')
+
+pl.plot(time, ((delta_rho1)),label = '$\mathrm{First\;Approach}$')
+pl.plot(time, ((delta_rho2)), '--' ,label = '$\mathrm{Second\;Approach}$')
+pl.xlabel('$\mathrm{time}$')
+pl.ylabel(r'$\delta \hat{\rho}\left(t\right)$')
+pl.title('$\mathrm{Linear\;Landau\;damping}$')
+pl.legend()
+pl.show()
+pl.clf()
+
+
+
+pl.plot(time, np.log(abs(delta_rho1)),label = '$\mathrm{First\;Approach}$')
 pl.plot(time, np.log(abs(delta_rho2)), '--' ,label = '$\mathrm{Second\;Approach}$')
 pl.xlabel('$\mathrm{time}$')
 pl.ylabel(r'$\delta \hat{\rho}\left(t\right)$')
 pl.title('$\mathrm{Linear\;Landau\;damping}$')
 pl.legend()
 pl.show()
-
+pl.clf()
 
 # In[ ]:
-
-
-
