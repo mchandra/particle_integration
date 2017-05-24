@@ -27,7 +27,6 @@ physical point
 
 """
 
-
 positive y axis going down due to matrix representation in computers
 positive x axis -------------> going right
 
@@ -57,8 +56,6 @@ where pij are the points located on the fused spatial grids for whole numbers i 
 p11, p12, p13, p14, p15, p16, p17, p18, p28, p38, p48, p58, p68, p78, p88, p87, p86, p85, p84, p83, p82,
 p81, p71, p61, p51, p41, p31 and p21 are all ghost points while all other points are the physical points for this
 example taken.
-
-
 
 +++++++++p11--------p12--------p13--------p14--------p15--------p16--------p17--------p18+++++++++++++++++++++++++++++++
           |                                                                            |
@@ -113,12 +110,16 @@ example taken.
 
 Now the fields aligned in x and y direction along with the following grids:
 
-Ex = (x_right, y_center )
-Ey = (x_center, y_top   )
-Ez = (x_center, y_center)
-Bx = (x_center, y_top   )
-By = (x_right, y_center )
-Bz = (x_right, y_top    )
+Ex  = (x_right, y_center  )
+Ey  = (x_center, y_top    )
+Ez  = (x_center, y_center )
+Bx  = (x_center, y_top    )
+By  = (x_right, y_center  )
+Bz  = (x_right, y_top     )
+rho = (x_center, y_top    )  # Not needed here
+Jx  = (x_right, y_center  )
+Jy  = (x_center, y_top    )
+Jz  = (x_center, y_center )
 
 """
 
@@ -196,17 +197,7 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
                       range(ghost_cells, y_number_of_points-ghost_cells)\
                     )
 
-  """  Updating the Electric field  """
 
-  Ez_in_function[X_index, Y_index] = Ez_in_function[X_index, Y_index] + (  (dt_by_dx * (By_in_function[X_index, Y_index] - By_in_function[X_index, Y_index - 1]))\
-                                                 - (dt_by_dy * (Bx_in_function[X_index, Y_index] - Bx_in_function[X_index - 1, Y_index]))\
-                                                )
-
-  # dEz/dt = dBy/dx - dBx/dy
-
-  """  Implementing periodic boundary conditions using ghost cells  """
-
-  Ez_in_function = periodic(Ez_in_function, x_number_of_points, y_number_of_points, ghost_cells)
 
   """  Updating the Magnetic fields   """
 
@@ -223,6 +214,21 @@ def mode1_fdtd( Ez, Bx, By, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
   Bx_in_function = periodic(Bx_in_function, x_number_of_points, y_number_of_points, ghost_cells)
 
   By_in_function = periodic(By_in_function, x_number_of_points, y_number_of_points, ghost_cells)
+
+
+  """  Updating the Electric field using the current too """
+
+  Ez_in_function[X_index, Y_index] = Ez_in_function[X_index, Y_index] + (  (dt_by_dx * (By_in_function[X_index, Y_index] - By_in_function[X_index, Y_index - 1]))\
+                                                                         - (dt_by_dy * (Bx_in_function[X_index, Y_index] - Bx_in_function[X_index - 1, Y_index]))\
+                                                                         )\
+                                                                      + (dt*Jz[X_index, Y_index])
+
+  # dEz/dt = dBy/dx - dBx/dy
+
+  """  Implementing periodic boundary conditions using ghost cells  """
+
+  Ez_in_function = periodic(Ez_in_function, x_number_of_points, y_number_of_points, ghost_cells)
+
 
   return Ez_in_function, Bx_in_function, By_in_function
 
@@ -285,13 +291,29 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
                     )
 
 
-  """  Updating the Electric fields   """
 
-  Ex_in_function[X_index, Y_index] = Ex_in_function[X_index, Y_index] + (dt_by_dy * (Bz_in_function[X_index + 1, Y_index] - Bz_in_function[X_index, Y_index]))
+
+  """  Updating the Magnetic field  """
+
+  Bz_in_function[X_index, Y_index] = Bz_in_function[X_index, Y_index] - (   (dt_by_dx * (Ey_in_function[X_index, Y_index] - Ey_in_function[X_index, Y_index - 1]))\
+                                                                            - (dt_by_dy * (Ex_in_function[X_index, Y_index] - Ex_in_function[X_index - 1, Y_index]))\
+                                                                        )
+
+  # dBz/dt = - ( dEy/dx - dEx/dy )
+
+  """  Implementing periodic boundary conditions using ghost cells  """
+
+  Bz_in_function = periodic(Bz_in_function, x_number_of_points, y_number_of_points, ghost_cells)
+
+  """  Updating the Electric fields using the current too   """
+
+  Ex_in_function[X_index, Y_index] = Ex_in_function[X_index, Y_index] + (dt_by_dy * (Bz_in_function[X_index + 1, Y_index] - Bz_in_function[X_index, Y_index])) \
+                                                                      + (dt*Jx[X_index, Y_index])
 
   # dEx/dt = + dBz/dy
 
-  Ey_in_function[X_index, Y_index] = Ey_in_function[X_index, Y_index] - (dt_by_dx * (Bz_in_function[X_index, Y_index + 1] - Bz_in_function[X_index, Y_index]))
+  Ey_in_function[X_index, Y_index] = Ey_in_function[X_index, Y_index] - (dt_by_dx * (Bz_in_function[X_index, Y_index + 1] - Bz_in_function[X_index, Y_index]))\
+                                                                      + (dt*Jy[X_index, Y_index])
 
   # dEy/dt = - dBz/dx
 
@@ -300,19 +322,6 @@ def mode2_fdtd( Bz, Ex, Ey, Lx, Ly, c, ghost_cells, Jx, Jy, Jz ):
   Ex_in_function = periodic(Ex_in_function, x_number_of_points, y_number_of_points, ghost_cells)
 
   Ey_in_function = periodic(Ey_in_function, x_number_of_points, y_number_of_points, ghost_cells)
-
-
-  """  Updating the Magnetic field  """
-
-  Bz_in_function[X_index, Y_index] = Bz_in_function[X_index, Y_index] - (   (dt_by_dx * (Ey_in_function[X_index, Y_index] - Ey_in_function[X_index, Y_index - 1]))\
-                                                  - (dt_by_dy * (Ex_in_function[X_index, Y_index] - Ex_in_function[X_index - 1, Y_index]))\
-                                                )
-
-  # dBz/dt = - ( dEy/dx - dEx/dy )
-
-  """  Implementing periodic boundary conditions using ghost cells  """
-
-  Bz_in_function = periodic(Bz_in_function, x_number_of_points, y_number_of_points, ghost_cells)
 
 
   return Bz_in_function, Ex_in_function, Ey_in_function
